@@ -2,106 +2,152 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>Terapia Espacial · Panel de control</title>
+<title>Terapia Espacial · Botonera</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0B0B1A">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#07070F">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#07070F; --panel:#11111F; --panel2:#181830; --borde:#2A2A4A; --txt:#ECEAF7; --tenue:#9B98B8;
-    --violeta:#7B2FF7; --magenta:#FF3DCB; --rayo:#FFF4C2; --ok:#5BE3A8; --aire:#FF2E63;
-    --r:14px;
+    --bg:#07070F; --panel:#11111F; --panel2:#181830; --panel3:#22223F; --borde:#2A2A4A; --txt:#ECEAF7; --tenue:#9B98B8;
+    --violeta:#7B2FF7; --magenta:#FF3DCB; --rayo:#FFF4C2; --ok:#5BE3A8; --aire:#FF2E63; --amarillo:#FFC83D;
+    --r:16px; --safeB:env(safe-area-inset-bottom); --safeT:env(safe-area-inset-top);
   }
-  *{box-sizing:border-box}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,Arial,sans-serif;font-size:15px;}
-  body{min-height:100vh;padding-bottom:calc(24px + env(safe-area-inset-bottom));}
+  body{min-height:100vh;min-height:100dvh;}
   button,input,select,textarea{font:inherit;color:inherit}
-  h2{font-family:Orbitron,Arial,sans-serif;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--tenue);margin:22px 0 10px;font-weight:700}
+  button{cursor:pointer;touch-action:manipulation}
+  h2{font-family:Orbitron,Arial,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tenue);margin:22px 0 10px;font-weight:700}
 
-  /* cabecera */
-  header{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(7,7,15,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--borde);}
-  .marca{display:flex;align-items:center;gap:10px;font-family:Orbitron,Arial,sans-serif;font-weight:900;letter-spacing:.08em;font-size:16px;white-space:nowrap}
-  .marca svg{width:38px;height:22px}
-  .estado{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tenue);margin-left:auto;white-space:nowrap}
-  .estado i{width:9px;height:9px;border-radius:50%;background:#666;display:inline-block}
-  .estado.ok i{background:var(--ok);box-shadow:0 0 8px var(--ok)}
-  .btnLimpiar{background:var(--aire);border:0;border-radius:10px;padding:9px 14px;font-weight:700;letter-spacing:.05em;cursor:pointer;white-space:nowrap}
+  /* ---------- cabecera ---------- */
+  header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:calc(8px + var(--safeT)) 14px 8px;background:rgba(7,7,15,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--borde);}
+  .marca{display:flex;align-items:center;gap:8px;font-family:Orbitron,Arial,sans-serif;font-weight:900;letter-spacing:.06em;font-size:15px;white-space:nowrap;min-width:0}
+  .marca svg{width:34px;height:20px;flex:0 0 auto}
+  .marca span{overflow:hidden;text-overflow:ellipsis}
+  .chips{display:flex;gap:6px;margin-left:auto;align-items:center}
+  .chip{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tenue);white-space:nowrap;border:1px solid var(--borde);border-radius:999px;padding:5px 10px;background:var(--panel)}
+  .chip i{width:8px;height:8px;border-radius:50%;background:#666}
+  .chip.ok i{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+  .chip.mal i{background:var(--aire)}
+  .chip.alerta{color:var(--amarillo);border-color:#5a4a10}
+  .hbtn{border:1px solid var(--borde);background:var(--panel);border-radius:12px;padding:9px 12px;font-weight:700;white-space:nowrap}
+  .hbtn.limpiar{background:var(--aire);border-color:var(--aire);color:#fff;letter-spacing:.04em}
 
-  nav{display:flex;gap:6px;padding:10px 16px;overflow-x:auto;border-bottom:1px solid var(--borde);position:sticky;top:57px;z-index:9;background:var(--bg)}
-  nav button{flex:0 0 auto;background:transparent;border:1px solid var(--borde);border-radius:999px;padding:8px 16px;cursor:pointer;color:var(--tenue);font-weight:600}
+  nav{display:flex;gap:6px;padding:8px 14px;overflow-x:auto;border-bottom:1px solid var(--borde);background:var(--bg)}
+  nav button{flex:0 0 auto;background:transparent;border:1px solid var(--borde);border-radius:999px;padding:8px 16px;color:var(--tenue);font-weight:600}
   nav button.on{background:var(--violeta);border-color:var(--violeta);color:#fff}
-
-  main{max-width:1280px;margin:0 auto;padding:4px 16px}
+  main{max-width:1400px;margin:0 auto;padding:4px 14px calc(30px + var(--safeB))}
   .vista{display:none}.vista.on{display:block}
   .cols{display:grid;grid-template-columns:1fr;gap:0 24px}
-  @media(min-width:1000px){.cols{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}}
+  @media(min-width:1000px){.cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+  .colsBot{display:grid;grid-template-columns:1fr;gap:0 20px}
+  @media(min-width:1100px){.colsBot{grid-template-columns:minmax(0,1.6fr) minmax(360px,1fr)}}
 
-  /* preview */
+  /* ---------- paso actual ---------- */
+  .ahora{display:grid;grid-template-columns:64px 1fr 64px;gap:8px;align-items:stretch;margin:12px 0}
+  .ahora button{border:1px solid var(--borde);background:var(--panel);border-radius:var(--r);font-size:24px;font-weight:900;min-height:64px}
+  .ahora .info{border:1px solid var(--violeta);background:var(--panel2);border-radius:var(--r);padding:10px 14px;min-width:0}
+  .ahora .info small{display:block;font-size:11px;letter-spacing:.14em;color:var(--magenta);font-weight:700;text-transform:uppercase}
+  .ahora .info b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ahora .info span{display:block;font-size:12px;color:var(--tenue);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ---------- botonera ---------- */
+  .bot{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+  .bt{position:relative;min-height:96px;padding:14px 14px 12px 18px;text-align:left;background:var(--panel);border:2px solid var(--borde);border-radius:var(--r);
+      display:flex;flex-direction:column;justify-content:center;gap:4px;transition:transform .07s, background .2s, border-color .2s;user-select:none;-webkit-user-select:none;overflow:hidden}
+  .bt::before{content:"";position:absolute;left:0;top:0;bottom:0;width:7px;background:var(--c,var(--violeta))}
+  .bt:active{transform:scale(.96)}
+  .bt b{font-weight:800;font-size:16px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .bt small{color:var(--tenue);font-size:12px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .bt kbd{position:absolute;right:8px;top:7px;font:600 10px Inter,Arial;color:var(--tenue);border:1px solid var(--borde);border-radius:5px;padding:1px 5px;background:var(--bg)}
+  .bt .tipo{position:absolute;right:9px;bottom:7px;font-size:13px;opacity:.8}
+  .bt.aire{background:linear-gradient(135deg,#3a0f2a,#1d0b2e);border-color:var(--aire)}
+  .bt.aire::after{content:"AL AIRE";position:absolute;right:8px;bottom:8px;font:700 10px Orbitron,Arial;letter-spacing:.1em;color:#fff;background:var(--aire);padding:3px 6px;border-radius:4px}
+  .bt.aire .tipo{display:none}
+  .bt.flash{background:var(--violeta)}
+  .bt.ancho{grid-column:span 2}
+  .bt.oculto{opacity:.35}
+  .edicion .bt{border-style:dashed}
+  .edicion .bt .ed{display:flex}
+  .bt .ed{display:none;position:absolute;inset:auto 6px 6px auto;gap:4px}
+  .bt .ed span{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:var(--panel3);border:1px solid var(--borde);font-size:15px}
+  .barraEd{display:none;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .edicion~.barraEd,.barraEd.on{display:flex}
+
+  /* ---------- modo BOTONERA (tablet / celular) ---------- */
+  body.modo-botonera nav, body.modo-botonera .soloPC{display:none!important}
+  body.modo-botonera main{max-width:none;padding:0 10px calc(16px + var(--safeB))}
+  body.modo-botonera .bot{grid-template-columns:repeat(2,1fr);gap:10px}
+  body.modo-botonera .bt{min-height:112px}
+  body.modo-botonera .bt b{font-size:18px}
+  body.modo-botonera .ahora{position:sticky;top:calc(58px + var(--safeT));z-index:10;background:var(--bg);margin:0 -10px;padding:8px 10px;box-shadow:0 10px 20px var(--bg)}
+  @media(min-width:600px){body.modo-botonera .bot{grid-template-columns:repeat(3,1fr)}}
+  @media(min-width:900px){body.modo-botonera .bot{grid-template-columns:repeat(4,1fr)}}
+  @media(min-width:1300px){body.modo-botonera .bot{grid-template-columns:repeat(5,1fr)}}
+  @media(max-width:560px){.marca span{font-size:12px}.chip span{display:none}.hbtn{padding:9px 10px}}
+
+  /* ---------- vista previa ---------- */
   .prev{position:relative;width:100%;aspect-ratio:16/9;border-radius:var(--r);overflow:hidden;border:1px solid var(--borde);background:#000}
   .prev iframe{position:absolute;left:0;top:0;width:100%;height:100%;border:0;pointer-events:none}
-  .prevBarra{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;color:var(--tenue)}
 
-  /* botonera */
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-  .bt{position:relative;min-height:74px;padding:12px 14px;text-align:left;background:var(--panel);border:1px solid var(--borde);border-radius:var(--r);cursor:pointer;
-      display:flex;flex-direction:column;justify-content:center;gap:4px;transition:transform .08s, background .2s, border-color .2s;-webkit-tap-highlight-color:transparent}
-  .bt:active{transform:scale(.97)}
-  .bt b{font-weight:700;font-size:15px;line-height:1.2}
-  .bt small{color:var(--tenue);font-size:12px}
-  .bt kbd{position:absolute;right:10px;top:9px;font:600 11px Inter,Arial;color:var(--tenue);border:1px solid var(--borde);border-radius:5px;padding:1px 5px}
-  .bt.aire{background:linear-gradient(135deg,#3a0f2a,#1d0b2e);border-color:var(--aire);box-shadow:0 0 0 1px var(--aire) inset}
-  .bt.aire::after{content:"AL AIRE";position:absolute;right:10px;bottom:9px;font:700 10px Orbitron,Arial;letter-spacing:.12em;color:#fff;background:var(--aire);padding:3px 6px;border-radius:4px}
-  .bt.aire{padding-bottom:30px}
-  .bt.disparo{border-style:dashed}
-  @media(max-width:520px){.marca{font-size:13px;gap:6px}.marca svg{width:28px}.estado span{display:none}header{gap:8px;padding:10px 12px}.btnLimpiar{padding:8px 10px}}
-  .bt.disparo.flash{background:var(--violeta)}
-
-  /* pauta */
-  .paso{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--borde);border-radius:var(--r);background:var(--panel);margin-bottom:8px;cursor:pointer}
+  /* ---------- pauta ---------- */
+  .paso{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--borde);border-radius:var(--r);background:var(--panel);margin-bottom:8px}
   .paso .n{font:700 13px Orbitron,Arial;color:var(--tenue);text-align:center}
   .paso .bl{font-size:11px;letter-spacing:.12em;color:var(--magenta);font-weight:700;text-transform:uppercase}
   .paso .ds{font-weight:600}
   .paso .ac{font-size:12px;color:var(--tenue)}
   .paso.actual{border-color:var(--violeta);background:var(--panel2);box-shadow:0 0 0 1px var(--violeta) inset}
   .paso.hecho{opacity:.55}
-  .paso button{background:var(--violeta);border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
-  .pautaNav{position:sticky;bottom:0;display:flex;gap:10px;padding:12px 0;background:linear-gradient(transparent,var(--bg) 30%)}
-  .pautaNav button{flex:1;padding:16px;border-radius:var(--r);border:1px solid var(--borde);background:var(--panel);font-weight:700;cursor:pointer}
-  .pautaNav button.go{background:var(--violeta);border-color:var(--violeta);flex:2}
+  .paso button{background:var(--violeta);border:0;border-radius:12px;padding:12px 16px;font-weight:800;min-width:56px}
 
-  /* formularios */
+  /* ---------- formularios ---------- */
   .campo{display:grid;gap:6px;margin-bottom:12px}
   .campo label{font-size:12px;color:var(--tenue);font-weight:600}
-  input[type=text],input[type=number],select,textarea{width:100%;background:var(--panel);border:1px solid var(--borde);border-radius:10px;padding:11px 12px;outline:none}
+  input[type=text],input[type=number],select,textarea{width:100%;background:var(--panel);border:1px solid var(--borde);border-radius:10px;padding:11px 12px;outline:none;font-size:16px}
   input:focus,select:focus,textarea:focus{border-color:var(--violeta)}
   textarea{min-height:70px;resize:vertical}
   .fila{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
-  .gcItem{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px}
-  .gcItem button,.mini{background:var(--panel2);border:1px solid var(--borde);border-radius:10px;padding:0 12px;cursor:pointer;min-height:42px}
-  .colores{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+  .item{display:grid;grid-template-columns:1fr 1fr 130px auto;gap:8px;margin-bottom:8px}
+  .itemT{display:grid;grid-template-columns:150px 1fr auto;gap:8px;margin-bottom:8px}
+  @media(max-width:700px){.item{grid-template-columns:1fr 1fr}.itemT{grid-template-columns:1fr auto}.itemT select{grid-column:1/-1}}
+  .mini{background:var(--panel2);border:1px solid var(--borde);border-radius:10px;padding:10px 14px;min-height:44px;font-weight:600}
+  .mini.prim{background:var(--violeta);border-color:var(--violeta);color:#fff}
+  a.btn{color:var(--txt)} a.btn.prim{color:#fff} [hidden]{display:none!important}
+  .colores{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
   .color{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--borde);border-radius:10px;padding:8px}
-  .color input{width:38px;height:30px;border:0;background:none;padding:0;cursor:pointer}
-  .color span{font-size:13px}
-  .seg{display:flex;border:1px solid var(--borde);border-radius:10px;overflow:hidden}
-  .seg button{flex:1;padding:11px;border:0;background:var(--panel);cursor:pointer;font-weight:600;color:var(--tenue)}
+  .color input{width:38px;height:30px;border:0;background:none;padding:0}
+  .seg{display:flex;border:1px solid var(--borde);border-radius:12px;overflow:hidden}
+  .seg button{flex:1;padding:12px 8px;border:0;background:var(--panel);font-weight:700;color:var(--tenue)}
   .seg button.on{background:var(--violeta);color:#fff}
   .switch{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--panel);border:1px solid var(--borde);border-radius:10px;padding:12px}
   .switch input{width:22px;height:22px;accent-color:var(--violeta)}
-  .nota{font-size:12px;color:var(--tenue);line-height:1.5}
+  .nota{font-size:12.5px;color:var(--tenue);line-height:1.5}
   .aviso{border:1px solid #6b5a12;background:#231d06;color:#f3e3a2;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5}
   .acciones{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-  .acciones .mini{padding:10px 14px}
-  .bt.sec-TALCA{border-left:6px solid var(--magenta)} .bt.sec-CHILE{border-left:6px solid var(--violeta)} .bt.sec-INTERNACIONAL{border-left:6px solid var(--rayo)}
-  .bt.ancho{grid-column:span 2}
-  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-  .chips button{background:var(--panel);border:1px solid var(--borde);border-radius:999px;padding:9px 14px;cursor:pointer;font-weight:600;color:var(--tenue)}
-  .chips button.on{background:var(--panel2);border-color:var(--violeta);color:#fff}
-  .titItem{display:grid;grid-template-columns:150px 1fr auto;gap:8px;margin-bottom:8px}
-  .gcItem{grid-template-columns:1fr 1fr auto auto!important}
-  .gcItem label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tenue);padding:0 6px}
   .logoPrev{height:60px;max-width:220px;object-fit:contain;background:#000;border-radius:8px;border:1px solid var(--borde)}
+
+  /* ---------- ventanas emergentes ---------- */
+  .modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px}
+  .modal.on{display:flex}
+  .caja{width:min(640px,100%);max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--borde);border-radius:20px;padding:20px}
+  .caja h3{margin:0 0 4px;font-family:Orbitron,Arial;font-size:16px;letter-spacing:.06em}
+  @media(max-width:700px){.modal{align-items:flex-end;padding:0}.caja{border-radius:20px 20px 0 0;padding-bottom:calc(20px + var(--safeB))}}
+  .link{display:grid;grid-template-columns:1fr auto;gap:8px;margin:6px 0 14px}
+  .link input{font-size:13px;font-family:ui-monospace,monospace}
+  .qr{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .qr img{width:150px;height:150px;border-radius:10px;background:#fff;padding:6px;image-rendering:pixelated}
+  .toast{position:fixed;left:50%;bottom:calc(20px + var(--safeB));transform:translateX(-50%) translateY(120px);background:var(--panel3);border:1px solid var(--borde);padding:12px 18px;border-radius:12px;z-index:60;transition:transform .3s;font-weight:600}
+  .toast.on{transform:translateX(-50%)}
+  .menu{position:absolute;right:14px;top:calc(58px + var(--safeT));z-index:30;background:var(--panel);border:1px solid var(--borde);border-radius:14px;padding:6px;display:none;min-width:230px;box-shadow:0 20px 40px rgba(0,0,0,.5)}
+  .menu.on{display:block}
+  .menu button{display:block;width:100%;text-align:left;background:none;border:0;padding:13px 14px;border-radius:10px;font-weight:600}
+  .menu button:active,.menu button:hover{background:var(--panel2)}
 </style>
 </head>
 <body>
@@ -110,40 +156,50 @@
     <svg viewBox="-140 -100 280 150"><path d="M-64,-4 C-64,-46 -38,-78 0,-78 C38,-78 64,-46 64,-4 Z" fill="#0B0B1A" stroke="#fff" stroke-width="10"/><ellipse rx="116" ry="29" fill="#0B0B1A" stroke="#fff" stroke-width="10"/><circle cx="-64" cy="6" r="9" fill="#FF3DCB"/><circle cy="13" r="9" fill="#FF3DCB"/><circle cx="64" cy="6" r="9" fill="#FF3DCB"/></svg>
     <span id="nombrePrograma">TERAPIA ESPACIAL</span>
   </div>
-  <div class="estado" id="estadoCon"><i></i><span>local</span></div>
-  <button class="btnLimpiar" id="btnLimpiar" title="Esc">LIMPIAR</button>
+  <div class="chips">
+    <div class="chip" id="chipRed" title="Conexión"><i></i><span>conectando</span></div>
+    <div class="chip" id="chipSal" title="Salidas de OBS conectadas"><i></i><span>OBS</span></div>
+    <button class="hbtn soloPC" id="btnLinks">🔗 Links</button>
+    <button class="hbtn limpiar" id="btnLimpiar" title="Esc">LIMPIAR</button>
+    <button class="hbtn" id="btnMenu" aria-label="Menú">⋯</button>
+  </div>
 </header>
+<div class="menu" id="menu">
+  <button data-m="links">🔗 Links de control y de OBS</button>
+  <button data-m="editar">✏️ Editar botonera</button>
+  <button data-m="botonera">🎛️ Este equipo: solo botonera</button>
+  <button data-m="completo">🖥️ Este equipo: panel completo</button>
+  <button data-m="auto">🪄 Este equipo: automático</button>
+  <button data-m="inicio">🏠 Volver al inicio</button>
+</div>
 <nav id="tabs">
-  <button data-v="vivo" class="on">En vivo</button>
+  <button data-v="bot" class="on">Botonera</button>
   <button data-v="pauta">Pauta</button>
   <button data-v="textos">Textos</button>
   <button data-v="config">Configuración</button>
 </nav>
 
 <main>
-  <!-- ================= EN VIVO ================= -->
-  <section class="vista on" id="v-vivo">
-    <div class="cols">
+  <!-- ================= BOTONERA ================= -->
+  <section class="vista on" id="v-bot">
+    <div class="ahora">
+      <button id="pAnt" aria-label="Paso anterior">◀</button>
+      <div class="info"><small>Ahora · pauta</small><b id="ahoraTxt">—</b><span id="sigueTxt"></span></div>
+      <button id="pSig" aria-label="Paso siguiente">▶</button>
+    </div>
+    <div class="colsBot">
       <div>
-        <h2>Vista previa</h2>
-        <div class="prev"><iframe id="prev" src="salida.html?preview=1" title="Vista previa de la salida"></iframe></div>
-        <div class="prevBarra"><span id="prevInfo">Salida 1920×1080</span><label><input type="checkbox" id="prevOn" checked> mostrar</label></div>
-
-        <h2>GC · nombres</h2>
-        <div class="grid" id="gridGC"></div>
-        <h2>Avance informativo · titulares</h2>
-        <div class="grid" id="gridTit"></div>
+        <div class="bot" id="bot"></div>
+        <div class="barraEd" id="barraEd">
+          <button class="mini prim" id="edAgregar">+ Agregar botón</button>
+          <button class="mini" id="edRestaurar">Restaurar botonera</button>
+          <button class="mini" id="edListo">✓ Listo</button>
+        </div>
       </div>
-      <div>
-        <h2>Títulos y avisos</h2>
-        <div class="grid" id="gridTitulos"></div>
-        <h2>Pantallas compartidas</h2>
-        <div class="grid" id="gridMulti"></div>
-        <h2>Cortinas y transiciones</h2>
-        <div class="grid" id="gridDisparos"></div>
-        <div class="chips" id="chipsTrans"></div>
-        <h2>Permanentes</h2>
-        <div class="grid" id="gridPerm"></div>
+      <div class="soloPC">
+        <h2>Vista previa (lo que sale en OBS)</h2>
+        <div class="prev"><iframe id="prev" title="Vista previa"></iframe></div>
+        <p class="nota">La vista previa es una salida más: muestra exactamente lo que está al aire.</p>
       </div>
     </div>
   </section>
@@ -151,19 +207,15 @@
   <!-- ================= PAUTA ================= -->
   <section class="vista" id="v-pauta">
     <h2>Pauta del programa</h2>
-    <p class="nota">Toca un paso para ejecutarlo, o usa <b>Siguiente</b> (barra espaciadora). Cada paso lanza las gráficas que pide la pauta.</p>
+    <p class="nota">Cada paso lanza las gráficas que pide el libreto. El paso actual se comparte con todos los equipos conectados.</p>
     <div id="listaPauta"></div>
-    <div class="pautaNav">
-      <button id="pAnt">◀ Anterior</button>
-      <button id="pSig" class="go">Siguiente ▶</button>
-    </div>
   </section>
 
   <!-- ================= TEXTOS ================= -->
   <section class="vista" id="v-textos">
     <div class="cols">
       <div>
-        <h2>GC (nombre y cargo)</h2>
+        <h2>GC (nombre, cargo y estilo)</h2>
         <div id="listaGC"></div>
         <button class="mini" id="agregarGC">+ Agregar GC</button>
         <h2>Avance informativo</h2>
@@ -177,11 +229,11 @@
         <h2>Aviso</h2>
         <div class="campo"><label>Título</label><input type="text" data-t="aviso.titulo"></div>
         <div class="campo"><label>Texto</label><input type="text" data-t="aviso.sub"></div>
+      </div>
+      <div>
         <h2>Volvemos</h2>
         <div class="campo"><label>Título</label><input type="text" data-t="volvemos.titulo"></div>
         <div class="campo"><label>Subtítulo</label><input type="text" data-t="volvemos.sub"></div>
-      </div>
-      <div>
         <h2>Triplex</h2>
         <div class="campo"><label>Título</label><input type="text" data-t="triplex.titulo"></div>
         <div class="campo"><label>Etiquetas (separadas por | )</label><input type="text" data-t="triplex.etiquetas" data-lista></div>
@@ -206,15 +258,14 @@
         <div class="campo"><label>Nombre del programa</label><input type="text" data-c="programa"></div>
         <h2>Fondo de la salida</h2>
         <div class="seg" id="segFondo">
-          <button data-f="verde">Verde (chroma)</button>
-          <button data-f="transparente">Transparente (alfa)</button>
+          <button data-f="verde">🟩 Verde</button>
+          <button data-f="espacio">🌌 Espacio</button>
+          <button data-f="transparente">◻️ Transparente</button>
         </div>
-        <p class="nota" style="margin-top:8px">En OBS la fuente de navegador ya trae transparencia: con <b>Transparente</b> no necesitas chroma y el rayo se ve con brillo. Con <b>Verde</b> el rayo se dibuja opaco y con líneas para que el chroma quede limpio.</p>
-
+        <p class="nota" style="margin-top:8px"><b>Verde</b>: para chroma en OBS o en el ATEM. <b>Espacio</b>: fondo estrellado del programa (para usar la salida como pantalla completa). <b>Transparente</b>: OBS ya la recibe sin fondo y el rayo se ve con brillo. En el <b>duplex y triplex</b> siempre se ve el espacio alrededor y solo el interior de las ventanas va en verde.</p>
         <h2>Colores</h2>
         <div class="colores" id="colores"></div>
         <div class="aviso" id="avisoVerde" style="display:none;margin-top:10px"></div>
-
         <h2>Tipografías</h2>
         <div class="fila">
           <div class="campo"><label>Títulos</label>
@@ -222,192 +273,290 @@
           <div class="campo"><label>Textos</label>
             <select data-c="fuenteTexto"><option>Inter</option><option>Space Grotesk</option><option>Montserrat</option><option>Exo 2</option><option>Arial</option></select></div>
         </div>
-
         <h2>Logo</h2>
         <div class="fila" style="align-items:center">
           <img id="logoPrev" class="logoPrev" alt="" hidden>
           <div class="acciones">
-            <label class="mini" style="display:flex;align-items:center;cursor:pointer">Subir logo…<input type="file" id="logoArchivo" accept="image/*" hidden></label>
+            <label class="mini" style="display:flex;align-items:center">Subir logo…<input type="file" id="logoArchivo" accept="image/*" hidden></label>
             <button class="mini" id="logoQuitar">Quitar</button>
           </div>
         </div>
-        <p class="nota">PNG con fondo transparente. Se usa en el bug, la apertura y el cierre. Se reduce solo a 600 px de alto.</p>
       </div>
       <div>
-        <h2>GC</h2>
+        <h2>Este equipo</h2>
+        <div class="seg" id="segDisp">
+          <button data-d="auto">🪄 Automático</button>
+          <button data-d="botonera">🎛️ Solo botonera</button>
+          <button data-d="completo">🖥️ Panel completo</button>
+        </div>
+        <p class="nota" style="margin-top:8px">Se elige en cada equipo. Automático: celular y tablet abren solo la botonera; el computador, el panel completo.</p>
+        <h2>GC y titulares</h2>
         <div class="fila">
           <div class="campo"><label>Borde izquierdo (px)</label><input type="number" data-c="bordeIzq" data-num></div>
-          <div class="campo"><label>Altura de la barra (y, px)</label><input type="number" data-c="gcY" data-num></div>
-          <div class="campo"><label>Tamaño del nombre (px)</label><input type="number" data-c="tamGC" data-num></div>
-          <div class="campo"><label>Salida automática (s, 0 = manual)</label><input type="number" data-c="autoSalidaGC" data-num></div>
+          <div class="campo"><label>Altura de la barra (y)</label><input type="number" data-c="gcY" data-num></div>
+          <div class="campo"><label>Tamaño del nombre</label><input type="number" data-c="tamGC" data-num></div>
+          <div class="campo"><label>Salida automática GC (s, 0 = manual)</label><input type="number" data-c="autoSalidaGC" data-num></div>
+          <div class="campo"><label>Segundos por titular</label><input type="number" data-c="segTitular" data-num></div>
+          <div class="campo"><label>Chip del duplex/triplex</label><input type="text" data-c="etiquetaSesion"></div>
         </div>
-        <h2>Avance, sesión y transiciones</h2>
-        <div class="fila">
-          <div class="campo"><label>Segundos por titular (avance automático)</label><input type="number" data-c="segTitular" data-num></div>
-          <div class="campo"><label>Texto del chip en duplex/triplex</label><input type="text" data-c="etiquetaSesion"></div>
-          <div class="campo"><label>Transición por defecto</label>
-            <select data-c="transicion"><option value="aleatoria">Aleatoria (varía cada vez)</option><option value="rayo">Rayo del ovni</option><option value="hipnosis">Espiral hipnótica</option><option value="rorschach">Mancha de Rorschach</option><option value="onda">Onda cerebral</option></select></div>
-        </div>
-        <h2>Ovni</h2>
+        <h2>Ovni y transiciones</h2>
         <div class="switch"><span>Ovni flotando sobre el GC durante la pausa</span><input type="checkbox" data-c="ovniPausa"></div>
         <div class="fila" style="margin-top:10px">
           <div class="campo"><label>Bamboleo (0 = quieto)</label><input type="number" step="0.1" data-c="bamboleo" data-num></div>
-          <div class="campo"><label>Velocidad de animación (1 = normal)</label><input type="number" step="0.1" min="0.3" max="3" data-c="velocidad" data-num></div>
+          <div class="campo"><label>Velocidad (1 = normal)</label><input type="number" step="0.1" min="0.3" max="3" data-c="velocidad" data-num></div>
+          <div class="campo"><label>Transición por defecto</label>
+            <select data-c="transicion"><option value="aleatoria">Aleatoria</option><option value="rayo">Rayo del ovni</option><option value="hipnosis">Espiral hipnótica</option><option value="rorschach">Mancha de Rorschach</option><option value="onda">Onda cerebral</option></select></div>
         </div>
         <h2>Respaldo</h2>
         <div class="acciones">
           <button class="mini" id="exportar">Descargar configuración (.json)</button>
-          <label class="mini" style="display:flex;align-items:center;cursor:pointer">Cargar configuración…<input type="file" id="importar" accept=".json,application/json" hidden></label>
-          <button class="mini" id="restablecer">Restablecer todo</button>
+          <label class="mini" style="display:flex;align-items:center">Cargar configuración…<input type="file" id="importar" accept=".json,application/json" hidden></label>
+          <button class="mini" id="restablecer">Restablecer textos y colores</button>
         </div>
-        <h2>Conexión</h2>
-        <p class="nota" id="infoConexion"></p>
-        <h2>Atajos de teclado</h2>
-        <p class="nota">1–9 GC · H avance automático · G siguiente titular · A apertura · C cortina · T transición · X cierre · R cortina título · V volvemos · N aviso · 3 triplex (con Shift) · 2 duplex (con Shift) · B bug · K ticker · Espacio siguiente paso · Esc limpiar</p>
       </div>
     </div>
   </section>
 </main>
 
+<!-- ventana: links -->
+<div class="modal" id="mLinks"><div class="caja">
+  <h3>Links del programa</h3>
+  <p class="nota" id="linksModo"></p>
+  <h2>🎛️ Control (botonera) — para tu tablet o celular</h2>
+  <div class="link"><input type="text" id="lCtrl" readonly><button class="mini prim" data-copiar="lCtrl">Copiar</button></div>
+  <div class="qr"><img id="qrCtrl" alt="QR del link de control"><p class="nota">Escanéalo con la tablet o el celular: se abre directo la botonera.<br><b>Este link da control total</b>: compártelo solo con tu equipo.</p></div>
+  <h2>📺 OBS (fuente Navegador 1920×1080)</h2>
+  <div class="link"><input type="text" id="lSal" readonly><button class="mini prim" data-copiar="lSal">Copiar</button></div>
+  <div class="seg" id="segLinkFondo" style="margin-bottom:8px">
+    <button data-lf="">Según configuración</button><button data-lf="verde">Forzar verde</button><button data-lf="espacio">Forzar espacio</button>
+  </div>
+  <p class="nota">En OBS: Fuentes → + → Navegador → pega el link · Ancho 1920 · Alto 1080. Deja sin marcar «Apagar la fuente cuando no esté visible». El link de OBS solo muestra: con él no se puede cambiar nada.</p>
+  <div class="acciones">
+    <button class="mini" id="regenerar" hidden>Generar links nuevos</button>
+    <button class="mini" id="cerrarLinks">Cerrar</button>
+  </div>
+</div></div>
+
+<!-- ventana: editar botón -->
+<div class="modal" id="mBoton"><div class="caja">
+  <h3>Editar botón</h3>
+  <div class="campo"><label>Acción</label><select id="ebAccion"></select></div>
+  <div class="campo"><label>Texto del botón (vacío = automático)</label><input type="text" id="ebTexto"></div>
+  <div class="fila">
+    <div class="campo"><label>Color</label><input type="color" id="ebColor" style="height:44px;width:100%;background:none;border:0"></div>
+    <div class="campo"><label>Tecla</label>
+      <select id="ebTecla"></select>
+      <button class="mini" id="ebCapturar" type="button">⌨️ Otra tecla…</button></div>
+  </div>
+  <div class="acciones">
+    <button class="mini prim" id="ebGuardar">Guardar</button>
+    <button class="mini" id="ebQuitar">Quitar de la botonera</button>
+    <button class="mini" id="ebCancelar">Cancelar</button>
+  </div>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
 <script src="comun.js"></script>
+<script src="conexion.js"></script>
+<script src="escena.js"></script>
+<script src="qrcode.js"></script>
 <script>
-let E = TE.copia(TE.ESTADO_BASE);
 const $ = (s, p = document) => p.querySelector(s);
 const $$ = (s, p = document) => [...p.querySelectorAll(s)];
-let pasoActual = -1, timerGC = null;
+let E = TE.normalizar({}), con = null, timerGC = null, timerAvance = null, avanceAuto = false, editando = false, salidasVistas = null;
+const LS = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const LSset = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+function toast(t) { const d = $('#toast'); d.textContent = t; d.classList.add('on'); clearTimeout(d._t); d._t = setTimeout(() => d.classList.remove('on'), 2200); }
+function vibrar() { try { navigator.vibrate && navigator.vibrate(12); } catch (e) {} }
 
-/* ---------- envío ---------- */
-let envioPend = null;
+/* =============== publicar =============== */
+let tPub = null;
 function publicar(inmediato) {
-  clearTimeout(envioPend);
-  const f = () => { const m = { tipo: 'estado', estado: E }; misIds.add(m.id = Date.now() + '-' + Math.random().toString(36).slice(2, 7)); TE.enviar(m); };
-  if (inmediato) f(); else envioPend = setTimeout(f, 160);
+  clearTimeout(tPub);
+  const f = () => { if (con) con.publicar(E); };
+  if (inmediato) f(); else tPub = setTimeout(f, 220);
   pintar();
 }
-function disparar(que, variante) {
-  const m = { tipo: 'disparar', que, variante }; misIds.add(m.id = Date.now() + '-' + Math.random().toString(36).slice(2, 7)); TE.enviar(m);
-  const b = $(`[data-disparo="${variante ? que + '-' + variante : que}"]`) || $(`[data-disparo="${que}"]`); if (b) { b.classList.add('flash'); setTimeout(() => b.classList.remove('flash'), 400); }
-}
-const misIds = new Set();
 
-/* ---------- lógica de aire ---------- */
-const INFERIOR = ['cortinaTitulo', 'aviso', 'volvemos'];   // comparten zona con los GC
+/* =============== acciones (lo que puede hacer un botón) =============== */
+const INFERIOR = ['cortinaTitulo', 'aviso', 'volvemos'];
+function limpiarInferior() { E.aire.gc = null; INFERIOR.forEach(k => E.aire[k] = false); }
+function disparar(que, variante) { E.disparo = { id: TE.id(), que, variante: variante || null }; publicar(true); }
 function ponerGC(i) {
   clearTimeout(timerGC);
-  E.aire.gc = (E.aire.gc === i) ? null : i;
-  if (E.aire.gc !== null) { INFERIOR.forEach(k => E.aire[k] = false); detenerAvance(); E.aire.titular = null; }
-  if (E.aire.gc !== null && E.config.autoSalidaGC > 0) {
-    const yo = E.aire.gc;
-    timerGC = setTimeout(() => { if (E.aire.gc === yo) { E.aire.gc = null; publicar(true); } }, (E.config.autoSalidaGC + 2.5) * 1000);
-  }
+  const nuevo = E.aire.gc === i ? null : i;
+  detenerAvance(); E.aire.titular = null; limpiarInferior(); E.aire.gc = nuevo;
+  if (nuevo !== null && E.config.autoSalidaGC > 0)
+    timerGC = setTimeout(() => { if (E.aire.gc === nuevo) { E.aire.gc = null; publicar(true); } }, (E.config.autoSalidaGC + 2.5) * 1000);
   publicar(true);
 }
 function alternar(k, valor) {
   const nuevo = valor === undefined ? !E.aire[k] : valor;
-  if (nuevo && INFERIOR.includes(k)) { E.aire.gc = null; INFERIOR.forEach(x => E.aire[x] = false); detenerAvance(); E.aire.titular = null; }
+  if (nuevo && INFERIOR.includes(k)) { detenerAvance(); E.aire.titular = null; limpiarInferior(); }
   if (nuevo && (k === 'triplex' || k === 'duplex')) { E.aire.triplex = false; E.aire.duplex = false; }
-  E.aire[k] = nuevo;
-  publicar(true);
+  E.aire[k] = nuevo; publicar(true);
 }
-function limpiar() {
-  clearTimeout(timerGC);
-  E.aire.gc = null; INFERIOR.forEach(k => E.aire[k] = false); E.aire.triplex = false; E.aire.duplex = false;
-  detenerAvance(); E.aire.titular = null;
-  publicar(true);
-}
-
-/* ---------- avance informativo ---------- */
-let timerAvance = null, avanceAuto = false;
-function ponerTitular(i) {   // -1 = portada · 0..n = titular · null = fuera
-  E.aire.gc = null; INFERIOR.forEach(k => E.aire[k] = false);
-  E.aire.titular = (E.aire.titular === i && !avanceAuto) ? null : i;
-  publicar(true);
-}
+function ponerTitular(i) { detenerAvance(); limpiarInferior(); E.aire.titular = (E.aire.titular === i) ? null : i; publicar(true); }
 function detenerAvance() { avanceAuto = false; clearTimeout(timerAvance); }
 function avanceAutomatico() {
   if (avanceAuto) { detenerAvance(); E.aire.titular = null; publicar(true); return; }
   avanceAuto = true;
-  const orden = [-1].concat(E.titulares.map((_, i) => i));
-  let n = 0;
+  const orden = [-1].concat(E.titulares.map((_, i) => i)); let n = 0;
   const paso = () => {
     if (!avanceAuto) return;
-    if (n >= orden.length) { avanceAuto = false; E.aire.titular = null; publicar(true); construirBotonera(); pintar(); return; }
-    E.aire.gc = null; INFERIOR.forEach(k => E.aire[k] = false);
-    E.aire.titular = orden[n++]; publicar(true);
-    // 2,5 s de entrada + pausa configurable (+2 s si hubo que absorber el anterior)
+    if (n >= orden.length) { avanceAuto = false; E.aire.titular = null; publicar(true); return; }
+    limpiarInferior(); E.aire.titular = orden[n++]; publicar(true);
     timerAvance = setTimeout(paso, ((n === 1 ? 2.5 : 4.5) + (E.config.segTitular || 6)) * 1000 / (E.config.velocidad || 1));
   };
   paso();
 }
 function siguienteTitular() {
-  detenerAvance();
-  const t = E.aire.titular;
-  const sig = (t === null || t === undefined) ? -1 : t + 1;
-  E.aire.gc = null; INFERIOR.forEach(k => E.aire[k] = false);
-  E.aire.titular = sig < E.titulares.length ? sig : null;
-  publicar(true);
+  detenerAvance(); const t = E.aire.titular, sig = (t === null || t === undefined) ? -1 : t + 1;
+  limpiarInferior(); E.aire.titular = sig < E.titulares.length ? sig : null; publicar(true);
+}
+function limpiar() {
+  clearTimeout(timerGC); detenerAvance();
+  limpiarInferior(); E.aire.titular = null; E.aire.triplex = false; E.aire.duplex = false;
+  publicar(true); toast('Salida limpia (bug y ticker se mantienen)');
 }
 
-/* ---------- botonera ---------- */
-function bt(padre, titulo, sub, tecla, onclick, extra = {}) {
-  const b = document.createElement('button');
-  b.className = 'bt' + (extra.disparo ? ' disparo' : '');
-  b.innerHTML = `<b></b><small></small>${tecla ? `<kbd>${tecla}</kbd>` : ''}`;
-  b.querySelector('b').textContent = titulo; b.querySelector('small').textContent = sub || '';
-  b.onclick = onclick;
-  for (const k in extra.data || {}) b.dataset[k] = extra.data[k];
-  padre.appendChild(b);
-  return b;
+// Catálogo: id de acción → definición
+const NOMBRE_TRANS = { rayo: 'Rayo', hipnosis: 'Hipnosis', rorschach: 'Rorschach', onda: 'Onda cerebral' };
+function catalogo() {
+  const c = {}, t = E.textos;
+  const add = (id, titulo, sub, color, tipo, hacer, aire) => c[id] = { id, titulo, sub, color, tipo, hacer, aire: aire || (() => false) };
+  E.gcs.forEach((g, i) => add('gc:' + i, (g.icono === 'alien' ? '👽 ' : g.icono === 'terapeuta' ? '🧠 ' : '') + (g.titulo || 'GC ' + (i + 1)), g.sub, '#7B2FF7', 'GC', () => ponerGC(i), () => E.aire.gc === i));
+  add('tit:auto', '▶ Avance informativo', 'portada + ' + E.titulares.length + ' titulares', '#FFF4C2', 'AVANCE', avanceAutomatico, () => avanceAuto);
+  add('tit:sig', 'Siguiente titular', 'paso a paso', '#FFF4C2', 'AVANCE', siguienteTitular);
+  add('tit:-1', 'Portada avance', t.avance.titulo, '#FFF4C2', 'AVANCE', () => ponerTitular(-1), () => E.aire.titular === -1);
+  E.titulares.forEach((h, i) => add('tit:' + i, h.texto, h.seccion, { TALCA: '#FF3DCB', CHILE: '#7B2FF7', INTERNACIONAL: '#FFF4C2' }[h.seccion] || '#7B2FF7', 'TITULAR', () => ponerTitular(i), () => E.aire.titular === i));
+  add('k:cortinaTitulo', 'Cortina título', t.cortinaTitulo.titulo, '#FF3DCB', 'TÍTULO', () => alternar('cortinaTitulo'), () => E.aire.cortinaTitulo);
+  add('k:volvemos', 'Volvemos', t.volvemos.titulo, '#FF3DCB', 'TÍTULO', () => alternar('volvemos'), () => E.aire.volvemos);
+  add('k:aviso', 'Aviso', t.aviso.titulo, '#FF3DCB', 'TÍTULO', () => alternar('aviso'), () => E.aire.aviso);
+  add('k:triplex', 'Triplex', t.triplex.titulo, '#A77BFF', 'PANTALLA', () => alternar('triplex'), () => E.aire.triplex);
+  add('k:duplex', 'Duplex', t.duplex.titulo, '#A77BFF', 'PANTALLA', () => alternar('duplex'), () => E.aire.duplex);
+  add('d:apertura', 'Apertura', '15 s · intro', '#5BE3A8', 'DISPARO', () => disparar('apertura'));
+  add('d:cortina', 'Cortina', 'stinger · corte 1,2 s', '#5BE3A8', 'DISPARO', () => disparar('cortina'));
+  add('d:transicion', 'Transición', (E.config.transicion === 'aleatoria' ? 'aleatoria' : NOMBRE_TRANS[E.config.transicion]) + ' · corte 1 s', '#5BE3A8', 'DISPARO', () => disparar('transicion'));
+  Object.keys(NOMBRE_TRANS).forEach(v => add('d:transicion:' + v, 'Transición ' + NOMBRE_TRANS[v], '2 s · corte 1 s', '#5BE3A8', 'DISPARO', () => disparar('transicion', v)));
+  add('d:cierre', 'Cierre', 'fin de la sesión', '#5BE3A8', 'DISPARO', () => disparar('cierre'));
+  add('k:bug', 'Bug / logo', 'esquina superior', '#9B98B8', 'FIJO', () => alternar('bug'), () => E.aire.bug);
+  add('k:ticker', 'Ticker', 'cinta inferior', '#9B98B8', 'FIJO', () => alternar('ticker'), () => E.aire.ticker);
+  add('paso:sig', 'Paso siguiente ▶', 'pauta', '#FFC83D', 'PAUTA', () => irPaso(E.paso + 1));
+  add('paso:ant', '◀ Paso anterior', 'pauta', '#FFC83D', 'PAUTA', () => irPaso(Math.max(-1, E.paso - 1), true));
+  add('limpiar', 'Limpiar salida', 'todo menos bug y ticker', '#FF2E63', 'ACCIÓN', limpiar);
+  return c;
 }
-function construirBotonera() {
-  const t = E.textos;
-  const g = $('#gridGC'); g.innerHTML = '';
-  E.gcs.forEach((x, i) => bt(g, (x.paciente ? '👽 ' : '') + (x.titulo || '(sin nombre)'), x.sub, i < 9 ? String(i + 1) : '', () => ponerGC(i), { data: { gc: i } }));
-  const gt = $('#gridTit'); gt.innerHTML = '';
-  bt(gt, avanceAuto ? '■ Detener avance' : '▶ Avance automático', 'portada + ' + E.titulares.length + ' titulares', 'H', () => { avanceAutomatico(); construirBotonera(); pintar(); }, { data: { avance: 1 } });
-  bt(gt, 'Siguiente titular', 'paso a paso', 'G', () => siguienteTitular());
-  bt(gt, 'Portada', t.avance.titulo, '', () => { detenerAvance(); ponerTitular(-1); }, { data: { tit: -1 } });
-  E.titulares.forEach((h, i) => {
-    const b = bt(gt, h.texto || '(vacío)', h.seccion, '', () => { detenerAvance(); ponerTitular(i); }, { data: { tit: i } });
-    b.classList.add('sec-' + (h.seccion || '').toUpperCase());
+
+/* =============== botonera (sembrar / dibujar / editar) =============== */
+const TECLAS = ['F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20', 'F21', 'F22', 'F23', 'F24'];
+function botonesIniciales() {
+  const ids = E.gcs.map((_, i) => 'gc:' + i).concat(['tit:auto', 'tit:sig', 'k:cortinaTitulo', 'k:volvemos', 'k:aviso', 'k:triplex', 'k:duplex',
+    'd:cortina', 'd:transicion', 'd:transicion:hipnosis', 'd:transicion:rorschach', 'd:apertura', 'd:cierre', 'k:bug', 'k:ticker', 'paso:sig', 'limpiar']);
+  return ids.map((a, i) => ({ id: TE.id() + i, accion: a, texto: '', color: '', tecla: TECLAS[i] || '' }));
+}
+function botones() { return (E.botonera && E.botonera.botones) || []; }
+function dibujarBotonera() {
+  const cat = catalogo(), cont = $('#bot');
+  cont.innerHTML = '';
+  cont.classList.toggle('edicion', editando);
+  botones().forEach((b, i) => {
+    const a = cat[b.accion];
+    const el = document.createElement('button');
+    el.className = 'bt' + (a ? '' : ' oculto');
+    el.dataset.i = i;
+    el.style.setProperty('--c', b.color || (a && a.color) || '#7B2FF7');
+    el.innerHTML = '<b></b><small></small>' + (b.tecla ? '<kbd></kbd>' : '') + '<span class="tipo"></span><div class="ed"><span data-e="izq">◀</span><span data-e="der">▶</span><span data-e="edit">✎</span></div>';
+    el.querySelector('b').textContent = b.texto || (a ? a.titulo : '(acción no disponible)');
+    el.querySelector('small').textContent = a ? a.sub || '' : b.accion;
+    if (b.tecla) el.querySelector('kbd').textContent = b.tecla;
+    el.querySelector('.tipo').textContent = a && a.tipo === 'DISPARO' ? '✨' : '';
+    cont.appendChild(el);
   });
-  const ti = $('#gridTitulos'); ti.innerHTML = '';
-  bt(ti, 'Cortina título', t.cortinaTitulo.titulo, 'R', () => alternar('cortinaTitulo'), { data: { k: 'cortinaTitulo' } });
-  bt(ti, 'Volvemos', t.volvemos.titulo, 'V', () => alternar('volvemos'), { data: { k: 'volvemos' } });
-  bt(ti, 'Aviso', t.aviso.titulo, 'N', () => alternar('aviso'), { data: { k: 'aviso' } });
-  const mu = $('#gridMulti'); mu.innerHTML = '';
-  bt(mu, 'Triplex', t.triplex.titulo, '⇧3', () => alternar('triplex'), { data: { k: 'triplex' } });
-  bt(mu, 'Duplex', t.duplex.titulo, '⇧2', () => alternar('duplex'), { data: { k: 'duplex' } });
-  const di = $('#gridDisparos'); di.innerHTML = '';
-  bt(di, 'Apertura', '15 s · intro', 'A', () => disparar('apertura'), { disparo: 1, data: { disparo: 'apertura' } });
-  bt(di, 'Cortina', 'stinger · corte 1,2 s', 'C', () => disparar('cortina'), { disparo: 1, data: { disparo: 'cortina' } });
-  bt(di, 'Transición', ({ aleatoria: 'aleatoria', rayo: 'rayo', hipnosis: 'hipnosis', rorschach: 'Rorschach', onda: 'onda cerebral' }[E.config.transicion] || 'aleatoria') + ' · 2 s · corte 1 s', 'T', () => disparar('transicion'), { disparo: 1, data: { disparo: 'transicion' } });
-  const ch = $('#chipsTrans'); ch.innerHTML = '';
-  [['rayo', 'Rayo'], ['hipnosis', 'Hipnosis'], ['rorschach', 'Rorschach'], ['onda', 'Onda cerebral']].forEach(([v, n]) => {
-    const b = document.createElement('button'); b.textContent = '▶ ' + n; b.dataset.disparo = 'transicion-' + v;
-    b.onclick = () => disparar('transicion', v); ch.appendChild(b);
-  });
-  bt(di, 'Cierre', 'despedida', 'X', () => disparar('cierre'), { disparo: 1, data: { disparo: 'cierre' } });
-  const pe = $('#gridPerm'); pe.innerHTML = '';
-  bt(pe, 'Bug / logo', 'esquina superior derecha', 'B', () => alternar('bug'), { data: { k: 'bug' } });
-  bt(pe, 'Ticker', 'cinta inferior', 'K', () => alternar('ticker'), { data: { k: 'ticker' } });
+  pintar();
+}
+$('#bot').addEventListener('click', e => {
+  const el = e.target.closest('.bt'); if (!el) return;
+  const i = +el.dataset.i, b = botones()[i];
+  if (editando) {
+    const acc = e.target.dataset.e;
+    if (acc === 'izq' && i > 0) { const l = botones(); [l[i - 1], l[i]] = [l[i], l[i - 1]]; publicar(); dibujarBotonera(); }
+    else if (acc === 'der' && i < botones().length - 1) { const l = botones(); [l[i + 1], l[i]] = [l[i], l[i + 1]]; publicar(); dibujarBotonera(); }
+    else editarBoton(i);
+    return;
+  }
+  ejecutarBoton(b, el);
+});
+function ejecutarBoton(b, el) {
+  const a = catalogo()[b.accion]; if (!a) return;
+  vibrar(); a.hacer();
+  if (el && a.tipo === 'DISPARO') { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 350); }
+  dibujarBotonera();
 }
 function pintar() {
   $('#nombrePrograma').textContent = E.config.programa;
-  $$('[data-gc]').forEach(b => b.classList.toggle('aire', E.aire.gc === +b.dataset.gc));
-  $$('[data-k]').forEach(b => b.classList.toggle('aire', !!E.aire[b.dataset.k]));
-  $$('[data-tit]').forEach(b => b.classList.toggle('aire', E.aire.titular === +b.dataset.tit));
-  $$('[data-avance]').forEach(b => b.classList.toggle('aire', avanceAuto));
-  $$('#segFondo button').forEach(b => b.classList.toggle('on', b.dataset.f === E.config.fondo));
+  const cat = catalogo();
+  $$('#bot .bt').forEach(el => { const b = botones()[+el.dataset.i], a = b && cat[b.accion]; el.classList.toggle('aire', !!(a && a.aire())); });
+  $$('#segFondo button').forEach(x => x.classList.toggle('on', x.dataset.f === E.config.fondo));
+  const ps = pasos(), p = ps[E.paso], s = ps[E.paso + 1];
+  $('#ahoraTxt').textContent = p ? (E.paso + 1) + '. ' + p[1] : 'Inicio del programa';
+  $('#sigueTxt').textContent = s ? 'Sigue: ' + (E.paso + 2) + '. ' + s[1] : 'Fin de la pauta';
 }
 
-/* ---------- pauta (según el guion «Terapia Espacial») ---------- */
+// edición de un botón
+let ebIndice = -1, ebNuevaTecla = '';
+function editarBoton(i) {
+  ebIndice = i; const b = i >= 0 ? botones()[i] : { accion: 'gc:0', texto: '', color: '', tecla: '' };
+  const cat = catalogo(), sel = $('#ebAccion'); sel.innerHTML = '';
+  const grupos = {};
+  Object.values(cat).forEach(a => { (grupos[a.tipo] = grupos[a.tipo] || []).push(a); });
+  Object.keys(grupos).forEach(g => {
+    const og = document.createElement('optgroup'); og.label = g;
+    grupos[g].forEach(a => { const o = document.createElement('option'); o.value = a.id; o.textContent = a.titulo + (a.sub ? ' — ' + a.sub : ''); og.appendChild(o); });
+    sel.appendChild(og);
+  });
+  sel.value = b.accion; $('#ebTexto').value = b.texto || ''; $('#ebColor').value = b.color || (cat[b.accion] && cat[b.accion].color) || '#7B2FF7';
+  ebNuevaTecla = b.tecla || '';
+  pintarTeclas();
+  $('#ebQuitar').hidden = i < 0;
+  $('#mBoton').classList.add('on');
+}
+function pintarTeclas() {
+  const s = $('#ebTecla'); s.innerHTML = '<option value="">Sin tecla</option>';
+  const usadas = botones().filter((_, j) => j !== ebIndice).map(b => b.tecla);
+  TECLAS.concat(ebNuevaTecla && !TECLAS.includes(ebNuevaTecla) ? [ebNuevaTecla] : []).forEach(t => {
+    const o = document.createElement('option'); o.value = t; o.textContent = t + (usadas.includes(t) ? ' (se quita del otro botón)' : ''); s.appendChild(o);
+  });
+  s.value = ebNuevaTecla;
+}
+$('#ebTecla').onchange = e => { ebNuevaTecla = e.target.value; };
+$('#ebCapturar').onclick = () => {
+  $('#ebCapturar').textContent = 'Presiona una tecla…';
+  const f = e => { e.preventDefault(); ebNuevaTecla = e.key.length === 1 ? e.key.toUpperCase() : e.key; removeEventListener('keydown', f, true); $('#ebCapturar').textContent = '⌨️ Otra tecla…'; pintarTeclas(); };
+  addEventListener('keydown', f, true);
+};
+$('#ebGuardar').onclick = () => {
+  const b = { id: ebIndice >= 0 ? botones()[ebIndice].id : TE.id(), accion: $('#ebAccion').value, texto: $('#ebTexto').value.trim(), color: $('#ebColor').value, tecla: ebNuevaTecla };
+  const cat = catalogo(); if (cat[b.accion] && b.color.toLowerCase() === cat[b.accion].color.toLowerCase()) b.color = '';
+  if (b.tecla) botones().forEach((x, j) => { if (j !== ebIndice && x.tecla === b.tecla) x.tecla = ''; });
+  if (ebIndice >= 0) botones()[ebIndice] = b; else botones().push(b);
+  $('#mBoton').classList.remove('on'); publicar(true); dibujarBotonera();
+};
+$('#ebQuitar').onclick = () => { botones().splice(ebIndice, 1); $('#mBoton').classList.remove('on'); publicar(true); dibujarBotonera(); };
+$('#ebCancelar').onclick = () => $('#mBoton').classList.remove('on');
+function modoEdicion(on) { editando = on; $('#barraEd').classList.toggle('on', on); dibujarBotonera(); if (on) toast('Toca un botón para editarlo · ◀ ▶ para moverlo'); }
+$('#edAgregar').onclick = () => editarBoton(-1);
+$('#edListo').onclick = () => modoEdicion(false);
+$('#edRestaurar').onclick = () => { if (confirm('¿Volver a la botonera inicial? (no cambia textos ni gráficas)')) { E.botonera = { botones: botonesIniciales() }; publicar(true); dibujarBotonera(); } };
+
+/* =============== pauta =============== */
 function pasos() {
   const n = i => (E.gcs[i] ? E.gcs[i].titulo : 'GC ' + (i + 1));
   return [
     ['Intro', 'VTR apertura «Terapia Espacial» (15″)', [['d', 'apertura']]],
     ['Intro', 'GC ' + n(0), [['gc', 0]]],
-    ['Intro', 'Avance informativo: titulares Talca, Chile e internacional', [['avance']]],
+    ['Intro', 'Avance informativo: Talca, Chile e internacional', [['avance']]],
     ['Intro', 'Cortina + título del compilado de avistamientos', [['d', 'cortina'], ['on', 'cortinaTitulo']]],
     ['Lead a nota', 'Quitar título', [['off', 'cortinaTitulo']]],
     ['Nota VTR ovnis', 'Cortina de entrada a la nota', [['d', 'cortina']]],
@@ -423,87 +572,86 @@ function pasos() {
     ['Fin nota', 'Cortina de salida + GC ' + n(2), [['d', 'cortina'], ['gc', 2]]],
     ['Bloque psicología', 'Duplex ' + E.textos.duplex.titulo, [['gcOff'], ['on', 'duplex']]],
     ['Cierre bloque', 'Quitar duplex', [['off', 'duplex']]],
-    ['Cierre', 'Cortina + cierre del programa', [['d', 'cortina'], ['limpiar'], ['d2', 'cierre']]]
+    ['Cierre', 'Cortina + cierre del programa', [['limpiar'], ['d2', 'cierre']]]
   ];
 }
-function ejecutarPaso(i) {
-  const lista = pasos(); if (i < 0 || i >= lista.length) return;
-  pasoActual = i;
-  lista[i][2].forEach(([acc, x]) => {
-    if (acc === 'd') disparar(x);
-    if (acc === 'd2') setTimeout(() => disparar(x), 1300);
-    if (acc === 'on') alternar(x, true);
-    if (acc === 'off') alternar(x, false);
-    if (acc === 'gc') { if (E.aire.gc !== x) ponerGC(x); }
-    if (acc === 'gcOff') { E.aire.gc = null; publicar(true); }
-    if (acc === 'limpiar') limpiar();
-    if (acc === 'avance') { E.aire.gc = null; detenerAvance(); avanceAutomatico(); construirBotonera(); pintar(); }
-  });
-  pintarPauta();
+function irPaso(i, soloMarcar) {
+  const lista = pasos(); if (i < -1 || i >= lista.length) return;
+  E.paso = i;
+  if (!soloMarcar && i >= 0) {
+    lista[i][2].forEach(([acc, x]) => {
+      if (acc === 'd') disparar(x);
+      if (acc === 'd2') setTimeout(() => disparar(x), 300);
+      if (acc === 'on') alternar(x, true);
+      if (acc === 'off') alternar(x, false);
+      if (acc === 'gc') { if (E.aire.gc !== x) ponerGC(x); }
+      if (acc === 'gcOff') E.aire.gc = null;
+      if (acc === 'limpiar') { limpiarInferior(); E.aire.titular = null; E.aire.triplex = E.aire.duplex = false; }
+      if (acc === 'avance') { detenerAvance(); avanceAutomatico(); }
+    });
+  }
+  publicar(true); pintarPauta(); dibujarBotonera();
 }
+$('#pSig').onclick = () => { vibrar(); irPaso(E.paso + 1); };
+$('#pAnt').onclick = () => { vibrar(); irPaso(Math.max(-1, E.paso - 1), true); };
 function pintarPauta() {
   const c = $('#listaPauta'); c.innerHTML = '';
+  const nombres = { d: 'disparo', d2: 'disparo', on: 'mostrar', off: 'quitar', gc: 'GC', gcOff: 'quitar GC', limpiar: 'limpiar', avance: 'avance automático' };
   pasos().forEach((p, i) => {
     const d = document.createElement('div');
-    d.className = 'paso' + (i === pasoActual ? ' actual' : '') + (i < pasoActual ? ' hecho' : '');
-    d.innerHTML = `<div class="n">${i + 1}</div><div><div class="bl"></div><div class="ds"></div><div class="ac"></div></div><button>▶</button>`;
-    d.querySelector('.bl').textContent = p[0];
-    d.querySelector('.ds').textContent = p[1];
-    d.querySelector('.ac').textContent = p[2].map(a => ({ d: 'disparo', d2: 'disparo', on: 'mostrar', off: 'quitar', gc: 'GC', gcOff: 'quitar GC', limpiar: 'limpiar', avance: 'avance automático' }[a[0]] + (a[1] !== undefined && a[0] !== 'gc' ? ' ' + a[1] : ''))).join(' · ');
-    d.onclick = () => ejecutarPaso(i);
+    d.className = 'paso' + (i === E.paso ? ' actual' : '') + (i < E.paso ? ' hecho' : '');
+    d.innerHTML = '<div class="n">' + (i + 1) + '</div><div><div class="bl"></div><div class="ds"></div><div class="ac"></div></div><button>▶</button>';
+    d.querySelector('.bl').textContent = p[0]; d.querySelector('.ds').textContent = p[1];
+    d.querySelector('.ac').textContent = p[2].map(a => nombres[a[0]] + (a[1] !== undefined && a[0] !== 'gc' ? ' ' + a[1] : '')).join(' · ');
+    d.querySelector('button').onclick = () => irPaso(i);
     c.appendChild(d);
   });
-  const act = c.querySelector('.actual'); if (act) act.scrollIntoView({ block: 'center', behavior: 'smooth' });
 }
-$('#pSig').onclick = () => ejecutarPaso(pasoActual + 1);
-$('#pAnt').onclick = () => { pasoActual = Math.max(-1, pasoActual - 1); pintarPauta(); };
 
-/* ---------- textos ---------- */
-function ruta(obj, r) { return r.split('.').reduce((o, k) => o[k], obj); }
-function fijar(obj, r, v) { const ks = r.split('.'); const u = ks.pop(); ks.reduce((o, k) => o[k], obj)[u] = v; }
+/* =============== textos =============== */
+function ruta(o, r) { return r.split('.').reduce((x, k) => x[k], o); }
+function fijar(o, r, v) { const ks = r.split('.'), u = ks.pop(); ks.reduce((x, k) => x[k], o)[u] = v; }
 function construirGCEditor() {
   const c = $('#listaGC'); c.innerHTML = '';
   E.gcs.forEach((g, i) => {
-    const f = document.createElement('div'); f.className = 'gcItem';
-    f.innerHTML = '<input type="text" placeholder="Nombre"><input type="text" placeholder="Cargo"><label title="Estilo paciente alienígena"><input type="checkbox"> 👽</label><button title="Eliminar">✕</button>';
-    const [a, b, pc] = f.querySelectorAll('input'); a.value = g.titulo; b.value = g.sub; pc.checked = !!g.paciente;
-    pc.onchange = () => { g.paciente = pc.checked; construirBotonera(); publicar(true); };
-    a.oninput = () => { g.titulo = a.value; construirBotonera(); publicar(); };
-    b.oninput = () => { g.sub = b.value; construirBotonera(); publicar(); };
+    const f = document.createElement('div'); f.className = 'item';
+    f.innerHTML = '<input type="text" placeholder="Nombre"><input type="text" placeholder="Cargo"><select><option value="">Normal</option><option value="terapeuta">🧠 Terapeuta</option><option value="alien">👽 Paciente alien</option></select><button class="mini" title="Eliminar">✕</button>';
+    const [a, b] = f.querySelectorAll('input'), s = f.querySelector('select');
+    a.value = g.titulo; b.value = g.sub; s.value = g.icono || '';
+    a.oninput = () => { g.titulo = a.value; dibujarBotonera(); publicar(); };
+    b.oninput = () => { g.sub = b.value; dibujarBotonera(); publicar(); };
+    s.onchange = () => { g.icono = s.value; dibujarBotonera(); publicar(true); };
     f.querySelector('button').onclick = () => {
       if (E.aire.gc === i) E.aire.gc = null; else if (E.aire.gc > i) E.aire.gc--;
-      E.gcs.splice(i, 1); construirGCEditor(); construirBotonera(); publicar(true);
+      E.gcs.splice(i, 1);
+      botones().forEach(bb => { const m = /^gc:(\d+)$/.exec(bb.accion); if (m && +m[1] > i) bb.accion = 'gc:' + (+m[1] - 1); else if (m && +m[1] === i) bb.accion = '-'; });
+      E.botonera.botones = botones().filter(bb => bb.accion !== '-');
+      construirGCEditor(); dibujarBotonera(); publicar(true);
     };
     c.appendChild(f);
   });
 }
+$('#agregarGC').onclick = () => { E.gcs.push({ titulo: 'Nuevo invitado', sub: 'Cargo', icono: '' }); botones().push({ id: TE.id(), accion: 'gc:' + (E.gcs.length - 1), texto: '', color: '', tecla: '' }); construirGCEditor(); dibujarBotonera(); publicar(true); };
 function construirTitEditor() {
   const c = $('#listaTit'); c.innerHTML = '';
   E.titulares.forEach((h, i) => {
-    const f = document.createElement('div'); f.className = 'titItem';
+    const f = document.createElement('div'); f.className = 'itemT';
     f.innerHTML = '<select><option>TALCA</option><option>CHILE</option><option>INTERNACIONAL</option></select><input type="text" placeholder="Titular"><button class="mini" title="Eliminar">✕</button>';
     const sel = f.querySelector('select'), inp = f.querySelector('input');
     sel.value = (h.seccion || 'CHILE').toUpperCase(); inp.value = h.texto;
-    sel.onchange = () => { h.seccion = sel.value; construirBotonera(); pintar(); publicar(); };
-    inp.oninput = () => { h.texto = inp.value; construirBotonera(); pintar(); publicar(); };
-    f.querySelector('button').onclick = () => {
-      if (E.aire.titular === i) E.aire.titular = null; else if (E.aire.titular > i) E.aire.titular--;
-      E.titulares.splice(i, 1); construirTitEditor(); construirBotonera(); pintar(); publicar(true);
-    };
+    sel.onchange = () => { h.seccion = sel.value; dibujarBotonera(); publicar(); };
+    inp.oninput = () => { h.texto = inp.value; dibujarBotonera(); publicar(); };
+    f.querySelector('button').onclick = () => { if (E.aire.titular === i) E.aire.titular = null; else if (E.aire.titular > i) E.aire.titular--; E.titulares.splice(i, 1); construirTitEditor(); dibujarBotonera(); publicar(true); };
     c.appendChild(f);
   });
 }
-$('#agregarTit').onclick = () => { E.titulares.push({ seccion: 'TALCA', texto: 'Nuevo titular' }); construirTitEditor(); construirBotonera(); pintar(); publicar(true); };
-$('#agregarGC').onclick = () => { E.gcs.push({ titulo: 'Nuevo invitado', sub: 'Cargo' }); construirGCEditor(); construirBotonera(); publicar(true); };
+$('#agregarTit').onclick = () => { E.titulares.push({ seccion: 'TALCA', texto: 'Nuevo titular' }); construirTitEditor(); dibujarBotonera(); publicar(true); };
 
 function enlazarCampos() {
   $$('[data-t]').forEach(inp => {
     const v = ruta(E.textos, inp.dataset.t);
     inp.value = inp.hasAttribute('data-lista') ? v.join(' | ') : v;
-    inp.oninput = () => {
-      fijar(E.textos, inp.dataset.t, inp.hasAttribute('data-lista') ? inp.value.split('|').map(s => s.trim()) : inp.value);
-      construirBotonera(); pintar(); publicar();
-    };
+    inp.oninput = () => { fijar(E.textos, inp.dataset.t, inp.hasAttribute('data-lista') ? inp.value.split('|').map(s => s.trim()) : inp.value); dibujarBotonera(); publicar(); };
   });
   $$('[data-c]').forEach(inp => {
     const k = inp.dataset.c, v = E.config[k];
@@ -512,22 +660,21 @@ function enlazarCampos() {
     inp[ev] = () => {
       E.config[k] = inp.type === 'checkbox' ? inp.checked : (inp.hasAttribute('data-num') ? (parseFloat(inp.value) || 0) : inp.value);
       if (k === 'programa') { E.textos.apertura.titulo = E.textos.cierre.titulo = inp.value; }
-      if (k === 'transicion') construirBotonera(), pintar();
+      if (k === 'transicion') dibujarBotonera();
       publicar();
     };
   });
-  // colores
-  const nombres = { espacio: 'Espacio (barras)', violeta: 'Violeta', magenta: 'Magenta', rayo: 'Rayo', blanco: 'Texto', menta: 'Menta (logo)' };
+  const nombres = { espacio: 'Espacio (barras)', violeta: 'Violeta', magenta: 'Magenta', rayo: 'Rayo', blanco: 'Texto', menta: 'Menta (alien)', violetaOsc: 'Diván oscuro', violetaClaro: 'Silla / detalles', pantalon: 'Pantalones', piel: 'Piel terapeuta', pelo: 'Pelo terapeuta' };
   const cc = $('#colores'); cc.innerHTML = '';
   Object.keys(E.config.colores).forEach(k => {
     const d = document.createElement('label'); d.className = 'color';
-    d.innerHTML = `<input type="color"><span>${nombres[k] || k}</span>`;
+    d.innerHTML = '<input type="color"><span>' + (nombres[k] || k) + '</span>';
     const i = d.querySelector('input'); i.value = E.config.colores[k];
     i.oninput = () => { E.config.colores[k] = i.value; revisarVerdes(); publicar(); };
     cc.appendChild(d);
   });
-  revisarVerdes();
-  pintarLogo();
+  revisarVerdes(); pintarLogo();
+  $$('#segDisp button').forEach(b => b.classList.toggle('on', b.dataset.d === (LS('te_disp') || 'auto')));
 }
 function revisarVerdes() {
   const malos = Object.entries(E.config.colores).filter(([, h]) => {
@@ -536,91 +683,163 @@ function revisarVerdes() {
   }).map(([k]) => k);
   const a = $('#avisoVerde');
   a.style.display = malos.length && E.config.fondo === 'verde' ? 'block' : 'none';
-  a.textContent = 'Ojo: ' + malos.join(', ') + ' es demasiado verde y el chroma lo va a borrar. Usa otro tono o cambia a fondo transparente.';
+  a.textContent = 'Ojo: ' + malos.join(', ') + ' es demasiado verde y el chroma lo va a borrar.';
 }
 $$('#segFondo button').forEach(b => b.onclick = () => { E.config.fondo = b.dataset.f; revisarVerdes(); publicar(true); });
-
-/* ---------- logo ---------- */
 function pintarLogo() { const i = $('#logoPrev'); i.hidden = !E.config.logo; if (E.config.logo) i.src = E.config.logo; }
 $('#logoArchivo').onchange = e => {
   const f = e.target.files[0]; if (!f) return;
   const img = new Image();
   img.onload = () => {
-    const esc = Math.min(1, 600 / img.height);
-    const cv = document.createElement('canvas'); cv.width = Math.round(img.width * esc); cv.height = Math.round(img.height * esc);
+    const esc = Math.min(1, 300 / img.height), cv = document.createElement('canvas');
+    cv.width = Math.round(img.width * esc); cv.height = Math.round(img.height * esc);
     cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
-    E.config.logo = cv.toDataURL('image/png'); pintarLogo(); publicar(true); URL.revokeObjectURL(img.src);
+    E.config.logo = cv.toDataURL('image/png'); pintarLogo(); publicar(true);
   };
   img.src = URL.createObjectURL(f);
 };
 $('#logoQuitar').onclick = () => { E.config.logo = null; pintarLogo(); publicar(true); };
-
-/* ---------- respaldo ---------- */
 $('#exportar').onclick = () => {
-  const datos = TE.copia(E); datos.aire = TE.copia(TE.ESTADO_BASE.aire);
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' }));
+  const d = TE.copia(E); d.aire = TE.copia(TE.ESTADO_BASE.aire); d.disparo = null;
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' }));
   a.download = 'terapia-espacial-config.json'; a.click();
 };
 $('#importar').onchange = async e => {
   const f = e.target.files[0]; if (!f) return;
-  try { const j = JSON.parse(await f.text()); E = TE.mezclar(TE.copia(TE.ESTADO_BASE), j); E.aire = TE.copia(TE.ESTADO_BASE.aire); todo(); publicar(true); }
+  try { const j = JSON.parse(await f.text()); const bot = E.botonera; E = TE.normalizar(j); E.aire = TE.copia(TE.ESTADO_BASE.aire); if (!E.botonera) E.botonera = bot; todo(); publicar(true); }
   catch (_) { alert('Ese archivo no es una configuración válida.'); }
 };
-$('#restablecer').onclick = () => { if (confirm('¿Volver a los textos y colores originales?')) { E = TE.copia(TE.ESTADO_BASE); todo(); publicar(true); } };
+$('#restablecer').onclick = () => { if (confirm('¿Volver a los textos y colores originales? (la botonera se mantiene)')) { const bot = E.botonera; E = TE.normalizar({}); E.botonera = bot; todo(); publicar(true); } };
 
-/* ---------- pestañas, teclado, preview ---------- */
-$$('#tabs button').forEach(b => b.onclick = () => {
-  $$('#tabs button').forEach(x => x.classList.toggle('on', x === b));
-  $$('.vista').forEach(v => v.classList.toggle('on', v.id === 'v-' + b.dataset.v));
-  if (b.dataset.v === 'pauta') pintarPauta();
-});
-$('#btnLimpiar').onclick = limpiar;
-$('#prevOn').onchange = e => { $('.prev').style.display = e.target.checked ? '' : 'none'; };
-if (matchMedia('(max-width:700px)').matches) { $('#prevOn').checked = false; $('.prev').style.display = 'none'; }
-
-addEventListener('keydown', e => {
-  if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
-  const k = e.key.toLowerCase();
-  if (e.shiftKey && (e.code === 'Digit3')) { alternar('triplex'); return e.preventDefault(); }
-  if (e.shiftKey && (e.code === 'Digit2')) { alternar('duplex'); return e.preventDefault(); }
-  if (/^[1-9]$/.test(e.key) && E.gcs[+e.key - 1]) { ponerGC(+e.key - 1); return; }
-  const mapa = { a: () => disparar('apertura'), c: () => disparar('cortina'), t: () => disparar('transicion'), x: () => disparar('cierre'),
-    r: () => alternar('cortinaTitulo'), v: () => alternar('volvemos'), n: () => alternar('aviso'), b: () => alternar('bug'), k: () => alternar('ticker'),
-    h: () => { avanceAutomatico(); construirBotonera(); pintar(); }, g: siguienteTitular,
-    escape: limpiar, ' ': () => ejecutarPaso(pasoActual + 1) };
-  if (mapa[k]) { e.preventDefault(); mapa[k](); }
-});
-
-function todo() { construirBotonera(); construirGCEditor(); construirTitEditor(); enlazarCampos(); pintar(); }
-
-/* ---------- conexión ---------- */
-function infoConexion(ok) {
-  const s = $('#estadoCon');
-  if (TE.conServidor) {
-    s.classList.toggle('ok', ok); s.querySelector('span').textContent = ok ? 'conectado' : 'sin servidor';
-    $('#infoConexion').innerHTML = ok
-      ? `Conectado al servidor. En OBS agrega una <b>Fuente de navegador</b> con la URL <b>${location.origin}/salida.html</b> (1920×1080). Desde el celular abre esta misma dirección cambiando <i>localhost</i> por la IP que muestra la ventana del servidor.`
-      : 'No hay conexión con el servidor. Revisa que la ventana negra de INICIAR.bat siga abierta.';
-  } else {
-    s.classList.add('ok'); s.querySelector('span').textContent = 'modo local';
-    $('#infoConexion').innerHTML = 'Modo local (archivo abierto directamente): funciona con la salida abierta <b>en este mismo navegador</b> o como dock de OBS. Para OBS + celular, usa <b>INICIAR.bat</b>.';
-  }
+/* =============== modo por equipo =============== */
+function tactil() { return matchMedia('(pointer: coarse)').matches || innerWidth < 900; }
+function aplicarDisp() {
+  const q = new URLSearchParams(location.search).get('modo');
+  const v = q || LS('te_disp') || 'auto', bot = v === 'botonera' || (v === 'auto' && tactil());
+  document.body.classList.toggle('modo-botonera', bot);
+  if (bot) cambiarVista('bot');
+  $$('#segDisp button').forEach(b => b.classList.toggle('on', b.dataset.d === (LS('te_disp') || 'auto')));
 }
-TE.escuchar(m => {
-  if (m.tipo === '_conexion') return infoConexion(m.ok);
-  if (m.tipo === 'estado' && m.id && !misIds.has(m.id) && m.id !== 'inicio') {   // cambios hechos desde otro panel (ej. celular)
-    E = TE.mezclar(TE.copia(TE.ESTADO_BASE), m.estado);
-    if (!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) todo(); else { construirBotonera(); pintar(); }
-  }
+function modoDisp(v) { LSset('te_disp', v); aplicarDisp(); toast(v === 'botonera' ? 'Este equipo queda como botonera' : v === 'completo' ? 'Este equipo muestra el panel completo' : 'Modo automático'); }
+$$('#segDisp button').forEach(b => b.onclick = () => modoDisp(b.dataset.d));
+addEventListener('resize', () => { if ((LS('te_disp') || 'auto') === 'auto') aplicarDisp(); });
+function cambiarVista(v) {
+  $$('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.v === v));
+  $$('.vista').forEach(x => x.classList.toggle('on', x.id === 'v-' + v));
+  if (v === 'pauta') pintarPauta();
+}
+$$('#tabs button').forEach(b => b.onclick = () => cambiarVista(b.dataset.v));
+
+/* =============== menú y links =============== */
+$('#btnMenu').onclick = e => { e.stopPropagation(); $('#menu').classList.toggle('on'); };
+document.addEventListener('click', () => $('#menu').classList.remove('on'));
+$('#menu').onclick = e => {
+  const m = e.target.dataset.m; if (!m) return;
+  if (m === 'links') abrirLinks();
+  if (m === 'editar') { if (document.body.classList.contains('modo-botonera') === false) cambiarVista('bot'); modoEdicion(!editando); }
+  if (['botonera', 'completo', 'auto'].includes(m)) modoDisp(m);
+  if (m === 'inicio') location.href = 'index.html';
+};
+$('#btnLinks').onclick = abrirLinks;
+$('#btnLimpiar').onclick = () => { vibrar(); limpiar(); };
+let fondoLink = '';
+function linkSalida() {
+  const l = con && con.links && con.links(); if (!l) return '';
+  if (!fondoLink) return l.salida;
+  return l.salida + (l.salida.includes('?') ? '&' : '?') + 'fondo=' + fondoLink;
+}
+function abrirLinks() {
+  const l = con && con.links && con.links();
+  if (!l) { toast('Sin links disponibles en este modo'); return; }
+  const textos = {
+    sala: 'Sala por internet: funciona desde cualquier lugar. Cualquier equipo con el link de control maneja la botonera; OBS solo necesita el link de salida.',
+    servidor: 'Servidor local (red WiFi del estudio, sin internet): el celular debe estar en la misma red que el computador de OBS.',
+    local: 'Modo local: solo funciona en este mismo navegador. En OBS usa el panel como dock (Docks → Docks de navegador personalizados) y la salida como fuente Navegador.'
+  };
+  $('#linksModo').textContent = textos[con.modo] || '';
+  $('#lCtrl').value = l.control + (l.control.includes('#') ? '' : '');
+  $('#lSal').value = linkSalida();
+  try { const q = qrcode(0, 'M'); q.addData(l.control); q.make(); $('#qrCtrl').src = q.createDataURL(5, 2); } catch (e) {}
+  $('#regenerar').hidden = con.modo !== 'sala';
+  $$('#segLinkFondo button').forEach(b => b.classList.toggle('on', b.dataset.lf === fondoLink));
+  $('#mLinks').classList.add('on');
+}
+$$('#segLinkFondo button').forEach(b => b.onclick = () => { fondoLink = b.dataset.lf; $('#lSal').value = linkSalida(); $$('#segLinkFondo button').forEach(x => x.classList.toggle('on', x === b)); });
+$('#cerrarLinks').onclick = () => $('#mLinks').classList.remove('on');
+$$('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('on'); }));
+$$('[data-copiar]').forEach(b => b.onclick = async () => {
+  const inp = $('#' + b.dataset.copiar);
+  try { await navigator.clipboard.writeText(inp.value); } catch (e) { inp.select(); document.execCommand('copy'); }
+  toast('Link copiado');
+});
+$('#regenerar').onclick = async () => {
+  if (!confirm('Los links actuales (control y OBS) dejarán de funcionar. ¿Generar links nuevos?')) return;
+  try {
+    const r = await con.regenerar();
+    guardarSalaLocal(r.sala, r.token);
+    location.href = 'panel.html?sala=' + r.sala + '#t=' + r.token;
+    setTimeout(() => location.reload(), 100);
+  } catch (e) { alert(e.message); }
+};
+function guardarSalaLocal(sala, token) {
+  let l = []; try { l = JSON.parse(LS('te_salas') || '[]'); } catch (e) {}
+  l = l.filter(x => x.sala !== sala); l.unshift({ sala, token, nombre: E.config.programa, ultima: Date.now() });
+  LSset('te_salas', JSON.stringify(l.slice(0, 20)));
+}
+
+/* =============== teclado =============== */
+addEventListener('keydown', e => {
+  if ($('.modal.on')) { if (e.key === 'Escape') $$('.modal').forEach(m => m.classList.remove('on')); return; }
+  if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
+  const tecla = e.key.length === 1 ? e.key.toUpperCase() : e.key;
+  const i = botones().findIndex(b => b.tecla && b.tecla === tecla);
+  if (i >= 0) { e.preventDefault(); ejecutarBoton(botones()[i], $$('#bot .bt')[i]); return; }
+  if (e.key === 'Escape') { e.preventDefault(); limpiar(); }
+  if (e.key === 'PageDown') { e.preventDefault(); irPaso(E.paso + 1); }
+  if (e.key === 'PageUp') { e.preventDefault(); irPaso(Math.max(-1, E.paso - 1), true); }
 });
 
-(async () => {
-  E = await TE.estadoInicial();
-  todo();
-  infoConexion(false);
-  TE.conectar();
-  if (!TE.conServidor) infoConexion(true);
+function todo() { if (!E.botonera) E.botonera = { botones: botonesIniciales() }; dibujarBotonera(); construirGCEditor(); construirTitEditor(); enlazarCampos(); pintarPauta(); pintar(); }
+
+/* =============== conexión =============== */
+function chipRed(r) {
+  const c = $('#chipRed'), t = { conectado: 'en línea', reconectando: 'reconectando', respaldo: 'en línea (respaldo)', 'sin-conexion': 'sin internet', local: 'modo local', conectando: 'conectando' };
+  c.className = 'chip ' + (r === 'conectado' || r === 'respaldo' || r === 'local' ? 'ok' : r === 'sin-conexion' ? 'mal' : '');
+  c.querySelector('span').textContent = (con && con.modo === 'servidor' && r === 'conectado') ? 'servidor local' : (t[r] || r);
+}
+function chipSalidas(n) {
+  const c = $('#chipSal');
+  if (n === null) { c.className = 'chip'; c.querySelector('span').textContent = 'OBS ?'; c.title = 'En modo local no se puede saber si OBS está abierto'; return; }
+  c.className = 'chip ' + (n > 0 ? 'ok' : 'alerta');
+  c.querySelector('span').textContent = n > 0 ? n + (n === 1 ? ' salida' : ' salidas') : 'sin salida';
+  c.title = n > 0 ? 'Salidas de OBS conectadas' : 'Ninguna salida de OBS conectada (lo que toques no se verá al aire)';
+}
+(async function iniciar() {
+  aplicarDisp(); todo();
+  try {
+    con = await TE_RT.abrir('control');
+    con.on('red', chipRed);
+    con.on('presencia', p => chipSalidas(p.salidas));
+    con.on('remoto', est => {
+      const bot = E.botonera; E = TE.normalizar(est); if (!E.botonera) E.botonera = bot;
+      if (!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { construirGCEditor(); construirTitEditor(); enlazarCampos(); }
+      dibujarBotonera(); pintarPauta();
+    });
+    con.on('acceso', m => alert(m));
+    const r = await con.conectar();
+    const tenia = r && r.estado && r.estado.config;
+    E = TE.normalizar(tenia ? r.estado : {});
+    if (!tenia || !E.botonera) { if (!E.botonera) E.botonera = { botones: botonesIniciales() }; publicar(true); }
+    todo();
+    if (con.modo === 'local') { chipRed('local'); chipSalidas(null); }
+    if (con.modo === 'sala') { const p = TE_RT.params(); guardarSalaLocal(p.sala, p.t); }
+    // vista previa: una salida más (solo en el panel completo)
+    const l = con.links && con.links();
+    if (l && !document.body.classList.contains('modo-botonera')) $('#prev').src = l.salida + (l.salida.includes('?') ? '&' : '?') + 'vista=1';
+  } catch (e) {
+    chipRed('sin-conexion');
+    alert('No se pudo conectar: ' + e.message);
+  }
 })();
 </script>
 </body>

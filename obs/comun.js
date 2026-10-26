@@ -1,37 +1,29 @@
-/* TERAPIA ESPACIAL — estado compartido y conexión panel ⇄ salida
-   - Con servidor (http://…): Server-Sent Events + POST /cmd  → funciona desde el celular.
-   - Sin servidor (abriendo el archivo): BroadcastChannel + localStorage (mismo navegador). */
+/* TERAPIA ESPACIAL — estado del programa (lo comparten el panel, la botonera y la salida). */
 (function () {
-  const CLAVE = 'te_estado_v2';
-
   const ESTADO_BASE = {
     config: {
       programa: 'TERAPIA ESPACIAL',
-      fondo: 'verde',                       // 'verde' | 'transparente'
+      fondo: 'verde',                      // verde | espacio | transparente
       colores: {
-        espacio: '#0B0B1A', violeta: '#7B2FF7', magenta: '#FF3DCB',
-        rayo: '#FFF4C2', blanco: '#FFFFFF', menta: '#D6EFC7'
+        espacio: '#0B0B1A', violeta: '#7B2FF7', magenta: '#FF3DCB', rayo: '#FFF4C2', blanco: '#FFFFFF', menta: '#D6EFC7',
+        violetaOsc: '#4A1A9E', violetaClaro: '#A77BFF', pantalon: '#26244F', piel: '#E8A987', pelo: '#3A1B4F'
       },
       fuenteTitulo: 'Orbitron',
       fuenteTexto: 'Inter',
-      logo: null,                           // dataURL
-      bordeIzq: 140,
-      gcY: 880,
-      tamGC: 54,
-      ovniPausa: true,
-      bamboleo: 1,
-      velocidad: 1,
-      autoSalidaGC: 0,                      // segundos (0 = manual)
-      segTitular: 6,                        // segundos que queda cada titular en el avance automático
-      transicion: 'aleatoria',              // aleatoria | rayo | hipnosis | rorschach | onda
+      logo: null,
+      bordeIzq: 140, gcY: 880, tamGC: 54,
+      ovniPausa: true, bamboleo: 1, velocidad: 1,
+      autoSalidaGC: 0, segTitular: 6,
+      transicion: 'aleatoria',             // aleatoria | rayo | hipnosis | rorschach | onda
       etiquetaSesion: 'SESIÓN EN CURSO',
       ticker: 'Terapia Espacial: la consulta que atiende a pacientes de todo el universo · Avistamientos en El Enladrillado, San Clemente, lago Colbún y laguna del Maule · Salud mental estudiantil: pedir ayuda también es valentía · Escríbenos tus dudas en nuestras redes'
     },
+    // icono: '' | 'alien' (paciente) | 'terapeuta'
     gcs: [
-      { titulo: 'Luis Monasterios', sub: 'Presentador' },
-      { titulo: 'Benjamín Castillo', sub: 'Parapsicólogo' },
-      { titulo: 'Sophia Jaque', sub: 'Psicóloga' },
-      { titulo: 'Paciente X-27', sub: 'Visitante de otro planeta', paciente: true }
+      { titulo: 'Luis Monasterios', sub: 'Presentador', icono: '' },
+      { titulo: 'Benjamín Castillo', sub: 'Parapsicólogo', icono: '' },
+      { titulo: 'Sophia Jaque', sub: 'Psicóloga', icono: 'terapeuta' },
+      { titulo: 'Paciente X-27', sub: 'Visitante de otro planeta', icono: 'alien' }
     ],
     titulares: [
       { seccion: 'TALCA', texto: 'Avistamientos en El Enladrillado y San Clemente vuelven a repetirse' },
@@ -56,7 +48,10 @@
     aire: {
       gc: null, titular: null, cortinaTitulo: false, aviso: false, volvemos: false,
       triplex: false, duplex: false, bug: false, ticker: false
-    }
+    },
+    disparo: null,          // { id, que, variante } — la salida lo lanza una sola vez
+    paso: -1,               // paso actual de la pauta (compartido entre equipos)
+    botonera: null          // { botones: [...] } — se siembra en el panel
   };
 
   function copia(o) { return JSON.parse(JSON.stringify(o)); }
@@ -69,59 +64,14 @@
     }
     return out;
   }
-
-  const conServidor = location.protocol.startsWith('http');
-  const canal = ('BroadcastChannel' in window) ? new BroadcastChannel('terapia-espacial') : null;
-  const oyentes = [];
-
-  function entregar(msg) { oyentes.forEach(fn => { try { fn(msg); } catch (e) { console.error(e); } }); }
-
-  if (canal) canal.onmessage = e => entregar(e.data);
-  window.addEventListener('storage', e => {
-    if (e.key === CLAVE + '_msg' && e.newValue) { try { entregar(JSON.parse(e.newValue)); } catch (_) {} }
-  });
-
-  let fuente = null, conectado = false;
-  function conectarSSE() {
-    if (!conServidor) return;
-    fuente = new EventSource('/eventos');
-    fuente.onopen = () => { conectado = true; entregar({ tipo: '_conexion', ok: true }); };
-    fuente.onmessage = e => { try { entregar(JSON.parse(e.data)); } catch (_) {} };
-    fuente.onerror = () => { conectado = false; entregar({ tipo: '_conexion', ok: false }); };
+  // compatibilidad con la v2 (paciente: true)
+  function normalizar(e) {
+    const est = mezclar(copia(ESTADO_BASE), e || {});
+    (est.gcs || []).forEach(g => { if (g.paciente && !g.icono) g.icono = 'alien'; delete g.paciente; if (g.icono === undefined) g.icono = ''; });
+    if (['verde', 'espacio', 'transparente'].indexOf(est.config.fondo) < 0) est.config.fondo = 'verde';
+    return est;
   }
+  function id() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
-  function guardarLocal(estado) {
-    try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (e) { console.warn('No se pudo guardar (¿logo muy pesado?)', e); }
-  }
-  function leerLocal() {
-    try { const s = localStorage.getItem(CLAVE); return s ? mezclar(copia(ESTADO_BASE), JSON.parse(s)) : copia(ESTADO_BASE); }
-    catch (e) { return copia(ESTADO_BASE); }
-  }
-
-  async function enviar(msg) {
-    msg.id = msg.id || (Date.now() + '-' + Math.random().toString(36).slice(2, 7));
-    if (msg.tipo === 'estado') guardarLocal(msg.estado);
-    if (conServidor) {
-      try {
-        await fetch('/cmd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(msg) });
-        return;
-      } catch (e) { /* sin servidor: sigue con canal local */ }
-    }
-    if (canal) canal.postMessage(msg);
-    try { localStorage.setItem(CLAVE + '_msg', JSON.stringify(msg)); } catch (_) {}
-  }
-
-  async function estadoInicial() {
-    if (conServidor) {
-      try { const r = await fetch('/estado'); if (r.ok) { const j = await r.json(); if (j && j.config) return mezclar(copia(ESTADO_BASE), j); } } catch (_) {}
-    }
-    return leerLocal();
-  }
-
-  window.TE = {
-    ESTADO_BASE, copia, mezclar, enviar, estadoInicial, conServidor,
-    escuchar(fn) { oyentes.push(fn); },
-    conectar: conectarSSE,
-    get conectado() { return conectado; }
-  };
+  window.TE = { ESTADO_BASE, copia, mezclar, normalizar, id };
 })();

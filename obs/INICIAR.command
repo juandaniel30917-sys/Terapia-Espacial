@@ -6,5 +6,5 @@ if ! command -v node >/dev/null 2>&1; then
   read -n 1
   exit 1
 fi
-open "http://localhost:8080/panel.html"
+open "http://localhost:8080/"
 node servidor.js

@@ -16,6 +16,15 @@
   #escena{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;}
   #fondoVerde{position:absolute;inset:0;background:#00FF00;display:none;}
   body.verde #fondoVerde{display:block;}
+  #fondoEspacio{position:absolute;inset:0;background:var(--espacio);display:none;overflow:hidden;}
+  body.fondo-espacio #fondoEspacio{display:block;}
+  #fondoEspacio canvas,.mxFondo canvas{position:absolute;left:0;top:0;animation:deriva 60s linear infinite;}
+  .mxFondo{position:absolute;inset:0;opacity:0;transition:opacity .6s;}
+  .mxFondo.on{opacity:1;}
+  .mxFondo svg{position:absolute;left:0;top:0;width:1920px;height:1080px;}
+  .escena-sesion{overflow:visible;}
+  #estadoRed{position:absolute;left:8px;bottom:8px;font:600 14px Inter,Arial;color:#fff;background:rgba(0,0,0,.6);padding:4px 10px;border-radius:6px;display:none;z-index:9}
+  body.debug #estadoRed{display:block}
   .capa{position:absolute;inset:0;pointer-events:none;}
 
   /* ---------- ABDUCCIÓN ---------- */
@@ -87,6 +96,7 @@
 <body class="verde">
 <div id="escena">
   <div id="fondoVerde"></div>
+  <div id="fondoEspacio"></div>
   <div class="capa" id="cEspacio"></div>
   <div class="capa" id="cVentanas"></div>
   <div class="capa" id="cGraficas"></div>
@@ -94,8 +104,12 @@
   <div class="capa" id="cBug"></div>
   <div class="capa" id="cCortina"></div>
 </div>
+<div id="estadoRed">conectando…</div>
 
+<script src="config.js"></script>
 <script src="comun.js"></script>
+<script src="conexion.js"></script>
+<script src="escena.js"></script>
 <script>
 /* ===================================================================
    MOTOR DE ANIMACIÓN — replica las llaves del script de After Effects
@@ -116,7 +130,9 @@ function pista(keys, t, lineal) {
   let f = (t - ta) / (tb - ta); if (!lineal) f = ease(f);
   return Array.isArray(va) ? va.map((v, j) => v + (vb[j] - v) * f) : va + (vb - va) * f;
 }
-const esVerde = () => cfg().fondo !== 'transparente';
+const PARAMS = new URLSearchParams(location.search);
+const FORZAR_FONDO = PARAMS.get('verde') === '1' ? 'verde' : (PARAMS.get('fondo') || null);
+const esVerde = () => (FORZAR_FONDO || cfg().fondo) !== 'transparente';   // verde o espacio: rayo opaco
 const COLOR_SECCION = { TALCA: ['var(--magenta)', 'var(--blanco)'], CHILE: ['var(--violeta)', 'var(--blanco)'], INTERNACIONAL: ['var(--rayo)', 'var(--espacio)'] };
 
 /* ---------- dibujos ---------- */
@@ -146,28 +162,16 @@ function svgCabeza(tam) {
   cabezaAlien(s, 0, 0, 1);
   return s;
 }
-// Paciente en el diván con burbuja de pensamiento
-function svgPaciente() {
-  const s = sv('svg', { viewBox: '-230 -230 460 320', width: 460, height: 320 });
-  const W = { stroke: 'var(--blanco)', 'stroke-width': 5, 'stroke-linejoin': 'round' };
-  // burbuja
-  const b = sv('g', { class: 'burbuja' }, s);
-  sv('circle', Object.assign({ cx: -46, cy: -118, r: 7, fill: 'var(--espacio)' }, W), b);
-  sv('circle', Object.assign({ cx: -22, cy: -146, r: 11, fill: 'var(--espacio)' }, W), b);
-  sv('ellipse', Object.assign({ cx: 40, cy: -182, rx: 62, ry: 36, fill: 'var(--espacio)' }, W), b);
-  const tx = sv('text', { x: 40, y: -168, 'text-anchor': 'middle', 'font-weight': 900, 'font-size': 44, style: 'font-family:var(--ft)', fill: 'var(--rayo)' }, b);
-  tx.textContent = '?';
-  // diván
-  sv('path', Object.assign({ d: 'M-196,40 C-206,-30 -188,-70 -150,-70 L-128,-70 L-128,40 Z', fill: 'var(--violeta)' }, W), s);
-  sv('rect', Object.assign({ x: -200, y: 18, width: 396, height: 46, rx: 18, fill: 'var(--violeta)' }, W), s);
-  sv('rect', Object.assign({ x: -132, y: -8, width: 300, height: 32, rx: 14, fill: 'var(--magenta)' }, W), s);
-  sv('rect', Object.assign({ x: 164, y: -22, width: 40, height: 70, rx: 16, fill: 'var(--violeta)' }, W), s);
-  sv('path', { d: 'M-170,64 L-180,88 M170,64 L180,88', stroke: 'var(--blanco)', 'stroke-width': 6, 'stroke-linecap': 'round' }, s);
-  // cuerpo recostado
-  sv('path', Object.assign({ d: 'M-70,-14 C-40,-44 80,-44 140,-26 C156,-20 156,-6 140,-4 C80,4 -40,6 -70,-14 Z', fill: 'var(--menta)' }, W), s);
-  sv('path', { d: 'M10,-30 C20,-6 40,-4 54,-12', fill: 'none', stroke: 'var(--blanco)', 'stroke-width': 5, 'stroke-linecap': 'round' }, s);
-  cabezaAlien(s, -110, -46, 1.05).setAttribute('transform', 'translate(-110,-46) scale(1.05) rotate(-62)');
-  return s;
+// Estrellas (canvas) para los fondos de espacio
+function estrellas(ancho, alto, n) {
+  const cv = document.createElement('canvas'); cv.width = ancho; cv.height = alto;
+  const g = cv.getContext('2d');
+  for (let i = 0; i < n; i++) {
+    const r = Math.random() * 2.2 + .4; g.globalAlpha = .35 + Math.random() * .65;
+    g.fillStyle = Math.random() < .12 ? cfg().colores.menta : '#fff';
+    g.beginPath(); g.arc(Math.random() * ancho, Math.random() * alto, r, 0, 7); g.fill();
+  }
+  return cv;
 }
 function ondaPath(ancho, alto, picos) {
   let d = `M0,${alto / 2}`; const n = picos, paso = ancho / n;
@@ -189,7 +193,7 @@ class Abduccion {
     this.subH = Math.round(o.tamS * 1.7);
     this.mT = Math.round(o.tamT * .75);
     this.mS = Math.round(o.tamS * .9);
-    this.icoW = o.paciente ? Math.round(this.barH * .9) : 0;
+    this.icoW = o.icono ? Math.round(this.barH * .9) : 0;
     this.ufoY = o.barY - this.barH / 2 - o.rayoLargo - 20 * this.S / 100;
     this.hoverY = o.barY - this.barH / 2 - 18 * this.S / 100;
     this.el = el('div', 'abd', capa);
@@ -204,10 +208,13 @@ class Abduccion {
     // grupo barra + textos
     this.grp = el('div', 'grp', this.el);
     if (o.logo) { this.ilus = el('img', 'ilus', this.grp); this.ilus.src = o.logo; this.ilus.style.maxHeight = '240px'; }
-    else if (o.ilustracion === 'paciente') { this.ilus = el('div', 'ilus', this.grp); this.ilus.appendChild(svgPaciente()); }
+    else if (o.ilustracion === 'sesion') { this.ilus = el('div', 'ilus', this.grp); this.ilus.appendChild(TE_ESCENA.crear({ ancho: o.anchoIlus || 620 })); }
     this.barra = el('div', 'barra', this.grp);
     el('div', 'linea', this.barra); el('div', 'acento', this.barra);
-    if (o.paciente) { const ic = svgCabeza(this.icoW); ic.classList.add('icono'); ic.style.left = (this.mT * .5 + 6) + 'px'; this.barra.appendChild(ic); }
+    if (o.icono) {
+      const ic = o.icono === 'terapeuta' ? TE_ESCENA.terapeuta(this.icoW) : svgCabeza(this.icoW);
+      ic.classList.add('icono'); ic.style.left = (this.mT * .5 + 6) + 'px'; this.barra.appendChild(ic);
+    }
     this.sub = el('div', 'subbarra', this.grp);
     if (o.etiqueta) {
       this.etq = el('div', 'etiqueta', this.grp);
@@ -306,7 +313,6 @@ class Abduccion {
     if (this.ilus) {
       const iw = this.ilus.offsetWidth, ih = this.ilus.offsetHeight;
       Object.assign(this.ilus.style, { left: -iw / 2 + 'px', top: (-barH / 2 - 24 - ih + Math.sin(now * 1.6) * 6) + 'px', opacity: v.to });
-      const bu = this.ilus.querySelector('.burbuja'); if (bu) bu.style.opacity = (Math.sin(now * 2) > -.3) ? 1 : .25;
     }
 
     // ovni
@@ -361,13 +367,7 @@ function espacio(on) {
   let e = $('.espacio', c);
   if (!e) {
     e = el('div', 'espacio', c);
-    const cv = el('canvas', '', e); cv.width = 2400; cv.height = 1080;
-    const g = cv.getContext('2d');
-    for (let i = 0; i < 260; i++) {
-      const r = Math.random() * 2.2 + .4; g.globalAlpha = .4 + Math.random() * .6;
-      g.fillStyle = Math.random() < .12 ? cfg().colores.menta : '#fff';
-      g.beginPath(); g.arc(Math.random() * 2400, Math.random() * 1080, r, 0, 7); g.fill();
-    }
+    e.appendChild(estrellas(2400, 1080, 260));
     void e.offsetWidth;
   }
   e.classList.toggle('on', on);
@@ -378,6 +378,18 @@ class Multiplex {
   constructor(ventanas, etiquetas, titulo) {
     this.cont = el('div', '', $('#cVentanas'));
     const vel = cfg().velocidad;
+    // fondo: espacio con estrellas en todo el cuadro; solo el interior de cada ventana queda en verde (o transparente)
+    this.fondo = el('div', 'mxFondo', this.cont);
+    const fs = sv('svg', { viewBox: '0 0 1920 1080' }, this.fondo), mid = 'mx' + TE.id();
+    const mk = sv('mask', { id: mid }, sv('defs', {}, fs));
+    sv('rect', { x: 0, y: 0, width: 1920, height: 1080, fill: '#fff' }, mk);
+    ventanas.forEach(vn => sv('rect', { x: vn.b[0], y: vn.b[1], width: vn.b[2], height: vn.b[3], rx: 16, fill: '#000' }, mk));
+    const afuera = sv('g', { mask: `url(#${mid})` }, fs);
+    sv('rect', { x: 0, y: 0, width: 1920, height: 1080, fill: 'var(--espacio)' }, afuera);
+    sv('image', { href: estrellas(1920, 1080, 180).toDataURL(), x: 0, y: 0, width: 1920, height: 1080 }, afuera);
+    if (cfg().fondo !== 'transparente' || FORZAR_FONDO === 'verde')
+      ventanas.forEach(vn => sv('rect', { x: vn.b[0], y: vn.b[1], width: vn.b[2], height: vn.b[3], rx: 16, fill: '#00FF00' }, fs));
+    requestAnimationFrame(() => requestAnimationFrame(() => this.fondo.classList.add('on')));
     this.items = ventanas.map((vn, i) => {
       const b = vn.b;
       const v = el('div', 'ventana', this.cont);
@@ -418,6 +430,7 @@ class Multiplex {
       et.classList.remove('on');
       [r1, r2].forEach(r => r.animate([{ strokeDashoffset: 0 }, { strokeDashoffset: 100 }], { duration: 600 / cfg().velocidad, fill: 'forwards', easing: 'ease-in-out' }));
     });
+    this.fondo.classList.remove('on');
     await this.titulo.salir();
     clearInterval(this.timer);
     this.cont.remove();
@@ -430,7 +443,9 @@ function cortina() {
   const raiz = el('div', 'abd', c);
   const pB = el('div', 'panelC', raiz); pB.style.background = col.magenta;
   const pA = el('div', 'panelC', raiz); pA.style.background = col.violeta;
-  const tx = el('div', 'cortTexto', raiz); tx.textContent = cfg().programa;
+  const tx = el('div', 'cortTexto', raiz); tx.textContent = cfg().programa; tx.style.top = '760px';
+  const esc = el('div', 'ilus', raiz); esc.appendChild(TE_ESCENA.crear({ ancho: 760 }));
+  Object.assign(esc.style, { left: '580px', top: '330px', opacity: 0 });
   const s = sv('svg', { class: 'full', viewBox: '0 0 1920 1080' }, raiz);
   const colm = sv('polygon', { fill: col.rayo, stroke: '#fff', 'stroke-width': 4 }, s);
   const u = el('div', 'ufo', raiz); u.appendChild(svgOvni());
@@ -448,6 +463,8 @@ function cortina() {
       colm.setAttribute('points', `${x - 40},${ty} ${x + 40},${ty} ${x + 110},${ty + 900} ${x - 110},${ty + 900}`);
       tx.style.opacity = pista([[.85, 0], [1.05, 1], [1.35, 1], [1.55, 0]], t);
       tx.style.transform = `scale(${pista([[.85, .9], [1.55, 1.04]], t)})`;
+      esc.style.opacity = pista([[.8, 0], [1.0, 1], [1.35, 1], [1.55, 0]], t);
+      esc.style.transform = `translateY(${pista([[.8, 30], [1.55, -10]], t)}px)`;
       requestAnimationFrame(paso);
     })();
   });
@@ -627,16 +644,18 @@ function conf(tipo) {
   const c = cfg(), col = c.colores;
   switch (tipo) {
     case 'gc': return { tamT: c.tamGC, tamS: Math.round(c.tamGC * .52), barY: c.gcY, rayoLargo: 230, S: 100, minW: 360, auto: c.autoSalidaGC || 0 };
-    case 'paciente': return { tamT: c.tamGC, tamS: Math.round(c.tamGC * .52), barY: c.gcY, rayoLargo: 230, S: 100, minW: 360, paciente: true,
+    case 'alien': return { tamT: c.tamGC, tamS: Math.round(c.tamGC * .52), barY: c.gcY, rayoLargo: 230, S: 100, minW: 360, icono: 'alien',
       colorBarra: col.espacio, colorSub: col.magenta, colorAcento: col.menta, auto: c.autoSalidaGC || 0 };
+    case 'terapeuta': return { tamT: c.tamGC, tamS: Math.round(c.tamGC * .52), barY: c.gcY, rayoLargo: 230, S: 100, minW: 360, icono: 'terapeuta',
+      colorAcento: col.violetaClaro, auto: c.autoSalidaGC || 0 };
     case 'cortinaTitulo': return { tamT: 72, tamS: 36, barY: 800, rayoLargo: 300, S: 130, centrado: true, minW: 700, maxW: 1720 };
     case 'avance': return { tamT: 84, tamS: 30, barY: 600, rayoLargo: 260, S: 140, centrado: true, minW: 900, maxW: 1720 };
     case 'titular': return { tamT: 52, tamS: 0, barY: 820, rayoLargo: 300, S: 120, centrado: true, minW: 760, maxW: 1720 };
     case 'aviso': return { tamT: 50, tamS: 28, barY: c.gcY, rayoLargo: 230, S: 100, colorBarra: col.magenta, colorAcento: col.rayo, colorSub: col.espacio };
-    case 'volvemos': return { tamT: 84, tamS: 36, barY: 640, rayoLargo: 260, S: 140, centrado: true, minW: 800, maxW: 1720 };
+    case 'volvemos': return { tamT: 84, tamS: 36, barY: 800, rayoLargo: 420, S: 140, centrado: true, minW: 800, maxW: 1720, ilustracion: 'sesion', anchoIlus: 560 };
     case 'multiplex': return { tamT: 46, tamS: 24, barY: 965, rayoLargo: 50, S: 80, centrado: true, minW: 520, sub: '' };
-    case 'apertura': return { tamT: 120, tamS: 40, barY: 760, rayoLargo: 420, S: 170, centrado: true, minW: 900, maxW: 1720, retraso: 1.5, auto: 9.7, logo: c.logo, ilustracion: 'paciente' };
-    case 'cierre': return { tamT: 110, tamS: 34, barY: 760, rayoLargo: 420, S: 170, centrado: true, minW: 900, maxW: 1720, retraso: .5, auto: 5, logo: c.logo, ilustracion: 'paciente' };
+    case 'apertura': return { tamT: 120, tamS: 40, barY: 760, rayoLargo: 420, S: 170, centrado: true, minW: 900, maxW: 1720, retraso: 1.5, auto: 9.7, logo: c.logo, ilustracion: 'sesion' };
+    case 'cierre': return { tamT: 110, tamS: 34, barY: 760, rayoLargo: 420, S: 170, centrado: true, minW: 900, maxW: 1720, retraso: .5, auto: 5, logo: c.logo, ilustracion: 'sesion' };
   }
 }
 // Triplex: costados verticales 9:16 y centro 16:9 · Duplex: dos 16:9 grandes
@@ -663,7 +682,10 @@ function aplicarConfig() {
   for (const k in c.colores) r.setProperty('--' + k, c.colores[k]);
   r.setProperty('--ft', `'${c.fuenteTitulo}', 'Arial Black', Arial, sans-serif`);
   r.setProperty('--fx', `'${c.fuenteTexto}', Arial, sans-serif`);
-  document.body.classList.toggle('verde', esVerde());
+  const f = FORZAR_FONDO || c.fondo;
+  document.body.classList.toggle('verde', f === 'verde');
+  document.body.classList.toggle('fondo-espacio', f === 'espacio');
+  if (f === 'espacio' && !$('#fondoEspacio canvas')) $('#fondoEspacio').appendChild(estrellas(2400, 1080, 260));
   pintarBug();
 }
 
@@ -673,11 +695,11 @@ function aplicar(nuevo) {
   const a = E.aire, tx = E.textos;
   // GC (y paciente)
   const g = a.gc !== null && a.gc !== undefined ? E.gcs[a.gc] : null;
-  const claveGC = g ? a.gc + '|' + !!g.paciente : null;
+  const claveGC = g ? a.gc + '|' + (g.icono || '') : null;
   if (slots.gc && slots.gc.pieza && g && slots.gc.clave === claveGC) {
     slots.gc.pieza.textos(g.titulo, g.sub);
   } else {
-    cambiarSlot('gc', claveGC, () => new Abduccion(Object.assign(conf(g.paciente ? 'paciente' : 'gc'), g), $('#cGraficas')));
+    cambiarSlot('gc', claveGC, () => new Abduccion(Object.assign(conf(g.icono || 'gc'), { titulo: g.titulo, sub: g.sub }), $('#cGraficas')));
   }
   // Avance informativo: -1 = portada, 0..n = titular
   const ti = a.titular;
@@ -704,7 +726,15 @@ function aplicar(nuevo) {
   });
   bug(!!a.bug);
   ticker(!!a.ticker);
+  // disparos (apertura, cortina, transición, cierre): se lanzan una sola vez por id
+  const d = E.disparo;
+  if (d && d.id && d.id !== ultimoDisparo) {
+    const nuevo = ultimoDisparo !== undefined;
+    ultimoDisparo = d.id;
+    if (nuevo) disparar(d.que, d.variante);
+  } else if (ultimoDisparo === undefined) ultimoDisparo = null;
 }
+let ultimoDisparo;
 
 async function disparar(que, variante) {
   const tx = E.textos;
@@ -725,6 +755,7 @@ async function disparar(que, variante) {
 function bucle() {
   const now = ahora();
   Abduccion.vivos.forEach(p => p.tick(now));
+  document.querySelectorAll('.escena-sesion').forEach(sv => TE_ESCENA.animar(sv, now));
   document.querySelectorAll('.ufo[data-bug]').forEach(u => {
     u.style.transform = `translate(58px,${58 + Math.sin(now * 3) * 5}px) rotate(${Math.sin(now * 2.2) * 6}deg) scale(.4)`;
     const l = u.querySelector('.luces'); if (l) l.style.opacity = Math.floor(now * 4) % 2 ? .35 : 1;
@@ -737,24 +768,17 @@ function ajustar() {
 }
 addEventListener('resize', ajustar);
 
-const vistos = new Set();
-TE.escuchar(m => {
-  if (!m || (m.id && vistos.has(m.id))) return;
-  if (m.id) { vistos.add(m.id); if (vistos.size > 200) vistos.clear(); }
-  if (m.tipo === 'estado') aplicar(m.estado);
-  if (m.tipo === 'disparar') disparar(m.que, m.variante);
-});
-
+if (PARAMS.has('debug')) document.body.classList.add('debug');
 (async function iniciar() {
   ajustar();
-  const ini = await TE.estadoInicial();
-  ini.aire = Object.assign({}, TE.ESTADO_BASE.aire, { bug: ini.aire && ini.aire.bug, ticker: ini.aire && ini.aire.ticker });
-  aplicar(ini);
-  TE.conectar();
+  aplicar(TE.copia(TE.ESTADO_BASE));
   bucle();
-  if (new URLSearchParams(location.search).has('demo')) {
-    const d = TE.copia(E); d.aire.gc = 0; d.aire.bug = true; aplicar(d);
-  }
+  if (PARAMS.has('demo')) { const d = TE.copia(E); d.aire.gc = 0; d.aire.bug = true; aplicar(d); return; }
+  const con = await TE_RT.abrir('salida');
+  con.on('estado', est => aplicar(TE.normalizar(est)));
+  con.on('red', (r, msg) => { $('#estadoRed').textContent = con.modo + ' · ' + r + (msg ? ' · ' + msg : ''); });
+  try { await con.conectar(); }
+  catch (e) { $('#estadoRed').textContent = 'Error: ' + e.message; document.body.classList.add('debug'); }
 })();
 </script>
 </body>

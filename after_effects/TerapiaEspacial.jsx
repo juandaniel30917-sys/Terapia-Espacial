@@ -26,7 +26,7 @@
         conductor: "Luis A. Monasterios",
         prefijo: "TE_",
         ancho: 1920, alto: 1080, fps: 29.97,
-        fondo: "verde",                 // "verde" (chroma) | "transparente" (alfa)
+        fondo: "verde",                 // "verde" (chroma) | "espacio" (fondo estrellado) | "transparente" (alfa)
         verde: [0, 1, 0],
         colores: {
             espacio: "#0B0B1A",
@@ -34,19 +34,24 @@
             magenta: "#FF3DCB",
             rayo:    "#FFF4C2",
             blanco:  "#FFFFFF",
-            menta:   "#D6EFC7"
+            menta:   "#D6EFC7",
+            violetaOsc: "#4A1A9E",
+            violetaClaro: "#A77BFF",
+            pantalon: "#26244F",
+            piel:    "#E8A987",
+            pelo:    "#3A1B4F"
         },
         fuentes: { titulo: "Arial-BoldMT", texto: "ArialMT" },
         bordeIzq: 140,                  // borde izquierdo de los GC (px)
         logoArchivo: null,              // File opcional (png / ai / mov)
         dur: { gc: 10, aviso: 8, volvemos: 8, titulo: 8, cortina: 2.5, transicion: 2,
                apertura: 15, cierre: 9.5, bug: 10, multiplex: 60, titular: 9, avance: 8 },
-        // GC: [nombre, cargo, paciente(1 = estilo paciente alienígena)]
+        // GC: [nombre, cargo, icono]  icono: "" | "terapeuta" | "alien"
         gcs: [
-            ["Luis Monasterios", "Presentador", 0],
-            ["Benjamín Castillo", "Parapsicólogo", 0],
-            ["Sophia Jaque", "Psicóloga", 0],
-            ["Paciente X-27", "Visitante de otro planeta", 1]
+            ["Luis Monasterios", "Presentador", ""],
+            ["Benjamín Castillo", "Parapsicólogo", ""],
+            ["Sophia Jaque", "Psicóloga", "terapeuta"],
+            ["Paciente X-27", "Visitante de otro planeta", "alien"]
         ],
         avance: { titulo: "AVANCE INFORMATIVO", sub: "ÚLTIMAS NOTICIAS · TALCA · CHILE · INTERNACIONAL" },
         // Titulares: [sección, texto]  — sección: TALCA | CHILE | INTERNACIONAL
@@ -70,6 +75,10 @@
         apertura:{ titulo: "TERAPIA ESPACIAL", sub: "CON LUIS A. MONASTERIOS" }
     };
 
+    // @@ESCENA_INICIO (generado por herramientas/construir_escena.py — no editar a mano)
+    var ESCENA_DATOS = {"escena":[{"k":"g","n":"lapiz","o":[284.0,-24.0],"h":[{"f":"piel","s":"blanco","w":3.0,"k":"ell","p":[248.0,36.0],"t":[18.0,18.0]},{"f":null,"s":"magenta","w":5.0,"k":"path","sp":[{"v":[[250.0,36.0],[234.0,50.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":null,"s":"rayo","w":14.0,"k":"path","sp":[{"v":[[284.0,-24.0],[250.0,32.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":null,"s":"blanco","w":22.0,"k":"path","sp":[{"v":[[284.0,-24.0],[250.0,32.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]}]},{"f":"piel","s":"blanco","w":3.0,"k":"ell","p":[224.0,28.0],"t":[18.0,18.0]},{"f":null,"s":"rayo","w":14.0,"k":"path","sp":[{"v":[[250.0,-28.0],[226.0,24.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":null,"s":"blanco","w":22.0,"k":"path","sp":[{"v":[[250.0,-28.0],[226.0,24.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":null,"s":"violeta","w":3.0,"k":"path","sp":[{"v":[[214.0,16.0],[248.0,16.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false},{"v":[[214.0,28.0],[246.0,28.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false},{"v":[[214.0,40.0],[240.0,40.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":"violeta","s":null,"w":0,"k":"rect","p":[232.0,-3.0],"t":[20.0,10.0],"r":3.0},{"f":"blanco","s":"espacio","w":3.0,"k":"rect","p":[232.0,31.0],"t":[52.0,66.0],"r":6.0},{"k":"g","n":"cabezaTerapeuta","o":[262.0,-50.0],"h":[{"f":null,"s":"espacio","w":3.0,"k":"path","sp":[{"v":[[250.0,-62.0],[268.0,-62.0]],"i":[[0,0],[-4.0,5.0]],"o":[[6.0,5.0],[0,0]],"c":false}]},{"f":"espacio","s":null,"w":0,"k":"ell","p":[269.0,-75.0],"t":[5.0,5.0]},{"f":"espacio","s":null,"w":0,"k":"ell","p":[245.0,-75.0],"t":[5.0,5.0]},{"f":null,"s":"espacio","w":3.0,"k":"path","sp":[{"v":[[256.0,-76.0],[262.0,-76.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":null,"s":"espacio","w":3.0,"k":"ell","p":[271.0,-76.0],"t":[18.0,18.0]},{"f":null,"s":"espacio","w":3.0,"k":"ell","p":[247.0,-76.0],"t":[18.0,18.0]},{"f":"pelo","s":"blanco","w":4.0,"k":"ell","p":[286.0,-120.0],"t":[30.0,30.0]},{"f":"pelo","s":"blanco","w":3.0,"k":"path","sp":[{"v":[[230.0,-82.0],[288.0,-96.0],[232.0,-78.0]],"i":[[0,0],[-20.0,-20.0],[16.0,-20.0]],"o":[[4.0,-26.0],[-18.0,-6.0],[0,0]],"c":true}]},{"f":"piel","s":"blanco","w":5.0,"k":"ell","p":[260.0,-78.0],"t":[60.0,60.0]}]},{"f":"piel","s":"blanco","w":4.0,"k":"rect","p":[262.0,-46.0],"t":[18.0,20.0],"r":6.0},{"f":null,"s":"violeta","w":4.0,"k":"path","sp":[{"v":[[260.0,-38.0],[264.0,-18.0],[272.0,-38.0]],"i":[[0,0],[0,0],[0,0]],"o":[[0,0],[0,0],[0,0]],"c":false}]},{"f":"rayo","s":"blanco","w":5.0,"k":"path","sp":[{"v":[[234.0,64.0],[250.0,-38.0],[292.0,-26.0],[292.0,66.0]],"i":[[0,0],[-20.0,18.0],[-8.0,-16.0],[8.0,-20.0]],"o":[[-8.0,-40.0],[16.0,-8.0],[10.0,34.0],[0,0]],"c":true}]},{"f":"pelo","s":"blanco","w":4.0,"k":"path","sp":[{"v":[[228.0,-74.0],[290.0,-118.0],[304.0,6.0],[284.0,0.0],[260.0,-90.0],[232.0,-62.0]],"i":[[0,0],[-30.0,-20.0],[16.0,-44.0],[0,0],[22.0,8.0],[2.0,-20.0]],"o":[[-10.0,-46.0],[26.0,20.0],[0,0],[6.0,-40.0],[-14.0,-2.0],[0,0]],"c":true}]},{"f":"magenta","s":"blanco","w":4.0,"k":"ell","p":[226.0,160.0],"t":[40.0,16.0]},{"f":"magenta","s":"blanco","w":4.0,"k":"ell","p":[188.0,154.0],"t":[44.0,18.0]},{"f":null,"s":"pantalon","w":27.0,"k":"path","sp":[{"v":[[284.0,62.0],[190.0,60.0],[198.0,148.0]],"i":[[0,0],[0,0],[0,0]],"o":[[0,0],[0,0],[0,0]],"c":false}]},{"f":null,"s":"blanco","w":36.0,"k":"path","sp":[{"v":[[284.0,62.0],[190.0,60.0],[198.0,148.0]],"i":[[0,0],[0,0],[0,0]],"o":[[0,0],[0,0],[0,0]],"c":false}]},{"f":null,"s":"pantalon","w":25.0,"k":"path","sp":[{"v":[[282.0,78.0],[226.0,86.0],[232.0,154.0]],"i":[[0,0],[0,0],[0,0]],"o":[[0,0],[0,0],[0,0]],"c":false}]},{"f":null,"s":"blanco","w":34.0,"k":"path","sp":[{"v":[[282.0,78.0],[226.0,86.0],[232.0,154.0]],"i":[[0,0],[0,0],[0,0]],"o":[[0,0],[0,0],[0,0]],"c":false}]},{"f":"violetaClaro","s":"blanco","w":5.0,"k":"rect","p":[264.0,72.0],"t":[140.0,24.0],"r":10.0},{"f":null,"s":"blanco","w":7.0,"k":"path","sp":[{"v":[[214.0,82.0],[204.0,160.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false},{"v":[[314.0,82.0],[324.0,160.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":"violetaClaro","s":"blanco","w":5.0,"k":"rect","p":[323.0,13.0],"t":[26.0,150.0],"r":10.0},{"k":"g","n":"globo","o":[72.0,-110.0],"h":[{"f":null,"s":"rayo","w":5.0,"k":"path","sp":[{"v":[[148.0,-132.0],[176.0,-132.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":null,"s":"rayo","w":5.0,"k":"path","sp":[{"v":[[148.0,-146.0],[190.0,-146.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":null,"s":"rayo","w":5.0,"k":"path","sp":[{"v":[[148.0,-160.0],[200.0,-160.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":null,"s":"rayo","w":3.0,"k":"path","sp":[{"v":[[106.0,-142.0],[98.0,-128.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false},{"v":[[118.0,-142.0],[126.0,-128.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":"espacio","s":"rayo","w":4.0,"k":"ell","p":[112.0,-150.0],"t":[48.0,14.0]},{"f":"espacio","s":"rayo","w":4.0,"k":"path","sp":[{"v":[[98.0,-152.0],[126.0,-152.0]],"i":[[0,0],[0.0,-16.0]],"o":[[0.0,-16.0],[0,0]],"c":false}]},{"f":"espacio","s":"blanco","w":5.0,"k":"rect","p":[146.0,-151.0],"t":[148.0,70.0],"r":24.0},{"f":"espacio","s":"blanco","w":5.0,"k":"path","sp":[{"v":[[90.0,-124.0],[72.0,-92.0],[116.0,-120.0]],"i":[[0,0],[0,0],[0,0]],"o":[[0,0],[0,0],[0,0]],"c":true}]}]},{"k":"g","n":"cabezaAlien","o":[56.0,-58.0],"h":[{"k":"g","n":"boca","o":[58.0,-37.0],"h":[{"f":"espacio","s":null,"w":0,"k":"ell","p":[58.0,-37.0],"t":[16.0,12.0]}]},{"f":null,"s":"espacio","w":3.0,"k":"path","sp":[{"v":[[66.0,-80.0],[84.0,-74.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":null,"s":"espacio","w":3.0,"k":"path","sp":[{"v":[[32.0,-74.0],[50.0,-80.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":"blanco","s":null,"w":0,"k":"ell","p":[79.0,-64.0],"t":[7.0,7.0]},{"f":"blanco","s":null,"w":0,"k":"ell","p":[47.0,-64.0],"t":[7.0,7.0]},{"f":"espacio","s":null,"w":0,"k":"ell","p":[74.0,-62.0],"t":[28.0,18.0]},{"f":"espacio","s":null,"w":0,"k":"ell","p":[42.0,-62.0],"t":[28.0,18.0]},{"f":"menta","s":"blanco","w":5.0,"k":"path","sp":[{"v":[[56.0,-108.0],[96.0,-64.0],[56.0,-18.0],[16.0,-64.0]],"i":[[-30.0,0.0],[4.0,-22.0],[16.0,-4.0],[4.0,24.0]],"o":[[30.0,0.0],[-4.0,24.0],[-16.0,-4.0],[-4.0,-22.0]],"c":true}]}]},{"k":"g","n":"gesto","o":[-8.0,-12.0],"h":[{"f":null,"s":"blanco","w":5.0,"k":"path","sp":[{"v":[[-75.0,-132.0],[-68.0,-144.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":null,"s":"blanco","w":5.0,"k":"path","sp":[{"v":[[-84.0,-136.0],[-86.0,-150.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":null,"s":"blanco","w":5.0,"k":"path","sp":[{"v":[[-94.0,-132.0],[-104.0,-144.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":"menta","s":"blanco","w":4.0,"k":"ell","p":[-86.0,-124.0],"t":[26.0,26.0]},{"f":null,"s":"magenta","w":17.0,"k":"path","sp":[{"v":[[-8.0,-12.0],[-34.0,-78.0],[-80.0,-118.0]],"i":[[0,0],[0,0],[0,0]],"o":[[0,0],[0,0],[0,0]],"c":false}]},{"f":null,"s":"blanco","w":26.0,"k":"path","sp":[{"v":[[-8.0,-12.0],[-34.0,-78.0],[-80.0,-118.0]],"i":[[0,0],[0,0],[0,0]],"o":[[0,0],[0,0],[0,0]],"c":false}]}]},{"f":"menta","s":"blanco","w":4.0,"k":"ell","p":[-108.0,10.0],"t":[20.0,20.0]},{"f":null,"s":"magenta","w":14.0,"k":"path","sp":[{"v":[[-46.0,2.0],[-104.0,12.0]],"i":[[0,0],[16.0,8.0]],"o":[[-16.0,16.0],[0,0]],"c":false}]},{"f":null,"s":"blanco","w":22.0,"k":"path","sp":[{"v":[[-46.0,2.0],[-104.0,12.0]],"i":[[0,0],[16.0,8.0]],"o":[[-16.0,16.0],[0,0]],"c":false}]},{"f":"magenta","s":"blanco","w":5.0,"k":"path","sp":[{"v":[[-158.0,-10.0],[24.0,-18.0],[20.0,32.0],[-158.0,32.0]],"i":[[-16.0,10.0],[-42.0,-12.0],[20.0,-8.0],[40.0,10.0]],"o":[[40.0,-20.0],[16.0,6.0],[-60.0,10.0],[-16.0,-8.0]],"c":true}]},{"f":"menta","s":"blanco","w":4.0,"k":"ell","p":[-326.0,-78.0],"t":[34.0,22.0]},{"f":null,"s":"pantalon","w":30.0,"k":"path","sp":[{"v":[[-144.0,16.0],[-242.0,-14.0],[-314.0,-66.0]],"i":[[0,0],[0,0],[0,0]],"o":[[0,0],[0,0],[0,0]],"c":false}]},{"f":null,"s":"blanco","w":40.0,"k":"path","sp":[{"v":[[-144.0,16.0],[-242.0,-14.0],[-314.0,-66.0]],"i":[[0,0],[0,0],[0,0]],"o":[[0,0],[0,0],[0,0]],"c":false}]},{"f":null,"s":"blanco","w":3.0,"k":"ell","p":[69.0,-28.0],"t":[40.0,40.0]},{"f":"violeta","s":"blanco","w":5.0,"k":"rect","p":[69.0,19.0],"t":[78.0,174.0],"r":39.0},{"f":null,"s":"blanco","w":3.0,"k":"ell","p":[-319.0,-28.0],"t":[40.0,40.0]},{"f":"violeta","s":"blanco","w":5.0,"k":"rect","p":[-319.0,19.0],"t":[78.0,174.0],"r":39.0},{"f":"espacio","s":"blanco","w":4.0,"k":"rect","p":[25.0,118.0],"t":[18.0,34.0],"r":4.0},{"f":"espacio","s":"blanco","w":4.0,"k":"rect","p":[-275.0,118.0],"t":[18.0,34.0],"r":4.0},{"f":null,"s":"blanco","w":3.0,"k":"path","sp":[{"v":[[-294.0,50.0],[44.0,50.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":"violeta","s":"blanco","w":5.0,"k":"rect","p":[-125.0,64.0],"t":[370.0,80.0],"r":18.0},{"f":"violetaOsc","s":"blanco","w":5.0,"k":"rect","p":[-125.0,-18.0],"t":[390.0,120.0],"r":46.0}],"terapeuta":[{"k":"g","n":"cabezaTerapeuta","o":[262.0,-50.0],"h":[{"f":null,"s":"espacio","w":3.0,"k":"path","sp":[{"v":[[250.0,-62.0],[268.0,-62.0]],"i":[[0,0],[-4.0,5.0]],"o":[[6.0,5.0],[0,0]],"c":false}]},{"f":"espacio","s":null,"w":0,"k":"ell","p":[269.0,-75.0],"t":[5.0,5.0]},{"f":"espacio","s":null,"w":0,"k":"ell","p":[245.0,-75.0],"t":[5.0,5.0]},{"f":null,"s":"espacio","w":3.0,"k":"path","sp":[{"v":[[256.0,-76.0],[262.0,-76.0]],"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"c":false}]},{"f":null,"s":"espacio","w":3.0,"k":"ell","p":[271.0,-76.0],"t":[18.0,18.0]},{"f":null,"s":"espacio","w":3.0,"k":"ell","p":[247.0,-76.0],"t":[18.0,18.0]},{"f":"pelo","s":"blanco","w":4.0,"k":"ell","p":[286.0,-120.0],"t":[30.0,30.0]},{"f":"pelo","s":"blanco","w":3.0,"k":"path","sp":[{"v":[[230.0,-82.0],[288.0,-96.0],[232.0,-78.0]],"i":[[0,0],[-20.0,-20.0],[16.0,-20.0]],"o":[[4.0,-26.0],[-18.0,-6.0],[0,0]],"c":true}]},{"f":"piel","s":"blanco","w":5.0,"k":"ell","p":[260.0,-78.0],"t":[60.0,60.0]}]},{"f":"pelo","s":"blanco","w":4.0,"k":"path","sp":[{"v":[[228.0,-74.0],[290.0,-118.0],[304.0,6.0],[284.0,0.0],[260.0,-90.0],[232.0,-62.0]],"i":[[0,0],[-30.0,-20.0],[16.0,-44.0],[0,0],[22.0,8.0],[2.0,-20.0]],"o":[[-10.0,-46.0],[26.0,20.0],[0,0],[6.0,-40.0],[-14.0,-2.0],[0,0]],"c":true}]}]};
+    // @@ESCENA_FIN
+
     // =====================================================================
     // UTILIDADES
     // =====================================================================
@@ -80,7 +89,8 @@
         if (h.length === 3) { h = h.charAt(0) + h.charAt(0) + h.charAt(1) + h.charAt(1) + h.charAt(2) + h.charAt(2); }
         return [parseInt(h.substr(0, 2), 16) / 255, parseInt(h.substr(2, 2), 16) / 255, parseInt(h.substr(4, 2), 16) / 255];
     }
-    function esVerde() { return CONFIG.fondo === "verde"; }
+    // con verde o espacio el rayo va opaco y sin glow; solo en transparente lleva brillo
+    function esVerde() { return CONFIG.fondo !== "transparente"; }
     function q(s) { return '"' + s + '"'; }   // comillas para expresiones
 
     function carpeta(nombre) {
@@ -229,7 +239,11 @@
             estrellas(comp).moveToEnd();
             l = comp.layers.addSolid(hex(CONFIG.colores.espacio), N("FONDO_ESPACIO"), comp.width, comp.height, 1, comp.duration);
             l.moveToEnd();
-        } else if (esVerde()) {
+        } else if (CONFIG.fondo === "espacio") {
+            estrellas(comp).moveToEnd();
+            l = comp.layers.addSolid(hex(CONFIG.colores.espacio), N("FONDO_ESPACIO"), comp.width, comp.height, 1, comp.duration);
+            l.moveToEnd();
+        } else if (CONFIG.fondo === "verde") {
             l = comp.layers.addSolid(CONFIG.verde, N("FONDO_VERDE_CHROMA"), comp.width, comp.height, 1, comp.duration);
             l.comment = "Verde puro 0,255,0 para chroma key en OBS";
             l.moveToEnd();
@@ -342,6 +356,61 @@
     }
 
     // =====================================================================
+    // ESCENA DE SESIÓN (terapeuta + paciente alien) — datos en ESCENA_DATOS
+    // =====================================================================
+    var ANIM_ESCENA = {
+        gesto: ["rot", "Math.sin(time*2.2)*12"],
+        cabezaAlien: ["rot", "Math.sin(time*1.7)*4"],
+        cabezaTerapeuta: ["rot", "Math.sin(time*1.3)*4"],
+        lapiz: ["rot", "Math.sin(time*12)*5"],
+        globo: ["esc", "var s=100+Math.sin(time*3)*4;[s,s]"],
+        boca: ["esc", "[100,(0.35+Math.abs(Math.sin(time*9))*0.75)*100]"]
+    };
+    function colorEscena(n) { return hex(CONFIG.colores[n] || CONFIG.colores.blanco); }
+    function dibujarPiezas(capa, padre, lista) {
+        var i, p, g, j, sp;
+        for (i = 0; i < lista.length; i++) {
+            p = lista[i];
+            g = padre ? grupoEn(padre, p.k === "g" ? p.n : "PIEZA " + (i + 1)) : grupo(capa, p.k === "g" ? p.n : "PIEZA " + (i + 1));
+            if (p.k === "g") {
+                gtr(g, "ADBE Vector Anchor").setValue(p.o);
+                gtr(g, "ADBE Vector Position").setValue(p.o);
+                var an = ANIM_ESCENA[p.n];
+                if (an) {
+                    if (an[0] === "rot") { gtr(g, "ADBE Vector Rotation").expression = an[1]; }
+                    else { gtr(g, "ADBE Vector Scale").expression = an[1]; }
+                }
+                dibujarPiezas(capa, g, p.h);
+                continue;
+            }
+            if (p.k === "rect") { rect(g, p.t, p.p, p.r || 0); }
+            else if (p.k === "ell") { elipse(g, p.t, p.p); }
+            else if (p.k === "path") {
+                for (j = 0; j < p.sp.length; j++) { sp = p.sp[j]; trazo(g, sp.v, sp.c, sp.i, sp.o); }
+            }
+            if (p.s && p.w) { contorno(g, colorEscena(p.s), p.w, 100); }
+            if (p.f) { relleno(g, colorEscena(p.f), 100); }
+        }
+    }
+    // capa con la escena completa (centrada en 0,0; 760×380 al 100 %)
+    function escenaSesion(comp, nombre, ancho) {
+        var l = capaForma(comp, nombre || N("ESCENA_SESION"));
+        dibujarPiezas(l, null, ESCENA_DATOS.escena);
+        var e = (ancho || 760) / 760 * 100;
+        tr(l, "ADBE Scale").setValue([e, e, 100]);
+        return l;
+    }
+    // ícono: cabeza de la terapeuta (para el GC de la psicóloga)
+    function iconoTerapeuta(comp, nombre, tam) {
+        var l = capaForma(comp, nombre), g = grupo(l, "TERAPEUTA");
+        dibujarPiezas(l, g, ESCENA_DATOS.terapeuta);
+        gtr(g, "ADBE Vector Position").setValue([-270, 88]);
+        var e = tam / 108 * 100;
+        tr(l, "ADBE Scale").setValue([e, e, 100]);
+        return l;
+    }
+
+    // =====================================================================
     // NÚCLEO: ABDUCCIÓN  (ovni + rayo + barra + subbarra + textos)
     // Lo usan: GC, CORTINA TÍTULO, AVISO, VOLVEMOS, APERTURA, CIERRE, MULTIPLEX
     // =====================================================================
@@ -356,7 +425,7 @@
         var ufoY = o.barY - barH / 2 - o.rayoLargo - 20 * S / 100;
         var hoverY = o.barY - barH / 2 - 18 * S / 100;
         var subY = barH / 2 + subH / 2 + 6;
-        var icoW = o.paciente ? Math.round(barH * 0.9) : 0;
+        var icoW = o.icono ? Math.round(barH * 0.9) : 0;
         var maxW = o.maxW || 0;
 
         // ---------- CONTROL ----------
@@ -422,9 +491,13 @@
         ts.parent = g;
         tt.motionBlur = ts.motionBlur = barra.motionBlur = sb.motionBlur = true;
 
-        // ---------- ICONO PACIENTE (cabeza de alien en la barra) ----------
+        // ---------- ICONO (paciente alien o terapeuta) en la barra ----------
         var ico = null;
-        if (o.paciente) {
+        if (o.icono === "terapeuta") {
+            ico = iconoTerapeuta(comp, N("ICONO_TERAPEUTA"), icoW);
+            ico.parent = g;
+            ico.moveBefore(tt);
+        } else if (o.icono) {
             ico = capaForma(comp, N("ICONO_PACIENTE"));
             cabezaAlien(ico, "ALIEN", 0, 0, icoW / 100, 0);
             ico.parent = g;
@@ -445,10 +518,10 @@
             etqB.parent = g; etqT.parent = g;
             etqB.moveAfter(etqT);
         }
-        // ---------- ILUSTRACIÓN (paciente en el diván) ----------
-        var ilus = null;
-        if (o.ilustracion === "paciente" && !(o.usarLogo && CONFIG.logoArchivo)) {
-            ilus = paciente(comp, N("PACIENTE"));
+        // ---------- ILUSTRACIÓN (sesión: terapeuta + paciente alien) ----------
+        var ilus = null, anchoIlus = o.anchoIlus || 620;
+        if (o.ilustracion === "sesion" && !(o.usarLogo && CONFIG.logoArchivo)) {
+            ilus = escenaSesion(comp, N("ESCENA_SESION"), anchoIlus);
             ilus.parent = g;
         }
 
@@ -500,7 +573,7 @@
         var u = ovni(comp, U);
 
         ctrl.moveToBeginning();
-        ponerFondo(comp, o.completo);
+        if (!o.sinFondo) { ponerFondo(comp, o.completo); }
 
         // ---------- EXPRESIONES (ya existen todas las capas) ----------
         pAncho.expression = 'var L=thisComp.layer(' + q(TT) + ');var t=L.sourceRectAtTime(0,false).width*L.transform.scale[0]/100;' +
@@ -517,7 +590,7 @@
             tr(etqT, "ADBE Position").expression = EW + '[-w/2+18, ' + (-barH / 2 - 27 + 8) + ']';
         }
         if (ilus) {
-            tr(ilus, "ADBE Position").expression = '[0, ' + (-barH / 2 - 24 - 92) + '+Math.sin(time*1.6)*6]';
+            tr(ilus, "ADBE Position").expression = '[0, ' + Math.round(-barH / 2 - 24 - 190 * anchoIlus / 760) + '+Math.sin(time*1.6)*6]';
         }
         pSub.expression = 'var t=thisComp.layer(' + q(TS) + ').sourceRectAtTime(0,false).width;' +
                           't>2 ? t+' + (mS * 2) + ' : 0';
@@ -624,12 +697,13 @@
     // =====================================================================
     // GRÁFICAS
     // =====================================================================
-    function crearGC(nombre, cargo, esPaciente) {
+    function crearGC(nombre, cargo, icono) {
         var limpio = nombre.replace(/[^A-Za-z0-9áéíóúñÁÉÍÓÚÑ ]/g, "");
         var o = { nombre: "GC_" + limpio, titulo: nombre, sub: cargo,
             tamT: 54, tamS: 28, barY: 880, rayoLargo: 230, S: 100,
             tIn: 0, tOut: CONFIG.dur.gc - 2, dur: CONFIG.dur.gc };
-        if (esPaciente) { o.paciente = true; o.colorSub = CONFIG.colores.magenta; o.colorAcento = CONFIG.colores.menta; }
+        if (icono === "alien" || icono === 1) { o.icono = "alien"; o.colorSub = CONFIG.colores.magenta; o.colorAcento = CONFIG.colores.menta; }
+        else if (icono === "terapeuta") { o.icono = "terapeuta"; o.colorAcento = CONFIG.colores.violetaClaro; }
         return abduccion(o);
     }
 
@@ -661,14 +735,14 @@
 
     function crearVolvemos() {
         return abduccion({ nombre: "VOLVEMOS", titulo: CONFIG.volvemos.titulo, sub: CONFIG.volvemos.sub,
-            tamT: 84, tamS: 36, barY: 640, rayoLargo: 260, S: 140, centrado: true, minW: 800, maxW: 1720,
+            tamT: 84, tamS: 36, barY: 800, rayoLargo: 420, S: 140, centrado: true, minW: 800, maxW: 1720, ilustracion: "sesion", anchoIlus: 560,
             tIn: 0, tOut: CONFIG.dur.volvemos - 2, dur: CONFIG.dur.volvemos });
     }
 
     function crearApertura() {
         return abduccion({ nombre: "APERTURA", titulo: CONFIG.apertura.titulo, sub: CONFIG.apertura.sub,
             tamT: 120, tamS: 40, barY: 760, rayoLargo: 420, S: 170, centrado: true, minW: 900, maxW: 1720,
-            completo: true, ovniPausa: true, usarLogo: true, ilustracion: "paciente",
+            completo: true, ovniPausa: true, usarLogo: true, ilustracion: "sesion",
             colorBarra: CONFIG.colores.espacio,
             tIn: 1.5, tOut: CONFIG.dur.apertura - 2.8, dur: CONFIG.dur.apertura });
     }
@@ -676,7 +750,7 @@
     function crearCierre() {
         return abduccion({ nombre: "CIERRE", titulo: CONFIG.cierre.titulo, sub: CONFIG.cierre.sub,
             tamT: 110, tamS: 34, barY: 760, rayoLargo: 420, S: 170, centrado: true, minW: 900, maxW: 1720,
-            completo: true, usarLogo: true, ilustracion: "paciente",
+            completo: true, usarLogo: true, ilustracion: "sesion",
             tIn: 0.5, tOut: CONFIG.dur.cierre - 2, dur: CONFIG.dur.cierre });
     }
 
@@ -697,7 +771,11 @@
         var p2 = panel(N("CORTINA_B"), cs.magenta, 0.12);
         var p1 = panel(N("CORTINA_A"), cs.violeta, 0);
         var t = crearTexto(comp, CONFIG.programa, CONFIG.fuentes.titulo, 110, hex(cs.blanco), 60, N("CORTINA_TEXTO"), true);
-        tr(t, "ADBE Position").setValue([960, 580]);
+        tr(t, "ADBE Position").setValue([960, 840]);
+        var esc = escenaSesion(comp, N("CORTINA_ESCENA"), 760);
+        tr(esc, "ADBE Position").setValue([960, 520]);
+        anim(tr(esc, "ADBE Opacity"), [[0.8, 0], [1.0, 100], [1.35, 100], [1.55, 0]]);
+        esc.moveBefore(t);
         anim(tr(t, "ADBE Opacity"), [[0.85, 0], [1.05, 100], [1.35, 100], [1.55, 0]]);
         anim(tr(t, "ADBE Scale"), [[0.85, [90, 90, 100]], [1.55, [104, 104, 100]]]);
         // columna de luz bajo el ovni
@@ -851,7 +929,34 @@
         var cs = CONFIG.colores, D = CONFIG.dur.multiplex, X = D - 2.2;
         var comp = abduccion({ nombre: nombre, titulo: titulo, sub: "",
             tamT: 46, tamS: 24, barY: 965, rayoLargo: 50, S: 80, centrado: true, minW: 520,
-            tIn: 0, tOut: X, dur: D });
+            tIn: 0, tOut: X, dur: D, sinFondo: true });
+        // fondo: espacio en todo el cuadro y SOLO el interior de las ventanas en verde (o transparente)
+        var fm = capaForma(comp, N("FONDO_SESION")), k2, intento, sx, sy, dentro;
+        var gEst = grupo(fm, "ESTRELLAS");
+        for (k2 = 0; k2 < 160; k2++) {
+            for (intento = 0; intento < 10; intento++) {
+                sx = Math.random() * 1920; sy = Math.random() * 1080; dentro = false;
+                for (var w2 = 0; w2 < cajas.length; w2++) {
+                    if (sx > cajas[w2][0] - 8 && sx < cajas[w2][0] + cajas[w2][2] + 8 && sy > cajas[w2][1] - 8 && sy < cajas[w2][1] + cajas[w2][3] + 8) { dentro = true; }
+                }
+                if (!dentro) { break; }
+            }
+            if (!dentro) { var ts2 = 2 + Math.random() * 4; elipse(gEst, [ts2, ts2], [sx - 960, sy - 540]); }
+        }
+        relleno(gEst, hex(cs.blanco), 85);
+        var gF = grupo(fm, "ESPACIO_CON_VENTANAS");
+        rect(gF, [1920, 1080], [0, 0], 0);
+        for (k2 = 0; k2 < cajas.length; k2++) { rect(gF, [cajas[k2][2], cajas[k2][3]], [cajas[k2][0] + cajas[k2][2] / 2 - 960, cajas[k2][1] + cajas[k2][3] / 2 - 540], 16); }
+        var mg = cont(gF).addProperty("ADBE Vector Filter - Merge");
+        try { mg.property("ADBE Vector Merge Type").setValue(3); } catch (e3) {}   // restar: las ventanas quedan huecas
+        relleno(gF, hex(cs.espacio), 100);
+        tr(fm, "ADBE Position").setValue([960, 540]);
+        fm.moveToEnd();
+        if (CONFIG.fondo !== "transparente") {
+            var verde = comp.layers.addSolid(CONFIG.verde, N("VENTANAS_VERDE_CHROMA"), 1920, 1080, 1, D);
+            verde.comment = "Verde puro solo visible dentro de las ventanas";
+            verde.moveToEnd();
+        }
         // chip «SESIÓN EN CURSO 00:00» con onda cerebral
         var chip = capaForma(comp, N("SESION_CHIP")), gch = grupo(chip, "PILDORA");
         var gpd = grupo(chip, "PUNTO"); elipse(gpd, [12, 12], [-196, 0]); relleno(gpd, hex(cs.magenta), 100);
@@ -972,7 +1077,7 @@
     var MODULOS = [
         ["gc", "GC (todos los de la lista)"],
         ["avance", "Avance informativo (portada + titulares)"],
-        ["apertura", "Apertura 15″ (paciente en el diván)"],
+        ["apertura", "Apertura 15″ (escena de sesión)"],
         ["cortinaTitulo", "Cortina título (compilado)"],
         ["cortina", "Cortina / stinger"],
         ["transicion", "Transiciones ×4 (rayo, hipnosis, Rorschach, onda)"],
@@ -1038,8 +1143,9 @@
         var tg = tabs.add("tab", undefined, "General"); tg.alignChildren = ["fill", "top"];
         var ePrograma = campo(tg, "Programa", CONFIG.programa);
         var gF = tg.add("panel", undefined, "Fondo"); gF.orientation = "row";
-        var rbV = gF.add("radiobutton", undefined, "Verde (chroma OBS)");
-        var rbT = gF.add("radiobutton", undefined, "Transparente (alfa)");
+        var rbV = gF.add("radiobutton", undefined, "Verde");
+        var rbE = gF.add("radiobutton", undefined, "Espacio");
+        var rbT = gF.add("radiobutton", undefined, "Transparente");
         rbV.value = true;
         var eFT = campo(tg, "Fuente títulos", CONFIG.fuentes.titulo);
         var eFX = campo(tg, "Fuente textos", CONFIG.fuentes.texto);
@@ -1058,9 +1164,9 @@
 
         // --- Textos ---
         var tx = tabs.add("tab", undefined, "Textos"); tx.alignChildren = ["fill", "top"];
-        tx.add("statictext", undefined, "GC — una línea por persona:  Nombre | Cargo   (agrega | paciente para el estilo alien)");
+        tx.add("statictext", undefined, "GC — una línea por persona:  Nombre | Cargo | estilo   (estilo: terapeuta o alien)");
         var lineas = [], i;
-        for (i = 0; i < CONFIG.gcs.length; i++) { lineas.push(CONFIG.gcs[i][0] + " | " + CONFIG.gcs[i][1] + (CONFIG.gcs[i][2] ? " | paciente" : "")); }
+        for (i = 0; i < CONFIG.gcs.length; i++) { lineas.push(CONFIG.gcs[i][0] + " | " + CONFIG.gcs[i][1] + (CONFIG.gcs[i][2] ? " | " + CONFIG.gcs[i][2] : "")); }
         var eGC = tx.add("edittext", undefined, lineas.join("\n"), { multiline: true });
         eGC.preferredSize = [360, 90];
         tx.add("statictext", undefined, "Titulares — una línea cada uno:  TALCA | texto   (TALCA, CHILE o INTERNACIONAL)");
@@ -1116,7 +1222,7 @@
 
         bCrear.onClick = function () {
             CONFIG.programa = trim(ePrograma.text) || CONFIG.programa;
-            CONFIG.fondo = rbV.value ? "verde" : "transparente";
+            CONFIG.fondo = rbV.value ? "verde" : (rbE.value ? "espacio" : "transparente");
             CONFIG.fuentes.titulo = trim(eFT.text); CONFIG.fuentes.texto = trim(eFX.text);
             CONFIG.bordeIzq = parseFloat(eBorde.text) || 140;
             var ls = eGC.text.split(/\r\n|\r|\n/), j, p;
@@ -1124,7 +1230,7 @@
             for (j = 0; j < ls.length; j++) {
                 if (trim(ls[j]) === "") { continue; }
                 p = separar(ls[j]);
-                CONFIG.gcs.push([p[0], p[1] || "", /paciente/i.test(p[2] || "") ? 1 : 0]);
+                CONFIG.gcs.push([p[0], p[1] || "", /alien|paciente/i.test(p[2] || "") ? "alien" : (/terapeuta|psic/i.test(p[2] || "") ? "terapeuta" : "")]);
             }
             var lt2 = eTit.text.split(/\r\n|\r|\n/);
             CONFIG.titulares = [];

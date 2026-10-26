@@ -20,10 +20,20 @@ const TIPOS = {
 let estado = null;
 try { estado = JSON.parse(fs.readFileSync(ARCHIVO_ESTADO, 'utf8')); } catch (e) { estado = null; }
 
-const clientes = new Set();
+const clientes = new Set();     // { res, rol }
 function emitir(msg) {
   const linea = 'data: ' + JSON.stringify(msg) + '\n\n';
-  for (const res of clientes) { try { res.write(linea); } catch (e) { clientes.delete(res); } }
+  for (const c of clientes) { try { c.res.write(linea); } catch (e) { clientes.delete(c); } }
+}
+function presencia() {
+  let salidas = 0, controles = 0;
+  for (const c of clientes) { if (c.rol === 'salida') salidas++; else controles++; }
+  emitir({ tipo: 'presencia', salidas, controles });
+}
+function ipsLocales() {
+  const ips = [];
+  for (const lista of Object.values(os.networkInterfaces())) for (const i of lista || []) if (i.family === 'IPv4' && !i.internal) ips.push(i.address);
+  return ips;
 }
 
 let guardadoPendiente = null;
@@ -40,10 +50,22 @@ const servidor = http.createServer((req, res) => {
   if (url.pathname === '/eventos') {
     res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' });
     res.write('retry: 1500\n\n');
-    if (estado) res.write('data: ' + JSON.stringify({ tipo: 'estado', estado, id: 'inicio' }) + '\n\n');
-    clientes.add(res);
+    const cli = { res, rol: url.searchParams.get('rol') === 'salida' ? 'salida' : 'control' };
+    clientes.add(cli);
+    presencia();
     const latido = setInterval(() => { try { res.write(': latido\n\n'); } catch (e) {} }, 15000);
-    req.on('close', () => { clearInterval(latido); clientes.delete(res); });
+    req.on('close', () => { clearInterval(latido); clientes.delete(cli); presencia(); });
+    return;
+  }
+
+  if (url.pathname === '/info') {
+    const ip = ipsLocales()[0] || 'localhost';
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-cache' });
+    res.end(JSON.stringify({
+      servidor: 'terapia-espacial', ips: ipsLocales(), puerto: PUERTO,
+      control: 'http://' + ip + ':' + PUERTO + '/panel.html',
+      salida: 'http://localhost:' + PUERTO + '/salida.html'
+    }));
     return;
   }
 
@@ -72,7 +94,7 @@ const servidor = http.createServer((req, res) => {
 
   // archivos estáticos
   let ruta = decodeURIComponent(url.pathname);
-  if (ruta === '/') ruta = '/panel.html';
+  if (ruta === '/') ruta = '/index.html';
   const archivo = path.normalize(path.join(CARPETA, ruta));
   if (!archivo.startsWith(CARPETA)) { res.writeHead(403); res.end(); return; }
   fs.readFile(archivo, (err, datos) => {
@@ -83,11 +105,9 @@ const servidor = http.createServer((req, res) => {
 });
 
 servidor.listen(PUERTO, '0.0.0.0', () => {
-  const ips = [];
-  for (const lista of Object.values(os.networkInterfaces())) {
-    for (const i of lista || []) if (i.family === 'IPv4' && !i.internal) ips.push(i.address);
-  }
+  const ips = ipsLocales();
   console.log('\n  ✦ TERAPIA ESPACIAL — servidor de gráficas listo ✦\n');
+  console.log('  Inicio (links):    http://localhost:' + PUERTO + '/');
   console.log('  Panel (este PC):   http://localhost:' + PUERTO + '/panel.html');
   console.log('  Salida para OBS:   http://localhost:' + PUERTO + '/salida.html');
   ips.forEach(ip => console.log('  Panel en celular:  http://' + ip + ':' + PUERTO + '/panel.html'));

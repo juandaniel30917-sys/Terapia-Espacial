@@ -1,4 +1,4 @@
-# PROMPT — Paquete gráfico «TERAPIA ESPACIAL» · v2
+# PROMPT — Paquete gráfico «TERAPIA ESPACIAL» · v3
 
 > Copia este prompt completo cuando quieras regenerar o ampliar el paquete. Cuando mandes referencias nuevas, agrégalas al final en la sección **«Referencias nuevas»** e indica en cada una a qué afecta: `CONFIG / GC / TRANSICIONES / CORTINAS / LOGO / PIP / COLORES / AVISOS`. Solo se modificará esa parte.
 
@@ -112,6 +112,21 @@
 - INTERNACIONAL: Bélgica y Asturias: los videos que reabren el debate
 
 Colores de las etiquetas: TALCA en magenta, CHILE en violeta e INTERNACIONAL en luz del rayo con texto oscuro. Si un titular es muy largo, la letra se achica sola hasta caber en 1720 px.
+
+## v3 — Escena de sesión, fondos y botonera
+
+**Escena de sesión (referencia: ilustración de terapia con diván):** una **terapeuta mujer** (pelo largo con moño, lentes y blusa crema) está sentada en una silla, con una libreta y un lápiz. Frente a ella, un **paciente alien** está **despierto**, recostado en el diván con la cabeza levantada mirándola. Tiene los ojos abiertos, cejas de preocupación y la boca abierta porque está hablando. Levanta un brazo para gesticular y tiene un globo de diálogo con un ovni dentro (está contando su abducción).
+- Movimientos: el brazo gesticula, la boca habla, el globo late, la terapeuta asiente y escribe.
+- Se usa en varias gráficas: apertura, cierre, «Volvemos · La sesión continúa», cortina (stinger), ícono del GC de la psicóloga y página principal.
+
+**Fondos:** Verde (chroma), Espacio (estrellado) o Transparente. En el duplex y el triplex siempre se ve el espacio alrededor y **solo el interior de las ventanas va en verde**.
+
+**Botonera (sistema de Completos Mojados, con visual propio):**
+- Salas en Supabase con link de control (token) y link de OBS (clave de solo lectura), más QR.
+- Realtime con consulta de respaldo, y presencia de salidas («1 salida» / «sin salida»).
+- Modo por equipo: tablet y celular abren solo la botonera.
+- Botones editables, con teclas F13–F24.
+- Paso de pauta compartido y LIMPIAR.
 
 ## Referencias nuevas (agregar aquí)
 - _(ejemplo)_ `afecta: COLORES, LOGO` — logo final en .ai con paleta X.

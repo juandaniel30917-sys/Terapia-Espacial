@@ -9,6 +9,6 @@ if errorlevel 1 (
   pause
   exit /b
 )
-start "" http://localhost:8080/panel.html
+start "" http://localhost:8080/
 node servidor.js
 pause
