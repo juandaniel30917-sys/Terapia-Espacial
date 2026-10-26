@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Terapia Espacial · Salida OBS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@700;800&family=Audiowide&family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;700&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --espacio:#0B0B1A; --violeta:#7B2FF7; --magenta:#FF3DCB; --rayo:#FFF4C2; --blanco:#FFFFFF; --menta:#D6EFC7;
+    --ft:'Orbitron', 'Arial Black', Arial, sans-serif; --fx:'Inter', Arial, sans-serif;
+  }
+  html,body{margin:0;padding:0;overflow:hidden;background:transparent;}
+  #escena{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;}
+  #fondoVerde{position:absolute;inset:0;background:#00FF00;display:none;}
+  body.verde #fondoVerde{display:block;}
+  .capa{position:absolute;inset:0;pointer-events:none;}
+
+  /* ---------- ABDUCCIÓN ---------- */
+  .abd{position:absolute;inset:0;}
+  svg.full{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:visible;}
+  .grp{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform;}
+  .barra{position:absolute;box-sizing:border-box;border-radius:6px;background:var(--espacio);}
+  .barra .linea{position:absolute;left:0;right:0;top:0;height:5px;background:var(--violeta);border-radius:6px 6px 0 0;}
+  .barra .acento{position:absolute;left:0;top:0;bottom:0;width:14px;background:var(--magenta);border-radius:6px 0 0 6px;}
+  .barra .icono{position:absolute;top:50%;transform:translateY(-50%);}
+  .titulo{position:absolute;white-space:nowrap;font-family:var(--ft);font-weight:700;color:var(--blanco);letter-spacing:.02em;line-height:1;}
+  .subbarra{position:absolute;border-radius:4px;background:var(--violeta);}
+  .subtitulo{position:absolute;white-space:nowrap;font-family:var(--fx);font-weight:700;color:var(--blanco);letter-spacing:.08em;text-transform:uppercase;line-height:1;}
+  .etiqueta{position:absolute;height:38px;padding:0 18px;display:flex;align-items:center;border-radius:4px;font-family:var(--ft);font-weight:700;font-size:21px;letter-spacing:.14em;white-space:nowrap;}
+  .ilus{position:absolute;}
+  .ufo{position:absolute;left:0;top:0;width:0;height:0;will-change:transform;}
+  .ufo svg{position:absolute;left:-140px;top:-100px;width:280px;height:150px;overflow:visible;}
+  body:not(.verde) .ufo svg, body:not(.verde) svg.rayo{filter:drop-shadow(0 0 10px rgba(123,47,247,.85)) drop-shadow(0 0 22px rgba(255,244,194,.35));}
+
+  /* ---------- ESPACIO (apertura/cierre) ---------- */
+  .espacio{position:absolute;inset:0;background:var(--espacio);opacity:0;transition:opacity .6s;}
+  .espacio.on{opacity:1;}
+  .espacio canvas{position:absolute;left:0;top:0;animation:deriva 30s linear infinite;}
+  @keyframes deriva{from{transform:translateX(0)}to{transform:translateX(-420px)}}
+
+  /* ---------- VENTANAS (duplex / triplex) ---------- */
+  .ventana{position:absolute;}
+  .ventana svg{position:absolute;inset:-6px;overflow:visible;}
+  .ventana rect{fill:none;}
+  .etq{position:absolute;height:46px;display:flex;align-items:center;padding:0 22px 0 26px;background:var(--espacio);border-radius:4px;
+       font-family:var(--ft);font-weight:700;font-size:22px;letter-spacing:.08em;color:var(--blanco);white-space:nowrap;
+       opacity:0;transform:translateY(10px);transition:opacity .35s, transform .35s;}
+  .etq::before{content:"";position:absolute;left:0;top:0;bottom:0;width:8px;background:var(--magenta);border-radius:4px 0 0 4px;}
+  .etq.on{opacity:1;transform:none;}
+  .sesion{position:absolute;left:96px;top:54px;height:46px;display:flex;align-items:center;gap:14px;padding:0 18px 0 16px;background:var(--espacio);
+       border:3px solid var(--violeta);border-radius:23px;font-family:var(--ft);font-weight:700;font-size:19px;letter-spacing:.12em;color:var(--blanco);
+       opacity:0;transform:translateX(-30px);transition:opacity .4s, transform .5s;}
+  .sesion.on{opacity:1;transform:none;}
+  .sesion i{width:12px;height:12px;border-radius:50%;background:var(--magenta);animation:parpadeo 1s steps(1) infinite;}
+  .sesion b{color:var(--rayo);font-weight:700;min-width:70px;}
+  .sesion svg{width:90px;height:30px;}
+
+  /* ---------- BUG ---------- */
+  .bug{position:absolute;right:96px;top:54px;width:360px;height:112px;transform-origin:100% 0;}
+  .bug .placa{position:absolute;inset:0;background:var(--espacio);border:4px solid var(--violeta);border-radius:56px;box-sizing:border-box;}
+  .bug .l1,.bug .l2{position:absolute;left:120px;font-family:var(--ft);font-weight:700;font-size:30px;letter-spacing:.06em;line-height:1;white-space:nowrap;}
+  .bug .l1{top:24px;color:var(--blanco);} .bug .l2{top:60px;color:var(--menta);}
+  .bug img{position:absolute;left:110px;top:10px;height:92px;max-width:230px;object-fit:contain;}
+  .bug .vivo{position:absolute;right:0;top:128px;height:38px;padding:0 18px 0 36px;border-radius:19px;background:var(--magenta);display:flex;align-items:center;
+       font-family:var(--ft);font-weight:700;font-size:18px;letter-spacing:.12em;color:var(--blanco);}
+  .bug .vivo::before{content:"";position:absolute;left:14px;top:13px;width:12px;height:12px;border-radius:50%;background:var(--blanco);animation:parpadeo 1s steps(1) infinite;}
+  @keyframes parpadeo{50%{opacity:.2}}
+  .bug{transition:opacity .4s, transform .5s cubic-bezier(.2,1.4,.4,1);}
+  .bug.fuera{opacity:0;transform:scale(.2) translateY(-60px);}
+
+  /* ---------- TICKER ---------- */
+  .ticker{position:absolute;left:0;right:0;bottom:18px;height:52px;background:var(--espacio);border-top:4px solid var(--violeta);
+       display:flex;align-items:center;overflow:hidden;transform:translateY(90px);transition:transform .6s cubic-bezier(.3,1.3,.5,1);}
+  .ticker.on{transform:none;}
+  .ticker .etiq{position:relative;z-index:2;height:100%;padding:0 26px;display:flex;align-items:center;background:var(--magenta);
+       font-family:var(--ft);font-weight:700;font-size:22px;letter-spacing:.1em;color:var(--blanco);white-space:nowrap;}
+  .ticker .cinta{white-space:nowrap;font-family:var(--fx);font-weight:600;font-size:26px;color:var(--blanco);padding-left:40px;}
+
+  /* ---------- CORTINA ---------- */
+  .panelC{position:absolute;top:0;bottom:0;left:0;}
+  .cortTexto{position:absolute;left:0;right:0;top:500px;text-align:center;font-family:var(--ft);font-weight:900;font-size:110px;letter-spacing:.06em;color:var(--blanco);opacity:0;}
+</style>
+</head>
+<body class="verde">
+<div id="escena">
+  <div id="fondoVerde"></div>
+  <div class="capa" id="cEspacio"></div>
+  <div class="capa" id="cVentanas"></div>
+  <div class="capa" id="cGraficas"></div>
+  <div class="capa" id="cTicker"></div>
+  <div class="capa" id="cBug"></div>
+  <div class="capa" id="cCortina"></div>
+</div>
+
+<script src="comun.js"></script>
+<script>
+/* ===================================================================
+   MOTOR DE ANIMACIÓN — replica las llaves del script de After Effects
+   =================================================================== */
+const SVGNS = 'http://www.w3.org/2000/svg';
+let E = TE.copia(TE.ESTADO_BASE);
+const cfg = () => E.config;
+const ahora = () => performance.now() / 1000;
+const $ = (s, p = document) => p.querySelector(s);
+function el(tag, cls, padre) { const e = document.createElement(tag); if (cls) e.className = cls; if (padre) padre.appendChild(e); return e; }
+function sv(tag, attrs, padre) { const e = document.createElementNS(SVGNS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (padre) padre.appendChild(e); return e; }
+function ease(x) { return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
+function pista(keys, t, lineal) {
+  if (t <= keys[0][0]) return keys[0][1];
+  const u = keys[keys.length - 1]; if (t >= u[0]) return u[1];
+  let i = 0; while (t > keys[i + 1][0]) i++;
+  const [ta, va] = keys[i], [tb, vb] = keys[i + 1];
+  let f = (t - ta) / (tb - ta); if (!lineal) f = ease(f);
+  return Array.isArray(va) ? va.map((v, j) => v + (vb[j] - v) * f) : va + (vb - va) * f;
+}
+const esVerde = () => cfg().fondo !== 'transparente';
+const COLOR_SECCION = { TALCA: ['var(--magenta)', 'var(--blanco)'], CHILE: ['var(--violeta)', 'var(--blanco)'], INTERNACIONAL: ['var(--rayo)', 'var(--espacio)'] };
+
+/* ---------- dibujos ---------- */
+function svgOvni() {
+  const s = sv('svg', { viewBox: '-140 -100 280 150' });
+  sv('ellipse', { cx: 0, cy: 0, rx: 125, ry: 37, fill: 'none', stroke: 'var(--violeta)', 'stroke-width': 6 }, s);
+  sv('path', { d: 'M-64,-4 C-64,-46 -38,-78 0,-78 C38,-78 64,-46 64,-4 Z', fill: 'var(--espacio)', stroke: 'var(--blanco)', 'stroke-width': 6, 'stroke-linejoin': 'round' }, s);
+  sv('ellipse', { cx: 0, cy: 0, rx: 116, ry: 29, fill: 'var(--espacio)', stroke: 'var(--blanco)', 'stroke-width': 6 }, s);
+  sv('path', { d: 'M20,-60 C32,-58 42,-52 40,-40', fill: 'none', stroke: 'var(--blanco)', 'stroke-width': 5, 'stroke-linecap': 'round' }, s);
+  const g = sv('g', { class: 'luces' }, s);
+  [[-64, 6], [0, 13], [64, 6]].forEach(([x, y]) => sv('circle', { cx: x, cy: y, r: 7, fill: 'var(--magenta)' }, g));
+  return s;
+}
+// Cabeza del paciente alienígena (dibujo original, línea blanca como el ovni)
+function cabezaAlien(g, x, y, esc) {
+  const h = sv('g', { transform: `translate(${x},${y}) scale(${esc})` }, g);
+  sv('path', { d: 'M0,-46 C30,-46 44,-24 40,-2 C36,22 16,40 0,44 C-16,40 -36,22 -40,-2 C-44,-24 -30,-46 0,-46 Z', fill: 'var(--menta)', stroke: 'var(--blanco)', 'stroke-width': 5 }, h);
+  sv('ellipse', { cx: -16, cy: 2, rx: 14, ry: 8, fill: 'var(--espacio)', transform: 'rotate(28 -16 2)' }, h);
+  sv('ellipse', { cx: 16, cy: 2, rx: 14, ry: 8, fill: 'var(--espacio)', transform: 'rotate(-28 16 2)' }, h);
+  sv('circle', { cx: -19, cy: -1, r: 3, fill: 'var(--blanco)' }, h);
+  sv('circle', { cx: 13, cy: -1, r: 3, fill: 'var(--blanco)' }, h);
+  sv('path', { d: 'M-6,26 Q0,30 6,26', fill: 'none', stroke: 'var(--espacio)', 'stroke-width': 3, 'stroke-linecap': 'round' }, h);
+  return h;
+}
+function svgCabeza(tam) {
+  const s = sv('svg', { viewBox: '-50 -52 100 100', width: tam, height: tam });
+  cabezaAlien(s, 0, 0, 1);
+  return s;
+}
+// Paciente en el diván con burbuja de pensamiento
+function svgPaciente() {
+  const s = sv('svg', { viewBox: '-230 -230 460 320', width: 460, height: 320 });
+  const W = { stroke: 'var(--blanco)', 'stroke-width': 5, 'stroke-linejoin': 'round' };
+  // burbuja
+  const b = sv('g', { class: 'burbuja' }, s);
+  sv('circle', Object.assign({ cx: -46, cy: -118, r: 7, fill: 'var(--espacio)' }, W), b);
+  sv('circle', Object.assign({ cx: -22, cy: -146, r: 11, fill: 'var(--espacio)' }, W), b);
+  sv('ellipse', Object.assign({ cx: 40, cy: -182, rx: 62, ry: 36, fill: 'var(--espacio)' }, W), b);
+  const tx = sv('text', { x: 40, y: -168, 'text-anchor': 'middle', 'font-weight': 900, 'font-size': 44, style: 'font-family:var(--ft)', fill: 'var(--rayo)' }, b);
+  tx.textContent = '?';
+  // diván
+  sv('path', Object.assign({ d: 'M-196,40 C-206,-30 -188,-70 -150,-70 L-128,-70 L-128,40 Z', fill: 'var(--violeta)' }, W), s);
+  sv('rect', Object.assign({ x: -200, y: 18, width: 396, height: 46, rx: 18, fill: 'var(--violeta)' }, W), s);
+  sv('rect', Object.assign({ x: -132, y: -8, width: 300, height: 32, rx: 14, fill: 'var(--magenta)' }, W), s);
+  sv('rect', Object.assign({ x: 164, y: -22, width: 40, height: 70, rx: 16, fill: 'var(--violeta)' }, W), s);
+  sv('path', { d: 'M-170,64 L-180,88 M170,64 L180,88', stroke: 'var(--blanco)', 'stroke-width': 6, 'stroke-linecap': 'round' }, s);
+  // cuerpo recostado
+  sv('path', Object.assign({ d: 'M-70,-14 C-40,-44 80,-44 140,-26 C156,-20 156,-6 140,-4 C80,4 -40,6 -70,-14 Z', fill: 'var(--menta)' }, W), s);
+  sv('path', { d: 'M10,-30 C20,-6 40,-4 54,-12', fill: 'none', stroke: 'var(--blanco)', 'stroke-width': 5, 'stroke-linecap': 'round' }, s);
+  cabezaAlien(s, -110, -46, 1.05).setAttribute('transform', 'translate(-110,-46) scale(1.05) rotate(-62)');
+  return s;
+}
+function ondaPath(ancho, alto, picos) {
+  let d = `M0,${alto / 2}`; const n = picos, paso = ancho / n;
+  for (let i = 0; i < n; i++) {
+    const x = i * paso;
+    d += ` L${x + paso * .35},${alto / 2} L${x + paso * .45},${alto * .1} L${x + paso * .55},${alto * .9} L${x + paso * .65},${alto / 2}`;
+  }
+  return d + ` L${ancho},${alto / 2}`;
+}
+
+/* ===================================================================
+   ABDUCCIÓN: ovni cae → rayo → GC baja por el rayo; salida lo absorbe
+   =================================================================== */
+class Abduccion {
+  constructor(o, capa) {
+    this.o = o;
+    this.S = o.S || 100;
+    this.barH = Math.round(o.tamT * 1.65);
+    this.subH = Math.round(o.tamS * 1.7);
+    this.mT = Math.round(o.tamT * .75);
+    this.mS = Math.round(o.tamS * .9);
+    this.icoW = o.paciente ? Math.round(this.barH * .9) : 0;
+    this.ufoY = o.barY - this.barH / 2 - o.rayoLargo - 20 * this.S / 100;
+    this.hoverY = o.barY - this.barH / 2 - 18 * this.S / 100;
+    this.el = el('div', 'abd', capa);
+
+    // rayo
+    this.svg = sv('svg', { class: 'full rayo', viewBox: '0 0 1920 1080' }, this.el);
+    this.cono = sv('polygon', { 'stroke-width': 5, 'stroke-linejoin': 'round' }, this.svg);
+    this.nucleo = sv('polygon', {}, this.svg);
+    this.lineas = [-.25, 0, .25].map(() => sv('line', { 'stroke-width': 3 }, this.svg));
+    this.anillos = [0, 1, 2, 3, 4].map(() => sv('ellipse', { fill: 'none', 'stroke-width': 4 }, this.svg));
+
+    // grupo barra + textos
+    this.grp = el('div', 'grp', this.el);
+    if (o.logo) { this.ilus = el('img', 'ilus', this.grp); this.ilus.src = o.logo; this.ilus.style.maxHeight = '240px'; }
+    else if (o.ilustracion === 'paciente') { this.ilus = el('div', 'ilus', this.grp); this.ilus.appendChild(svgPaciente()); }
+    this.barra = el('div', 'barra', this.grp);
+    el('div', 'linea', this.barra); el('div', 'acento', this.barra);
+    if (o.paciente) { const ic = svgCabeza(this.icoW); ic.classList.add('icono'); ic.style.left = (this.mT * .5 + 6) + 'px'; this.barra.appendChild(ic); }
+    this.sub = el('div', 'subbarra', this.grp);
+    if (o.etiqueta) {
+      this.etq = el('div', 'etiqueta', this.grp);
+      const c = COLOR_SECCION[o.etiqueta] || COLOR_SECCION.CHILE;
+      this.etq.style.background = c[0]; this.etq.style.color = c[1];
+      this.etq.textContent = o.etiqueta;
+    }
+    this.tit = el('div', 'titulo', this.grp);
+    this.stx = el('div', 'subtitulo', this.grp);
+    this.fs = o.tamT;
+    this.tit.style.fontSize = o.tamT + 'px';
+    this.stx.style.fontSize = o.tamS + 'px';
+    if (o.colorBarra) this.barra.style.background = o.colorBarra;
+    if (o.colorAcento) this.barra.querySelector('.acento').style.background = o.colorAcento;
+    if (o.colorSub) { this.sub.style.background = o.colorSub; this.barra.querySelector('.linea').style.background = o.colorSub; }
+    this.textos(o.titulo, o.sub);
+
+    // ovni
+    this.ufo = el('div', 'ufo', this.el);
+    this.ufo.appendChild(svgOvni());
+
+    this.fase = 'entrada';
+    this.tFase = ahora() + (o.retraso || 0);
+    Abduccion.vivos.add(this);
+    this.fin = new Promise(r => (this._resolver = r));
+    this.render(-1);
+  }
+  textos(t, s) {
+    if (this.tit.textContent !== (t || '')) { this.tit.textContent = t || ''; this.fs = this.o.tamT; this.tit.style.fontSize = this.fs + 'px'; }
+    this.stx.textContent = (s || '').toUpperCase();
+  }
+  salir() {
+    if (this.fase === 'salida' || this.fase === 'fin') return this.fin;
+    if (this.fase === 'entrada') { this.salidaPendiente = true; return this.fin; }
+    this.fase = 'salida'; this.tFase = ahora();
+    return this.fin;
+  }
+  valores(t) {
+    const S = this.S, uY = this.ufoY, hY = this.hoverY, bY = this.o.barY, m = 40 * S / 100;
+    if (this.fase === 'entrada') {
+      return {
+        rx: pista([[0, -1500], [.7, 0]], t), uy: pista([[0, uY - 500], [.7, uY], [1.9, uY], [2.5, hY]], t),
+        us: pista([[0, .4 * S], [.7, S], [1.9, S], [2.5, .5 * S]], t), rot: pista([[0, -25], [.7, 0]], t),
+        lado: pista([[1.9, 0], [2.5, 1]], t), k: pista([[.7, 0], [1, 1], [1.6, 1], [1.85, 0]], t),
+        gy: pista([[.95, uY + m], [1.45, bY]], t), gs: pista([[.95, .08], [1.45, 1]], t),
+        bo: pista([[.95, 0], [1.05, 1]], t, true), to: pista([[1.3, 0], [1.36, 1], [1.42, .25], [1.5, 1]], t, true),
+        uo: (!cfg().ovniPausa && t > 2.0) ? Math.max(0, 1 - (t - 2.0) / .3) : 1, dir: 1
+      };
+    }
+    if (this.fase === 'pausa') {
+      return { rx: 0, uy: hY, us: .5 * S, rot: 0, lado: 1, k: 0, gy: bY, gs: 1, bo: 1, to: 1, uo: cfg().ovniPausa ? 1 : 0, dir: 1 };
+    }
+    return {
+      rx: pista([[1.6, 0], [2.0, 1500]], t), uy: pista([[0, hY], [.5, uY], [1.6, uY], [2.0, uY - 500]], t),
+      us: pista([[0, .5 * S], [.5, S], [1.6, S], [2.0, .4 * S]], t), rot: pista([[1.6, 0], [2.0, 20]], t),
+      lado: pista([[0, 1], [.5, 0]], t), k: pista([[.5, 0], [.8, 1], [1.4, 1], [1.6, 0]], t),
+      gy: pista([[.85, bY], [1.4, uY + m]], t), gs: pista([[.85, 1], [1.4, .05]], t),
+      bo: pista([[1.25, 1], [1.4, 0]], t, true), to: pista([[1.1, 1], [1.25, 0]], t, true),
+      uo: cfg().ovniPausa ? 1 : Math.min(1, t / .3), dir: -1
+    };
+  }
+  tick(now) {
+    let t = (now - this.tFase) * cfg().velocidad;
+    if (t < 0) { this.render(-1); return; }
+    if (this.fase === 'entrada' && t >= 2.5) {
+      this.fase = this.salidaPendiente ? 'salida' : 'pausa'; this.tFase = now; t = 0;
+      if (this.o.auto && !this.salidaPendiente) this.timerAuto = setTimeout(() => this.salir(), this.o.auto * 1000 / cfg().velocidad);
+    }
+    if (this.fase === 'salida' && t >= 2.0) { this.destruir(); return; }
+    this.render(t);
+  }
+  render(t) {
+    if (t < 0) { this.el.style.visibility = 'hidden'; return; }
+    this.el.style.visibility = 'visible';
+    const v = this.valores(t), o = this.o, c = cfg(), now = ahora(), b = c.bamboleo;
+    let wt = this.tit.offsetWidth;
+    // si el titular es muy largo, se achica la letra hasta caber
+    if (o.maxW && wt + this.mT * 2 + this.icoW > o.maxW && wt > 0) {
+      this.fs = Math.max(24, Math.floor(this.fs * (o.maxW - this.mT * 2 - this.icoW) / wt));
+      this.tit.style.fontSize = this.fs + 'px'; wt = this.tit.offsetWidth;
+    }
+    const ws0 = this.stx.offsetWidth;
+    const w = Math.max(wt + this.mT * 2 + this.icoW, o.minW || 360);
+    const ws = ws0 > 2 ? ws0 + this.mS * 2 : 0;
+    const cx = o.centrado ? 960 : c.bordeIzq + w / 2;
+    const barH = this.barH, subH = this.subH, subY = barH / 2 + subH / 2 + 6;
+
+    this.grp.style.transform = `translate(${cx}px,${v.gy}px) scale(${v.gs})`;
+    Object.assign(this.barra.style, { left: -w / 2 + 'px', top: -barH / 2 + 'px', width: w + 'px', height: barH + 'px', opacity: v.bo });
+    const sx = o.centrado ? -ws / 2 : -w / 2;
+    Object.assign(this.sub.style, { left: sx + 'px', top: subY - subH / 2 + 'px', width: ws + 'px', height: subH + 'px', opacity: ws ? v.bo : 0 });
+    const tx0 = o.centrado && o.maxW ? -wt / 2 + this.icoW / 2 : -w / 2 + this.mT + this.icoW;
+    Object.assign(this.tit.style, { left: tx0 + 'px', top: (-this.fs * .5) + 'px', opacity: v.to });
+    Object.assign(this.stx.style, { left: (sx + this.mS) + 'px', top: (subY - o.tamS * .5) + 'px', opacity: v.to });
+    if (this.etq) Object.assign(this.etq.style, { left: -w / 2 + 'px', top: (-barH / 2 - 46) + 'px', opacity: v.to });
+    if (this.ilus) {
+      const iw = this.ilus.offsetWidth, ih = this.ilus.offsetHeight;
+      Object.assign(this.ilus.style, { left: -iw / 2 + 'px', top: (-barH / 2 - 24 - ih + Math.sin(now * 1.6) * 6) + 'px', opacity: v.to });
+      const bu = this.ilus.querySelector('.burbuja'); if (bu) bu.style.opacity = (Math.sin(now * 2) > -.3) ? 1 : .25;
+    }
+
+    // ovni
+    const s = v.us / 100, rot = v.rot + Math.sin(now * 2.3) * 3 * b, rad = rot * Math.PI / 180;
+    const x = cx + v.rx + v.lado * (w / 2 - 20), y = v.uy + Math.sin(now * 3.1) * 6 * b;
+    this.ufo.style.transform = `translate(${x}px,${y}px) rotate(${rot}deg) scale(${s})`;
+    this.ufo.style.opacity = v.uo;
+    this.ufo.querySelector('.luces').style.opacity = Math.floor(now * 4) % 2 ? .35 : 1;
+
+    // rayo (mismas fórmulas que la expresión de AE)
+    const k = v.k;
+    this.svg.style.display = k < .01 ? 'none' : 'block';
+    if (k >= .01) {
+      const tx = x - Math.sin(rad) * 20 * s, ty = y + Math.cos(rad) * 20 * s;
+      const bx = cx, by = v.gy - barH / 2 * v.gs;
+      const H = Math.max(1, by - ty) * k, dx = bx - tx, tw = 90 * s;
+      const bw = tw + (Math.max(tw, w * v.gs) - tw) * k;
+      const verde = esVerde(), rayo = c.colores.rayo;
+      const P = (a, bb) => `${tx - a},${ty} ${tx + a},${ty} ${tx + dx + bb},${ty + H} ${tx + dx - bb},${ty + H}`;
+      this.cono.setAttribute('points', P(tw / 2, bw / 2));
+      this.cono.setAttribute('stroke', rayo); this.cono.setAttribute('fill', rayo);
+      this.cono.setAttribute('fill-opacity', verde ? 0 : .35);
+      this.nucleo.setAttribute('points', P(tw * .3, bw * .15));
+      this.nucleo.setAttribute('fill', '#fff'); this.nucleo.setAttribute('fill-opacity', verde ? 0 : .55);
+      [-.25, 0, .25].forEach((q, i) => {
+        const l = this.lineas[i];
+        l.setAttribute('x1', tx + tw * q); l.setAttribute('y1', ty);
+        l.setAttribute('x2', tx + dx + bw * q); l.setAttribute('y2', ty + H);
+        l.setAttribute('stroke', rayo); l.style.display = verde ? '' : 'none';
+      });
+      this.anillos.forEach((a, i) => {
+        let f = ((i + now * 1.4) % 5) / 5; if (v.dir < 0) f = 1 - f;
+        const ww = tw + (bw - tw) * f;
+        a.setAttribute('cx', tx + dx * f); a.setAttribute('cy', ty + H * f);
+        a.setAttribute('rx', ww / 2); a.setAttribute('ry', (ww * .16 + 12) / 2 * k);
+        a.setAttribute('stroke', rayo); a.setAttribute('opacity', Math.sin(f * Math.PI));
+      });
+    }
+  }
+  destruir() {
+    this.fase = 'fin'; clearTimeout(this.timerAuto);
+    this.el.remove(); Abduccion.vivos.delete(this); this._resolver();
+  }
+}
+Abduccion.vivos = new Set();
+
+/* ===================================================================
+   PIEZAS
+   =================================================================== */
+function espacio(on) {
+  const c = $('#cEspacio');
+  let e = $('.espacio', c);
+  if (!e) {
+    e = el('div', 'espacio', c);
+    const cv = el('canvas', '', e); cv.width = 2400; cv.height = 1080;
+    const g = cv.getContext('2d');
+    for (let i = 0; i < 260; i++) {
+      const r = Math.random() * 2.2 + .4; g.globalAlpha = .4 + Math.random() * .6;
+      g.fillStyle = Math.random() < .12 ? cfg().colores.menta : '#fff';
+      g.beginPath(); g.arc(Math.random() * 2400, Math.random() * 1080, r, 0, 7); g.fill();
+    }
+    void e.offsetWidth;
+  }
+  e.classList.toggle('on', on);
+}
+
+/* ---------- Duplex / Triplex: «sesión en curso» ---------- */
+class Multiplex {
+  constructor(ventanas, etiquetas, titulo) {
+    this.cont = el('div', '', $('#cVentanas'));
+    const vel = cfg().velocidad;
+    this.items = ventanas.map((vn, i) => {
+      const b = vn.b;
+      const v = el('div', 'ventana', this.cont);
+      Object.assign(v.style, { left: b[0] + 'px', top: b[1] + 'px', width: b[2] + 'px', height: b[3] + 'px' });
+      const s = sv('svg', { width: b[2] + 12, height: b[3] + 12, viewBox: `-6 -6 ${b[2] + 12} ${b[3] + 12}` }, v);
+      const r1 = sv('rect', { x: 0, y: 0, width: b[2], height: b[3], rx: 16, stroke: 'var(--violeta)', 'stroke-width': 8, pathLength: 100, 'stroke-dasharray': 100, 'stroke-dashoffset': 100 }, s);
+      const r2 = sv('rect', { x: 9, y: 9, width: b[2] - 18, height: b[3] - 18, rx: 10, stroke: 'var(--blanco)', 'stroke-width': 2, pathLength: 100, 'stroke-dasharray': 100, 'stroke-dashoffset': 100 }, s);
+      const et = el('div', 'etq', this.cont); et.textContent = etiquetas[i] || '';
+      Object.assign(et.style, { left: b[0] + 'px', top: (vn.etq === 'arriba' ? b[1] - 56 : b[1] + b[3] + 11) + 'px' });
+      if (!etiquetas[i]) et.style.display = 'none';
+      return { r1, r2, et, i };
+    });
+    this.items.forEach(({ r1, r2, et, i }) => {
+      const d = (300 + i * 150) / vel;
+      r1.animate([{ strokeDashoffset: 100 }, { strokeDashoffset: 0 }], { duration: 600 / vel, delay: d, fill: 'forwards', easing: 'ease-in-out' });
+      r2.animate([{ strokeDashoffset: 100 }, { strokeDashoffset: 0 }], { duration: 600 / vel, delay: d + 100, fill: 'forwards', easing: 'ease-in-out' });
+      setTimeout(() => et.classList.add('on'), d + 500);
+    });
+    // chip de sesión con cronómetro y onda cerebral
+    this.chip = el('div', 'sesion', this.cont);
+    el('i', '', this.chip);
+    this.chipTxt = el('span', '', this.chip); this.chipTxt.textContent = cfg().etiquetaSesion;
+    this.reloj = el('b', '', this.chip); this.reloj.textContent = '00:00';
+    const os = sv('svg', { viewBox: '0 0 180 30', preserveAspectRatio: 'none' }, this.chip);
+    this.onda = sv('path', { d: ondaPath(360, 30, 6), fill: 'none', stroke: 'var(--rayo)', 'stroke-width': 3, 'stroke-linejoin': 'round' }, os);
+    this.inicio = ahora();
+    setTimeout(() => this.chip.classList.add('on'), 400);
+    this.timer = setInterval(() => {
+      const t = Math.floor(ahora() - this.inicio);
+      this.reloj.textContent = String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0');
+    }, 250);
+    this.ondaAnim = this.onda.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-180px)' }], { duration: 1600, iterations: Infinity });
+    this.titulo = new Abduccion(Object.assign(conf('multiplex'), { titulo }), $('#cGraficas'));
+  }
+  async salir() {
+    this.chip.classList.remove('on');
+    this.items.forEach(({ r1, r2, et }) => {
+      et.classList.remove('on');
+      [r1, r2].forEach(r => r.animate([{ strokeDashoffset: 0 }, { strokeDashoffset: 100 }], { duration: 600 / cfg().velocidad, fill: 'forwards', easing: 'ease-in-out' }));
+    });
+    await this.titulo.salir();
+    clearInterval(this.timer);
+    this.cont.remove();
+  }
+}
+
+/* ---------- Cortina (stinger) — barrido de ida y vuelta. Corte a los 1,2 s ---------- */
+function cortina() {
+  const c = $('#cCortina'), col = cfg().colores;
+  const raiz = el('div', 'abd', c);
+  const pB = el('div', 'panelC', raiz); pB.style.background = col.magenta;
+  const pA = el('div', 'panelC', raiz); pA.style.background = col.violeta;
+  const tx = el('div', 'cortTexto', raiz); tx.textContent = cfg().programa;
+  const s = sv('svg', { class: 'full', viewBox: '0 0 1920 1080' }, raiz);
+  const colm = sv('polygon', { fill: col.rayo, stroke: '#fff', 'stroke-width': 4 }, s);
+  const u = el('div', 'ufo', raiz); u.appendChild(svgOvni());
+  const kx = [[0, -200], [1.1, 2150], [1.3, 2150], [2.3, -200]], kr = [[0, 12], [1.1, 12], [1.3, -12], [2.3, -12]];
+  const t0 = ahora();
+  return new Promise(res => {
+    (function paso() {
+      const t = (ahora() - t0) * cfg().velocidad;
+      if (t > 2.5) { raiz.remove(); res(); return; }
+      const x = pista(kx, t), y = 200 + Math.sin(t * 6) * 8, r = pista(kr, t), xB = pista(kx, t - .12);
+      pA.style.width = Math.max(0, x + 60) + 'px';
+      pB.style.width = Math.max(0, xB + 60) + 'px';
+      u.style.transform = `translate(${x}px,${y}px) rotate(${r}deg) scale(1.5)`;
+      const ty = y + 30;
+      colm.setAttribute('points', `${x - 40},${ty} ${x + 40},${ty} ${x + 110},${ty + 900} ${x - 110},${ty + 900}`);
+      tx.style.opacity = pista([[.85, 0], [1.05, 1], [1.35, 1], [1.55, 0]], t);
+      tx.style.transform = `scale(${pista([[.85, .9], [1.55, 1.04]], t)})`;
+      requestAnimationFrame(paso);
+    })();
+  });
+}
+
+/* ===================================================================
+   TRANSICIONES VARIADAS (2 s · punto de corte 1,0 s)
+   =================================================================== */
+function animar(dur, raiz, fn) {
+  const t0 = ahora();
+  return new Promise(res => {
+    (function paso() {
+      const t = (ahora() - t0) * cfg().velocidad;
+      if (t > dur) { raiz.remove(); res(); return; }
+      fn(t); requestAnimationFrame(paso);
+    })();
+  });
+}
+const TRANSICIONES = {
+  // 1) El rayo del ovni se abre a pantalla completa
+  rayo() {
+    const col = cfg().colores, raiz = el('div', 'abd', $('#cCortina'));
+    const s = sv('svg', { class: 'full', viewBox: '0 0 1920 1080' }, raiz);
+    const p = sv('polygon', { fill: col.rayo, stroke: col.violeta, 'stroke-width': 10 }, s);
+    const anillos = [0, 1, 2].map(() => sv('ellipse', { fill: 'none', stroke: col.violeta, 'stroke-width': 6 }, s));
+    const u = el('div', 'ufo', raiz); u.appendChild(svgOvni());
+    return animar(2.05, raiz, t => {
+      const y = pista([[0, -150], [.45, 180], [1.45, 180], [1.95, -220]], t);
+      u.style.transform = `translate(960px,${y}px) scale(1.2)`;
+      const k = pista([[.45, 0], [.65, 1], [1.35, 1], [1.55, 0]], t), a = pista([[.65, 0], [.95, 1], [1.1, 1], [1.35, 0]], t);
+      const tw = 110 + a * 2400, bw = 160 + a * 2600, y0 = y + 24 - a * 500 * k, yb = y + 24 + 1000 * k;
+      s.style.display = k < .01 ? 'none' : 'block';
+      p.setAttribute('points', `${960 - tw / 2},${y0} ${960 + tw / 2},${y0} ${960 + bw / 2},${yb} ${960 - bw / 2},${yb}`);
+      anillos.forEach((e, i) => {
+        const f = ((i + t * 2) % 3) / 3, ww = 110 + (160 + a * 2600 - 110) * f;
+        e.setAttribute('cx', 960); e.setAttribute('cy', y + 24 + 1000 * k * f); e.setAttribute('rx', ww / 2); e.setAttribute('ry', (ww * .12 + 10) * k);
+        e.setAttribute('opacity', (1 - a) * Math.sin(f * Math.PI));
+      });
+    });
+  },
+  // 2) Espiral hipnótica del terapeuta: se abre desde el centro
+  hipnosis() {
+    const col = cfg().colores, raiz = el('div', 'abd', $('#cCortina'));
+    const s = sv('svg', { class: 'full', viewBox: '0 0 1920 1080' }, raiz);
+    const defs = sv('defs', {}, s), cp = sv('clipPath', { id: 'hip' + Date.now() }, defs);
+    const circ = sv('circle', { cx: 960, cy: 540, r: 0 }, cp);
+    const g = sv('g', { 'clip-path': `url(#${cp.id})` }, s);
+    sv('rect', { x: 0, y: 0, width: 1920, height: 1080, fill: col.espacio }, g);
+    let d = 'M960,540'; for (let a = 0; a < Math.PI * 18; a += .12) { const r = 21 * a; d += ` L${960 + Math.cos(a) * r},${540 + Math.sin(a) * r}`; }
+    const esp = sv('g', {}, g);
+    sv('path', { d, fill: 'none', stroke: col.violeta, 'stroke-width': 52, 'stroke-linecap': 'round' }, esp);
+    sv('path', { d, fill: 'none', stroke: col.magenta, 'stroke-width': 8, transform: 'rotate(90 960 540)' }, esp);
+    const ojos = sv('g', { opacity: 0 }, g); cabezaAlien(ojos, 960, 540, 2.4);
+    const borde = sv('circle', { cx: 960, cy: 540, r: 0, fill: 'none', stroke: col.rayo, 'stroke-width': 10 }, s);
+    return animar(2.0, raiz, t => {
+      const r = pista([[0, 0], [.9, 1150], [1.1, 1150], [2.0, 0]], t);
+      circ.setAttribute('r', r); borde.setAttribute('r', r); borde.style.display = r < 2 ? 'none' : '';
+      esp.setAttribute('transform', `rotate(${-t * 320} 960 540)`);
+      ojos.setAttribute('opacity', pista([[.6, 0], [.85, 1], [1.2, 1], [1.45, 0]], t));
+    });
+  },
+  // 3) Test de Rorschach: una mancha simétrica crece y tapa la pantalla (cada vez es distinta)
+  rorschach() {
+    const col = cfg().colores, raiz = el('div', 'abd', $('#cCortina'));
+    const s = sv('svg', { class: 'full', viewBox: '0 0 1920 1080' }, raiz);
+    const mancha = (rmin, rmax) => {
+      const n = 9, pts = [];
+      for (let i = 0; i <= n; i++) { const a = -Math.PI / 2 + Math.PI * i / n; const r = rmin + Math.random() * (rmax - rmin); pts.push([Math.cos(a) * r, Math.sin(a) * r]); }
+      const todos = pts.concat(pts.slice(1, -1).reverse().map(([x, y]) => [-x, y]));
+      let d = ''; const N = todos.length;
+      for (let i = 0; i < N; i++) {
+        const p0 = todos[(i - 1 + N) % N], p1 = todos[i], p2 = todos[(i + 1) % N], p3 = todos[(i + 2) % N];
+        if (i === 0) d += `M${p1[0]},${p1[1]}`;
+        d += ` C${p1[0] + (p2[0] - p0[0]) / 6},${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6},${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]},${p2[1]}`;
+      }
+      return d + 'Z';
+    };
+    const g = sv('g', {}, s);
+    sv('path', { d: mancha(280, 390), fill: col.espacio, stroke: col.magenta, 'stroke-width': 4 }, g);
+    sv('path', { d: mancha(140, 230), fill: col.violeta }, g);
+    sv('path', { d: mancha(50, 110), fill: col.magenta }, g);
+    for (let i = 0; i < 6; i++) {
+      const x = 330 + Math.random() * 120, y = -260 + Math.random() * 520, r = 10 + Math.random() * 26;
+      sv('circle', { cx: x, cy: y, r, fill: col.espacio }, g); sv('circle', { cx: -x, cy: y, r, fill: col.espacio }, g);
+    }
+    return animar(2.0, raiz, t => {
+      const e = pista([[0, 0], [.95, 4.4], [1.05, 4.4], [2.0, 0]], t), r = pista([[0, -8], [2, 8]], t);
+      g.setAttribute('transform', `translate(960 540) rotate(${r}) scale(${e})`);
+    });
+  },
+  // 4) Onda cerebral (electroencefalograma) que cruza y abre una franja
+  onda() {
+    const col = cfg().colores, raiz = el('div', 'abd', $('#cCortina'));
+    const s = sv('svg', { class: 'full', viewBox: '0 0 1920 1080' }, raiz);
+    const bB = sv('rect', { x: 0, width: 1920, fill: col.magenta }, s);
+    const bA = sv('rect', { x: 0, width: 1920, fill: col.violeta }, s);
+    let d = 'M-20,540', x = -20;
+    while (x < 1960) {
+      const amp = 60 + Math.random() * 160, w = 50 + Math.random() * 40;
+      d += ` L${x + 40},540 L${x + 40 + w * .3},${540 - amp} L${x + 40 + w * .6},${540 + amp * .7} L${x + 40 + w},540`;
+      x += 40 + w + 30 + Math.random() * 60;
+    }
+    const linea = sv('path', { d, fill: 'none', stroke: col.rayo, 'stroke-width': 10, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': '1 1' }, s);
+    const titulo = sv('text', { x: 960, y: 330, 'text-anchor': 'middle', 'font-weight': 900, 'font-size': 84, 'letter-spacing': 10, fill: col.blanco, opacity: 0, style: 'font-family:var(--ft)' }, s);
+    titulo.textContent = cfg().programa;
+    return animar(2.0, raiz, t => {
+      linea.setAttribute('stroke-dashoffset', pista([[0, 1], [.5, 0], [1.45, 0], [1.95, -1]], t));
+      const hA = pista([[.35, 0], [.85, 1200], [1.15, 1200], [1.6, 0]], t), hB = pista([[.28, 0], [.8, 1200], [1.2, 1200], [1.7, 0]], t);
+      bA.setAttribute('y', 540 - hA / 2); bA.setAttribute('height', hA);
+      bB.setAttribute('y', 540 - hB / 2); bB.setAttribute('height', hB);
+      titulo.setAttribute('opacity', pista([[.8, 0], [.95, 1], [1.1, 1], [1.25, 0]], t));
+    });
+  }
+};
+let ultimaTrans = '';
+function transicion(variante) {
+  let v = variante || cfg().transicion || 'aleatoria';
+  if (!TRANSICIONES[v]) {
+    const ops = Object.keys(TRANSICIONES).filter(k => k !== ultimaTrans);
+    v = ops[Math.floor(Math.random() * ops.length)];
+  }
+  ultimaTrans = v;
+  return TRANSICIONES[v]();
+}
+
+/* ---------- Bug ---------- */
+let bugEl = null;
+function bug(on) {
+  if (on && !bugEl) {
+    bugEl = el('div', 'bug fuera', $('#cBug'));
+    el('div', 'placa', bugEl);
+    const u = el('div', 'ufo', bugEl); u.appendChild(svgOvni()); u.dataset.bug = 1;
+    const v = el('div', 'vivo', bugEl); v.textContent = 'EN VIVO';
+    pintarBug();
+    requestAnimationFrame(() => requestAnimationFrame(() => bugEl && bugEl.classList.remove('fuera')));
+  } else if (!on && bugEl) {
+    const b = bugEl; bugEl = null; b.classList.add('fuera'); setTimeout(() => b.remove(), 600);
+  }
+}
+function pintarBug() {
+  if (!bugEl) return;
+  bugEl.querySelectorAll('.l1,.l2,img').forEach(n => n.remove());
+  if (cfg().logo) { const i = el('img', '', bugEl); i.src = cfg().logo; }
+  else {
+    const p = (cfg().programa || '').split(' ');
+    el('div', 'l1', bugEl).textContent = p.shift() || '';
+    el('div', 'l2', bugEl).textContent = p.join(' ');
+  }
+}
+
+/* ---------- Ticker ---------- */
+let tickerEl = null, tickerAnim = null;
+function ticker(on) {
+  if (!tickerEl) {
+    tickerEl = el('div', 'ticker', $('#cTicker'));
+    el('div', 'etiq', tickerEl);
+    el('div', 'cinta', tickerEl);
+  }
+  tickerEl.querySelector('.etiq').textContent = cfg().programa;
+  const cinta = tickerEl.querySelector('.cinta');
+  const txt = (cfg().ticker || '').split('·').map(s => s.trim()).filter(Boolean).join('   ✦   ');
+  if (cinta.dataset.txt !== txt) {
+    cinta.dataset.txt = txt; cinta.textContent = txt + '   ✦   ' + txt + '   ✦   ';
+    if (tickerAnim) tickerAnim.cancel();
+    requestAnimationFrame(() => {
+      const ancho = cinta.scrollWidth / 2;
+      tickerAnim = cinta.animate([{ transform: 'translateX(0)' }, { transform: `translateX(-${ancho}px)` }], { duration: ancho / 110 * 1000, iterations: Infinity });
+    });
+  }
+  tickerEl.classList.toggle('on', !!on);
+}
+
+/* ===================================================================
+   CONFIGURACIÓN DE CADA GRÁFICA (mismas medidas que el .jsx)
+   =================================================================== */
+function conf(tipo) {
+  const c = cfg(), col = c.colores;
+  switch (tipo) {
+    case 'gc': return { tamT: c.tamGC, tamS: Math.round(c.tamGC * .52), barY: c.gcY, rayoLargo: 230, S: 100, minW: 360, auto: c.autoSalidaGC || 0 };
+    case 'paciente': return { tamT: c.tamGC, tamS: Math.round(c.tamGC * .52), barY: c.gcY, rayoLargo: 230, S: 100, minW: 360, paciente: true,
+      colorBarra: col.espacio, colorSub: col.magenta, colorAcento: col.menta, auto: c.autoSalidaGC || 0 };
+    case 'cortinaTitulo': return { tamT: 72, tamS: 36, barY: 800, rayoLargo: 300, S: 130, centrado: true, minW: 700, maxW: 1720 };
+    case 'avance': return { tamT: 84, tamS: 30, barY: 600, rayoLargo: 260, S: 140, centrado: true, minW: 900, maxW: 1720 };
+    case 'titular': return { tamT: 52, tamS: 0, barY: 820, rayoLargo: 300, S: 120, centrado: true, minW: 760, maxW: 1720 };
+    case 'aviso': return { tamT: 50, tamS: 28, barY: c.gcY, rayoLargo: 230, S: 100, colorBarra: col.magenta, colorAcento: col.rayo, colorSub: col.espacio };
+    case 'volvemos': return { tamT: 84, tamS: 36, barY: 640, rayoLargo: 260, S: 140, centrado: true, minW: 800, maxW: 1720 };
+    case 'multiplex': return { tamT: 46, tamS: 24, barY: 965, rayoLargo: 50, S: 80, centrado: true, minW: 520, sub: '' };
+    case 'apertura': return { tamT: 120, tamS: 40, barY: 760, rayoLargo: 420, S: 170, centrado: true, minW: 900, maxW: 1720, retraso: 1.5, auto: 9.7, logo: c.logo, ilustracion: 'paciente' };
+    case 'cierre': return { tamT: 110, tamS: 34, barY: 760, rayoLargo: 420, S: 170, centrado: true, minW: 900, maxW: 1720, retraso: .5, auto: 5, logo: c.logo, ilustracion: 'paciente' };
+  }
+}
+// Triplex: costados verticales 9:16 y centro 16:9 · Duplex: dos 16:9 grandes
+const VENTANAS = {
+  triplex: [{ b: [180, 280, 287, 510], etq: 'arriba' }, { b: [507, 280, 907, 510], etq: 'arriba' }, { b: [1454, 280, 287, 510], etq: 'arriba' }],
+  duplex: [{ b: [96, 230, 832, 468], etq: 'abajo' }, { b: [992, 230, 832, 468], etq: 'abajo' }]
+};
+
+/* ===================================================================
+   ESTADO → PANTALLA
+   =================================================================== */
+const slots = {};
+async function cambiarSlot(nombre, clave, crear) {
+  const actual = slots[nombre];
+  if (actual && actual.clave === clave) return;
+  slots[nombre] = { clave, pieza: null };
+  if (actual && actual.pieza) await actual.pieza.salir();
+  if (slots[nombre].clave !== clave) return;
+  if (clave !== null && clave !== false) slots[nombre].pieza = crear();
+}
+
+function aplicarConfig() {
+  const c = cfg(), r = document.documentElement.style;
+  for (const k in c.colores) r.setProperty('--' + k, c.colores[k]);
+  r.setProperty('--ft', `'${c.fuenteTitulo}', 'Arial Black', Arial, sans-serif`);
+  r.setProperty('--fx', `'${c.fuenteTexto}', Arial, sans-serif`);
+  document.body.classList.toggle('verde', esVerde());
+  pintarBug();
+}
+
+function aplicar(nuevo) {
+  E = TE.mezclar(TE.copia(TE.ESTADO_BASE), nuevo);
+  aplicarConfig();
+  const a = E.aire, tx = E.textos;
+  // GC (y paciente)
+  const g = a.gc !== null && a.gc !== undefined ? E.gcs[a.gc] : null;
+  const claveGC = g ? a.gc + '|' + !!g.paciente : null;
+  if (slots.gc && slots.gc.pieza && g && slots.gc.clave === claveGC) {
+    slots.gc.pieza.textos(g.titulo, g.sub);
+  } else {
+    cambiarSlot('gc', claveGC, () => new Abduccion(Object.assign(conf(g.paciente ? 'paciente' : 'gc'), g), $('#cGraficas')));
+  }
+  // Avance informativo: -1 = portada, 0..n = titular
+  const ti = a.titular;
+  const claveT = ti === null || ti === undefined ? null : (ti < 0 ? 'portada' : 't' + ti);
+  if (slots.titular && slots.titular.pieza && slots.titular.clave === claveT) {
+    if (ti < 0) slots.titular.pieza.textos(tx.avance.titulo, tx.avance.sub);
+    else if (E.titulares[ti]) slots.titular.pieza.textos(E.titulares[ti].texto, '');
+  } else {
+    cambiarSlot('titular', claveT, () => {
+      if (ti < 0) return new Abduccion(Object.assign(conf('avance'), { titulo: tx.avance.titulo, sub: tx.avance.sub }), $('#cGraficas'));
+      const h = E.titulares[ti] || { seccion: '', texto: '' };
+      return new Abduccion(Object.assign(conf('titular'), { titulo: h.texto, sub: '', etiqueta: (h.seccion || '').toUpperCase() }), $('#cGraficas'));
+    });
+  }
+  ['cortinaTitulo', 'aviso', 'volvemos'].forEach(n => {
+    const on = !!a[n], t = tx[n];
+    if (on && slots[n] && slots[n].pieza) { slots[n].pieza.textos(t.titulo, t.sub); return; }
+    cambiarSlot(n, on ? n : null, () => new Abduccion(Object.assign(conf(n), { titulo: t.titulo, sub: t.sub }), $('#cGraficas')));
+  });
+  ['triplex', 'duplex'].forEach(n => {
+    const t = tx[n];
+    const clave = a[n] ? n + '|' + t.titulo + '|' + t.etiquetas.join(',') : null;
+    cambiarSlot(n, clave, () => new Multiplex(VENTANAS[n], t.etiquetas, t.titulo));
+  });
+  bug(!!a.bug);
+  ticker(!!a.ticker);
+}
+
+async function disparar(que, variante) {
+  const tx = E.textos;
+  if (que === 'cortina') return cortina();
+  if (que === 'transicion') return transicion(variante);
+  if (que === 'apertura' || que === 'cierre') {
+    espacio(true);
+    const p = new Abduccion(Object.assign(conf(que), { titulo: tx[que].titulo, sub: tx[que].sub }), $('#cGraficas'));
+    await p.fin;
+    espacio(false);
+  }
+  if (que === 'limpiar') Abduccion.vivos.forEach(p => p.salir());
+}
+
+/* ===================================================================
+   BUCLE Y CONEXIÓN
+   =================================================================== */
+function bucle() {
+  const now = ahora();
+  Abduccion.vivos.forEach(p => p.tick(now));
+  document.querySelectorAll('.ufo[data-bug]').forEach(u => {
+    u.style.transform = `translate(58px,${58 + Math.sin(now * 3) * 5}px) rotate(${Math.sin(now * 2.2) * 6}deg) scale(.4)`;
+    const l = u.querySelector('.luces'); if (l) l.style.opacity = Math.floor(now * 4) % 2 ? .35 : 1;
+  });
+  requestAnimationFrame(bucle);
+}
+function ajustar() {
+  const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+  $('#escena').style.transform = `scale(${s})`;
+}
+addEventListener('resize', ajustar);
+
+const vistos = new Set();
+TE.escuchar(m => {
+  if (!m || (m.id && vistos.has(m.id))) return;
+  if (m.id) { vistos.add(m.id); if (vistos.size > 200) vistos.clear(); }
+  if (m.tipo === 'estado') aplicar(m.estado);
+  if (m.tipo === 'disparar') disparar(m.que, m.variante);
+});
+
+(async function iniciar() {
+  ajustar();
+  const ini = await TE.estadoInicial();
+  ini.aire = Object.assign({}, TE.ESTADO_BASE.aire, { bug: ini.aire && ini.aire.bug, ticker: ini.aire && ini.aire.ticker });
+  aplicar(ini);
+  TE.conectar();
+  bucle();
+  if (new URLSearchParams(location.search).has('demo')) {
+    const d = TE.copia(E); d.aire.gc = 0; d.aire.bug = true; aplicar(d);
+  }
+})();
+</script>
+</body>
+</html>

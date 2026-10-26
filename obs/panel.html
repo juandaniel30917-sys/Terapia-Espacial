@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Terapia Espacial · Panel de control</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B0B1A">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07070F; --panel:#11111F; --panel2:#181830; --borde:#2A2A4A; --txt:#ECEAF7; --tenue:#9B98B8;
+    --violeta:#7B2FF7; --magenta:#FF3DCB; --rayo:#FFF4C2; --ok:#5BE3A8; --aire:#FF2E63;
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,Arial,sans-serif;font-size:15px;}
+  body{min-height:100vh;padding-bottom:calc(24px + env(safe-area-inset-bottom));}
+  button,input,select,textarea{font:inherit;color:inherit}
+  h2{font-family:Orbitron,Arial,sans-serif;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--tenue);margin:22px 0 10px;font-weight:700}
+
+  /* cabecera */
+  header{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(7,7,15,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--borde);}
+  .marca{display:flex;align-items:center;gap:10px;font-family:Orbitron,Arial,sans-serif;font-weight:900;letter-spacing:.08em;font-size:16px;white-space:nowrap}
+  .marca svg{width:38px;height:22px}
+  .estado{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tenue);margin-left:auto;white-space:nowrap}
+  .estado i{width:9px;height:9px;border-radius:50%;background:#666;display:inline-block}
+  .estado.ok i{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+  .btnLimpiar{background:var(--aire);border:0;border-radius:10px;padding:9px 14px;font-weight:700;letter-spacing:.05em;cursor:pointer;white-space:nowrap}
+
+  nav{display:flex;gap:6px;padding:10px 16px;overflow-x:auto;border-bottom:1px solid var(--borde);position:sticky;top:57px;z-index:9;background:var(--bg)}
+  nav button{flex:0 0 auto;background:transparent;border:1px solid var(--borde);border-radius:999px;padding:8px 16px;cursor:pointer;color:var(--tenue);font-weight:600}
+  nav button.on{background:var(--violeta);border-color:var(--violeta);color:#fff}
+
+  main{max-width:1280px;margin:0 auto;padding:4px 16px}
+  .vista{display:none}.vista.on{display:block}
+  .cols{display:grid;grid-template-columns:1fr;gap:0 24px}
+  @media(min-width:1000px){.cols{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}}
+
+  /* preview */
+  .prev{position:relative;width:100%;aspect-ratio:16/9;border-radius:var(--r);overflow:hidden;border:1px solid var(--borde);background:#000}
+  .prev iframe{position:absolute;left:0;top:0;width:100%;height:100%;border:0;pointer-events:none}
+  .prevBarra{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;color:var(--tenue)}
+
+  /* botonera */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .bt{position:relative;min-height:74px;padding:12px 14px;text-align:left;background:var(--panel);border:1px solid var(--borde);border-radius:var(--r);cursor:pointer;
+      display:flex;flex-direction:column;justify-content:center;gap:4px;transition:transform .08s, background .2s, border-color .2s;-webkit-tap-highlight-color:transparent}
+  .bt:active{transform:scale(.97)}
+  .bt b{font-weight:700;font-size:15px;line-height:1.2}
+  .bt small{color:var(--tenue);font-size:12px}
+  .bt kbd{position:absolute;right:10px;top:9px;font:600 11px Inter,Arial;color:var(--tenue);border:1px solid var(--borde);border-radius:5px;padding:1px 5px}
+  .bt.aire{background:linear-gradient(135deg,#3a0f2a,#1d0b2e);border-color:var(--aire);box-shadow:0 0 0 1px var(--aire) inset}
+  .bt.aire::after{content:"AL AIRE";position:absolute;right:10px;bottom:9px;font:700 10px Orbitron,Arial;letter-spacing:.12em;color:#fff;background:var(--aire);padding:3px 6px;border-radius:4px}
+  .bt.aire{padding-bottom:30px}
+  .bt.disparo{border-style:dashed}
+  @media(max-width:520px){.marca{font-size:13px;gap:6px}.marca svg{width:28px}.estado span{display:none}header{gap:8px;padding:10px 12px}.btnLimpiar{padding:8px 10px}}
+  .bt.disparo.flash{background:var(--violeta)}
+
+  /* pauta */
+  .paso{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--borde);border-radius:var(--r);background:var(--panel);margin-bottom:8px;cursor:pointer}
+  .paso .n{font:700 13px Orbitron,Arial;color:var(--tenue);text-align:center}
+  .paso .bl{font-size:11px;letter-spacing:.12em;color:var(--magenta);font-weight:700;text-transform:uppercase}
+  .paso .ds{font-weight:600}
+  .paso .ac{font-size:12px;color:var(--tenue)}
+  .paso.actual{border-color:var(--violeta);background:var(--panel2);box-shadow:0 0 0 1px var(--violeta) inset}
+  .paso.hecho{opacity:.55}
+  .paso button{background:var(--violeta);border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+  .pautaNav{position:sticky;bottom:0;display:flex;gap:10px;padding:12px 0;background:linear-gradient(transparent,var(--bg) 30%)}
+  .pautaNav button{flex:1;padding:16px;border-radius:var(--r);border:1px solid var(--borde);background:var(--panel);font-weight:700;cursor:pointer}
+  .pautaNav button.go{background:var(--violeta);border-color:var(--violeta);flex:2}
+
+  /* formularios */
+  .campo{display:grid;gap:6px;margin-bottom:12px}
+  .campo label{font-size:12px;color:var(--tenue);font-weight:600}
+  input[type=text],input[type=number],select,textarea{width:100%;background:var(--panel);border:1px solid var(--borde);border-radius:10px;padding:11px 12px;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--violeta)}
+  textarea{min-height:70px;resize:vertical}
+  .fila{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+  .gcItem{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px}
+  .gcItem button,.mini{background:var(--panel2);border:1px solid var(--borde);border-radius:10px;padding:0 12px;cursor:pointer;min-height:42px}
+  .colores{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+  .color{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--borde);border-radius:10px;padding:8px}
+  .color input{width:38px;height:30px;border:0;background:none;padding:0;cursor:pointer}
+  .color span{font-size:13px}
+  .seg{display:flex;border:1px solid var(--borde);border-radius:10px;overflow:hidden}
+  .seg button{flex:1;padding:11px;border:0;background:var(--panel);cursor:pointer;font-weight:600;color:var(--tenue)}
+  .seg button.on{background:var(--violeta);color:#fff}
+  .switch{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--panel);border:1px solid var(--borde);border-radius:10px;padding:12px}
+  .switch input{width:22px;height:22px;accent-color:var(--violeta)}
+  .nota{font-size:12px;color:var(--tenue);line-height:1.5}
+  .aviso{border:1px solid #6b5a12;background:#231d06;color:#f3e3a2;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5}
+  .acciones{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .acciones .mini{padding:10px 14px}
+  .bt.sec-TALCA{border-left:6px solid var(--magenta)} .bt.sec-CHILE{border-left:6px solid var(--violeta)} .bt.sec-INTERNACIONAL{border-left:6px solid var(--rayo)}
+  .bt.ancho{grid-column:span 2}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .chips button{background:var(--panel);border:1px solid var(--borde);border-radius:999px;padding:9px 14px;cursor:pointer;font-weight:600;color:var(--tenue)}
+  .chips button.on{background:var(--panel2);border-color:var(--violeta);color:#fff}
+  .titItem{display:grid;grid-template-columns:150px 1fr auto;gap:8px;margin-bottom:8px}
+  .gcItem{grid-template-columns:1fr 1fr auto auto!important}
+  .gcItem label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tenue);padding:0 6px}
+  .logoPrev{height:60px;max-width:220px;object-fit:contain;background:#000;border-radius:8px;border:1px solid var(--borde)}
+</style>
+</head>
+<body>
+<header>
+  <div class="marca">
+    <svg viewBox="-140 -100 280 150"><path d="M-64,-4 C-64,-46 -38,-78 0,-78 C38,-78 64,-46 64,-4 Z" fill="#0B0B1A" stroke="#fff" stroke-width="10"/><ellipse rx="116" ry="29" fill="#0B0B1A" stroke="#fff" stroke-width="10"/><circle cx="-64" cy="6" r="9" fill="#FF3DCB"/><circle cy="13" r="9" fill="#FF3DCB"/><circle cx="64" cy="6" r="9" fill="#FF3DCB"/></svg>
+    <span id="nombrePrograma">TERAPIA ESPACIAL</span>
+  </div>
+  <div class="estado" id="estadoCon"><i></i><span>local</span></div>
+  <button class="btnLimpiar" id="btnLimpiar" title="Esc">LIMPIAR</button>
+</header>
+<nav id="tabs">
+  <button data-v="vivo" class="on">En vivo</button>
+  <button data-v="pauta">Pauta</button>
+  <button data-v="textos">Textos</button>
+  <button data-v="config">Configuración</button>
+</nav>
+
+<main>
+  <!-- ================= EN VIVO ================= -->
+  <section class="vista on" id="v-vivo">
+    <div class="cols">
+      <div>
+        <h2>Vista previa</h2>
+        <div class="prev"><iframe id="prev" src="salida.html?preview=1" title="Vista previa de la salida"></iframe></div>
+        <div class="prevBarra"><span id="prevInfo">Salida 1920×1080</span><label><input type="checkbox" id="prevOn" checked> mostrar</label></div>
+
+        <h2>GC · nombres</h2>
+        <div class="grid" id="gridGC"></div>
+        <h2>Avance informativo · titulares</h2>
+        <div class="grid" id="gridTit"></div>
+      </div>
+      <div>
+        <h2>Títulos y avisos</h2>
+        <div class="grid" id="gridTitulos"></div>
+        <h2>Pantallas compartidas</h2>
+        <div class="grid" id="gridMulti"></div>
+        <h2>Cortinas y transiciones</h2>
+        <div class="grid" id="gridDisparos"></div>
+        <div class="chips" id="chipsTrans"></div>
+        <h2>Permanentes</h2>
+        <div class="grid" id="gridPerm"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PAUTA ================= -->
+  <section class="vista" id="v-pauta">
+    <h2>Pauta del programa</h2>
+    <p class="nota">Toca un paso para ejecutarlo, o usa <b>Siguiente</b> (barra espaciadora). Cada paso lanza las gráficas que pide la pauta.</p>
+    <div id="listaPauta"></div>
+    <div class="pautaNav">
+      <button id="pAnt">◀ Anterior</button>
+      <button id="pSig" class="go">Siguiente ▶</button>
+    </div>
+  </section>
+
+  <!-- ================= TEXTOS ================= -->
+  <section class="vista" id="v-textos">
+    <div class="cols">
+      <div>
+        <h2>GC (nombre y cargo)</h2>
+        <div id="listaGC"></div>
+        <button class="mini" id="agregarGC">+ Agregar GC</button>
+        <h2>Avance informativo</h2>
+        <div class="campo"><label>Portada · título</label><input type="text" data-t="avance.titulo"></div>
+        <div class="campo"><label>Portada · subtítulo</label><input type="text" data-t="avance.sub"></div>
+        <div id="listaTit"></div>
+        <button class="mini" id="agregarTit">+ Agregar titular</button>
+        <h2>Cortina título</h2>
+        <div class="campo"><label>Título</label><input type="text" data-t="cortinaTitulo.titulo"></div>
+        <div class="campo"><label>Subtítulo</label><input type="text" data-t="cortinaTitulo.sub"></div>
+        <h2>Aviso</h2>
+        <div class="campo"><label>Título</label><input type="text" data-t="aviso.titulo"></div>
+        <div class="campo"><label>Texto</label><input type="text" data-t="aviso.sub"></div>
+        <h2>Volvemos</h2>
+        <div class="campo"><label>Título</label><input type="text" data-t="volvemos.titulo"></div>
+        <div class="campo"><label>Subtítulo</label><input type="text" data-t="volvemos.sub"></div>
+      </div>
+      <div>
+        <h2>Triplex</h2>
+        <div class="campo"><label>Título</label><input type="text" data-t="triplex.titulo"></div>
+        <div class="campo"><label>Etiquetas (separadas por | )</label><input type="text" data-t="triplex.etiquetas" data-lista></div>
+        <h2>Duplex</h2>
+        <div class="campo"><label>Título</label><input type="text" data-t="duplex.titulo"></div>
+        <div class="campo"><label>Etiquetas (separadas por | )</label><input type="text" data-t="duplex.etiquetas" data-lista></div>
+        <h2>Apertura y cierre</h2>
+        <div class="campo"><label>Apertura · subtítulo</label><input type="text" data-t="apertura.sub"></div>
+        <div class="campo"><label>Cierre · subtítulo</label><input type="text" data-t="cierre.sub"></div>
+        <h2>Ticker</h2>
+        <div class="campo"><label>Frases separadas por · (punto medio)</label><textarea data-c="ticker"></textarea></div>
+        <p class="nota">Los cambios se ven al instante en la salida, incluso si la gráfica está al aire.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONFIGURACIÓN ================= -->
+  <section class="vista" id="v-config">
+    <div class="cols">
+      <div>
+        <h2>Programa</h2>
+        <div class="campo"><label>Nombre del programa</label><input type="text" data-c="programa"></div>
+        <h2>Fondo de la salida</h2>
+        <div class="seg" id="segFondo">
+          <button data-f="verde">Verde (chroma)</button>
+          <button data-f="transparente">Transparente (alfa)</button>
+        </div>
+        <p class="nota" style="margin-top:8px">En OBS la fuente de navegador ya trae transparencia: con <b>Transparente</b> no necesitas chroma y el rayo se ve con brillo. Con <b>Verde</b> el rayo se dibuja opaco y con líneas para que el chroma quede limpio.</p>
+
+        <h2>Colores</h2>
+        <div class="colores" id="colores"></div>
+        <div class="aviso" id="avisoVerde" style="display:none;margin-top:10px"></div>
+
+        <h2>Tipografías</h2>
+        <div class="fila">
+          <div class="campo"><label>Títulos</label>
+            <select data-c="fuenteTitulo"><option>Orbitron</option><option>Exo 2</option><option>Audiowide</option><option>Space Grotesk</option><option>Montserrat</option><option>Arial Black</option></select></div>
+          <div class="campo"><label>Textos</label>
+            <select data-c="fuenteTexto"><option>Inter</option><option>Space Grotesk</option><option>Montserrat</option><option>Exo 2</option><option>Arial</option></select></div>
+        </div>
+
+        <h2>Logo</h2>
+        <div class="fila" style="align-items:center">
+          <img id="logoPrev" class="logoPrev" alt="" hidden>
+          <div class="acciones">
+            <label class="mini" style="display:flex;align-items:center;cursor:pointer">Subir logo…<input type="file" id="logoArchivo" accept="image/*" hidden></label>
+            <button class="mini" id="logoQuitar">Quitar</button>
+          </div>
+        </div>
+        <p class="nota">PNG con fondo transparente. Se usa en el bug, la apertura y el cierre. Se reduce solo a 600 px de alto.</p>
+      </div>
+      <div>
+        <h2>GC</h2>
+        <div class="fila">
+          <div class="campo"><label>Borde izquierdo (px)</label><input type="number" data-c="bordeIzq" data-num></div>
+          <div class="campo"><label>Altura de la barra (y, px)</label><input type="number" data-c="gcY" data-num></div>
+          <div class="campo"><label>Tamaño del nombre (px)</label><input type="number" data-c="tamGC" data-num></div>
+          <div class="campo"><label>Salida automática (s, 0 = manual)</label><input type="number" data-c="autoSalidaGC" data-num></div>
+        </div>
+        <h2>Avance, sesión y transiciones</h2>
+        <div class="fila">
+          <div class="campo"><label>Segundos por titular (avance automático)</label><input type="number" data-c="segTitular" data-num></div>
+          <div class="campo"><label>Texto del chip en duplex/triplex</label><input type="text" data-c="etiquetaSesion"></div>
+          <div class="campo"><label>Transición por defecto</label>
+            <select data-c="transicion"><option value="aleatoria">Aleatoria (varía cada vez)</option><option value="rayo">Rayo del ovni</option><option value="hipnosis">Espiral hipnótica</option><option value="rorschach">Mancha de Rorschach</option><option value="onda">Onda cerebral</option></select></div>
+        </div>
+        <h2>Ovni</h2>
+        <div class="switch"><span>Ovni flotando sobre el GC durante la pausa</span><input type="checkbox" data-c="ovniPausa"></div>
+        <div class="fila" style="margin-top:10px">
+          <div class="campo"><label>Bamboleo (0 = quieto)</label><input type="number" step="0.1" data-c="bamboleo" data-num></div>
+          <div class="campo"><label>Velocidad de animación (1 = normal)</label><input type="number" step="0.1" min="0.3" max="3" data-c="velocidad" data-num></div>
+        </div>
+        <h2>Respaldo</h2>
+        <div class="acciones">
+          <button class="mini" id="exportar">Descargar configuración (.json)</button>
+          <label class="mini" style="display:flex;align-items:center;cursor:pointer">Cargar configuración…<input type="file" id="importar" accept=".json,application/json" hidden></label>
+          <button class="mini" id="restablecer">Restablecer todo</button>
+        </div>
+        <h2>Conexión</h2>
+        <p class="nota" id="infoConexion"></p>
+        <h2>Atajos de teclado</h2>
+        <p class="nota">1–9 GC · H avance automático · G siguiente titular · A apertura · C cortina · T transición · X cierre · R cortina título · V volvemos · N aviso · 3 triplex (con Shift) · 2 duplex (con Shift) · B bug · K ticker · Espacio siguiente paso · Esc limpiar</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="comun.js"></script>
+<script>
+let E = TE.copia(TE.ESTADO_BASE);
+const $ = (s, p = document) => p.querySelector(s);
+const $$ = (s, p = document) => [...p.querySelectorAll(s)];
+let pasoActual = -1, timerGC = null;
+
+/* ---------- envío ---------- */
+let envioPend = null;
+function publicar(inmediato) {
+  clearTimeout(envioPend);
+  const f = () => { const m = { tipo: 'estado', estado: E }; misIds.add(m.id = Date.now() + '-' + Math.random().toString(36).slice(2, 7)); TE.enviar(m); };
+  if (inmediato) f(); else envioPend = setTimeout(f, 160);
+  pintar();
+}
+function disparar(que, variante) {
+  const m = { tipo: 'disparar', que, variante }; misIds.add(m.id = Date.now() + '-' + Math.random().toString(36).slice(2, 7)); TE.enviar(m);
+  const b = $(`[data-disparo="${variante ? que + '-' + variante : que}"]`) || $(`[data-disparo="${que}"]`); if (b) { b.classList.add('flash'); setTimeout(() => b.classList.remove('flash'), 400); }
+}
+const misIds = new Set();
+
+/* ---------- lógica de aire ---------- */
+const INFERIOR = ['cortinaTitulo', 'aviso', 'volvemos'];   // comparten zona con los GC
+function ponerGC(i) {
+  clearTimeout(timerGC);
+  E.aire.gc = (E.aire.gc === i) ? null : i;
+  if (E.aire.gc !== null) { INFERIOR.forEach(k => E.aire[k] = false); detenerAvance(); E.aire.titular = null; }
+  if (E.aire.gc !== null && E.config.autoSalidaGC > 0) {
+    const yo = E.aire.gc;
+    timerGC = setTimeout(() => { if (E.aire.gc === yo) { E.aire.gc = null; publicar(true); } }, (E.config.autoSalidaGC + 2.5) * 1000);
+  }
+  publicar(true);
+}
+function alternar(k, valor) {
+  const nuevo = valor === undefined ? !E.aire[k] : valor;
+  if (nuevo && INFERIOR.includes(k)) { E.aire.gc = null; INFERIOR.forEach(x => E.aire[x] = false); detenerAvance(); E.aire.titular = null; }
+  if (nuevo && (k === 'triplex' || k === 'duplex')) { E.aire.triplex = false; E.aire.duplex = false; }
+  E.aire[k] = nuevo;
+  publicar(true);
+}
+function limpiar() {
+  clearTimeout(timerGC);
+  E.aire.gc = null; INFERIOR.forEach(k => E.aire[k] = false); E.aire.triplex = false; E.aire.duplex = false;
+  detenerAvance(); E.aire.titular = null;
+  publicar(true);
+}
+
+/* ---------- avance informativo ---------- */
+let timerAvance = null, avanceAuto = false;
+function ponerTitular(i) {   // -1 = portada · 0..n = titular · null = fuera
+  E.aire.gc = null; INFERIOR.forEach(k => E.aire[k] = false);
+  E.aire.titular = (E.aire.titular === i && !avanceAuto) ? null : i;
+  publicar(true);
+}
+function detenerAvance() { avanceAuto = false; clearTimeout(timerAvance); }
+function avanceAutomatico() {
+  if (avanceAuto) { detenerAvance(); E.aire.titular = null; publicar(true); return; }
+  avanceAuto = true;
+  const orden = [-1].concat(E.titulares.map((_, i) => i));
+  let n = 0;
+  const paso = () => {
+    if (!avanceAuto) return;
+    if (n >= orden.length) { avanceAuto = false; E.aire.titular = null; publicar(true); construirBotonera(); pintar(); return; }
+    E.aire.gc = null; INFERIOR.forEach(k => E.aire[k] = false);
+    E.aire.titular = orden[n++]; publicar(true);
+    // 2,5 s de entrada + pausa configurable (+2 s si hubo que absorber el anterior)
+    timerAvance = setTimeout(paso, ((n === 1 ? 2.5 : 4.5) + (E.config.segTitular || 6)) * 1000 / (E.config.velocidad || 1));
+  };
+  paso();
+}
+function siguienteTitular() {
+  detenerAvance();
+  const t = E.aire.titular;
+  const sig = (t === null || t === undefined) ? -1 : t + 1;
+  E.aire.gc = null; INFERIOR.forEach(k => E.aire[k] = false);
+  E.aire.titular = sig < E.titulares.length ? sig : null;
+  publicar(true);
+}
+
+/* ---------- botonera ---------- */
+function bt(padre, titulo, sub, tecla, onclick, extra = {}) {
+  const b = document.createElement('button');
+  b.className = 'bt' + (extra.disparo ? ' disparo' : '');
+  b.innerHTML = `<b></b><small></small>${tecla ? `<kbd>${tecla}</kbd>` : ''}`;
+  b.querySelector('b').textContent = titulo; b.querySelector('small').textContent = sub || '';
+  b.onclick = onclick;
+  for (const k in extra.data || {}) b.dataset[k] = extra.data[k];
+  padre.appendChild(b);
+  return b;
+}
+function construirBotonera() {
+  const t = E.textos;
+  const g = $('#gridGC'); g.innerHTML = '';
+  E.gcs.forEach((x, i) => bt(g, (x.paciente ? '👽 ' : '') + (x.titulo || '(sin nombre)'), x.sub, i < 9 ? String(i + 1) : '', () => ponerGC(i), { data: { gc: i } }));
+  const gt = $('#gridTit'); gt.innerHTML = '';
+  bt(gt, avanceAuto ? '■ Detener avance' : '▶ Avance automático', 'portada + ' + E.titulares.length + ' titulares', 'H', () => { avanceAutomatico(); construirBotonera(); pintar(); }, { data: { avance: 1 } });
+  bt(gt, 'Siguiente titular', 'paso a paso', 'G', () => siguienteTitular());
+  bt(gt, 'Portada', t.avance.titulo, '', () => { detenerAvance(); ponerTitular(-1); }, { data: { tit: -1 } });
+  E.titulares.forEach((h, i) => {
+    const b = bt(gt, h.texto || '(vacío)', h.seccion, '', () => { detenerAvance(); ponerTitular(i); }, { data: { tit: i } });
+    b.classList.add('sec-' + (h.seccion || '').toUpperCase());
+  });
+  const ti = $('#gridTitulos'); ti.innerHTML = '';
+  bt(ti, 'Cortina título', t.cortinaTitulo.titulo, 'R', () => alternar('cortinaTitulo'), { data: { k: 'cortinaTitulo' } });
+  bt(ti, 'Volvemos', t.volvemos.titulo, 'V', () => alternar('volvemos'), { data: { k: 'volvemos' } });
+  bt(ti, 'Aviso', t.aviso.titulo, 'N', () => alternar('aviso'), { data: { k: 'aviso' } });
+  const mu = $('#gridMulti'); mu.innerHTML = '';
+  bt(mu, 'Triplex', t.triplex.titulo, '⇧3', () => alternar('triplex'), { data: { k: 'triplex' } });
+  bt(mu, 'Duplex', t.duplex.titulo, '⇧2', () => alternar('duplex'), { data: { k: 'duplex' } });
+  const di = $('#gridDisparos'); di.innerHTML = '';
+  bt(di, 'Apertura', '15 s · intro', 'A', () => disparar('apertura'), { disparo: 1, data: { disparo: 'apertura' } });
+  bt(di, 'Cortina', 'stinger · corte 1,2 s', 'C', () => disparar('cortina'), { disparo: 1, data: { disparo: 'cortina' } });
+  bt(di, 'Transición', ({ aleatoria: 'aleatoria', rayo: 'rayo', hipnosis: 'hipnosis', rorschach: 'Rorschach', onda: 'onda cerebral' }[E.config.transicion] || 'aleatoria') + ' · 2 s · corte 1 s', 'T', () => disparar('transicion'), { disparo: 1, data: { disparo: 'transicion' } });
+  const ch = $('#chipsTrans'); ch.innerHTML = '';
+  [['rayo', 'Rayo'], ['hipnosis', 'Hipnosis'], ['rorschach', 'Rorschach'], ['onda', 'Onda cerebral']].forEach(([v, n]) => {
+    const b = document.createElement('button'); b.textContent = '▶ ' + n; b.dataset.disparo = 'transicion-' + v;
+    b.onclick = () => disparar('transicion', v); ch.appendChild(b);
+  });
+  bt(di, 'Cierre', 'despedida', 'X', () => disparar('cierre'), { disparo: 1, data: { disparo: 'cierre' } });
+  const pe = $('#gridPerm'); pe.innerHTML = '';
+  bt(pe, 'Bug / logo', 'esquina superior derecha', 'B', () => alternar('bug'), { data: { k: 'bug' } });
+  bt(pe, 'Ticker', 'cinta inferior', 'K', () => alternar('ticker'), { data: { k: 'ticker' } });
+}
+function pintar() {
+  $('#nombrePrograma').textContent = E.config.programa;
+  $$('[data-gc]').forEach(b => b.classList.toggle('aire', E.aire.gc === +b.dataset.gc));
+  $$('[data-k]').forEach(b => b.classList.toggle('aire', !!E.aire[b.dataset.k]));
+  $$('[data-tit]').forEach(b => b.classList.toggle('aire', E.aire.titular === +b.dataset.tit));
+  $$('[data-avance]').forEach(b => b.classList.toggle('aire', avanceAuto));
+  $$('#segFondo button').forEach(b => b.classList.toggle('on', b.dataset.f === E.config.fondo));
+}
+
+/* ---------- pauta (según el guion «Terapia Espacial») ---------- */
+function pasos() {
+  const n = i => (E.gcs[i] ? E.gcs[i].titulo : 'GC ' + (i + 1));
+  return [
+    ['Intro', 'VTR apertura «Terapia Espacial» (15″)', [['d', 'apertura']]],
+    ['Intro', 'GC ' + n(0), [['gc', 0]]],
+    ['Intro', 'Avance informativo: titulares Talca, Chile e internacional', [['avance']]],
+    ['Intro', 'Cortina + título del compilado de avistamientos', [['d', 'cortina'], ['on', 'cortinaTitulo']]],
+    ['Lead a nota', 'Quitar título', [['off', 'cortinaTitulo']]],
+    ['Nota VTR ovnis', 'Cortina de entrada a la nota', [['d', 'cortina']]],
+    ['Fin nota', 'Cortina de salida de la nota', [['d', 'cortina']]],
+    ['Lead a comercial 1', 'Volvemos enseguida', [['on', 'volvemos']]],
+    ['Comercial 1', 'Quitar volvemos + cortina', [['off', 'volvemos'], ['d', 'cortina']]],
+    ['Bloque ovnis', 'Cortina de regreso + GC ' + n(1), [['d', 'cortina'], ['gc', 1]]],
+    ['Bloque ovnis', 'Triplex ' + E.textos.triplex.titulo, [['gcOff'], ['on', 'triplex']]],
+    ['Cierre bloque ovnis', 'Quitar triplex + cortina', [['off', 'triplex'], ['d', 'cortina']]],
+    ['Lead a comercial 2', 'Volvemos enseguida', [['on', 'volvemos']]],
+    ['Comercial 2', 'Quitar volvemos + cortina de regreso', [['off', 'volvemos'], ['d', 'cortina']]],
+    ['Nota psicología', 'Cortina de entrada a la nota', [['d', 'cortina']]],
+    ['Fin nota', 'Cortina de salida + GC ' + n(2), [['d', 'cortina'], ['gc', 2]]],
+    ['Bloque psicología', 'Duplex ' + E.textos.duplex.titulo, [['gcOff'], ['on', 'duplex']]],
+    ['Cierre bloque', 'Quitar duplex', [['off', 'duplex']]],
+    ['Cierre', 'Cortina + cierre del programa', [['d', 'cortina'], ['limpiar'], ['d2', 'cierre']]]
+  ];
+}
+function ejecutarPaso(i) {
+  const lista = pasos(); if (i < 0 || i >= lista.length) return;
+  pasoActual = i;
+  lista[i][2].forEach(([acc, x]) => {
+    if (acc === 'd') disparar(x);
+    if (acc === 'd2') setTimeout(() => disparar(x), 1300);
+    if (acc === 'on') alternar(x, true);
+    if (acc === 'off') alternar(x, false);
+    if (acc === 'gc') { if (E.aire.gc !== x) ponerGC(x); }
+    if (acc === 'gcOff') { E.aire.gc = null; publicar(true); }
+    if (acc === 'limpiar') limpiar();
+    if (acc === 'avance') { E.aire.gc = null; detenerAvance(); avanceAutomatico(); construirBotonera(); pintar(); }
+  });
+  pintarPauta();
+}
+function pintarPauta() {
+  const c = $('#listaPauta'); c.innerHTML = '';
+  pasos().forEach((p, i) => {
+    const d = document.createElement('div');
+    d.className = 'paso' + (i === pasoActual ? ' actual' : '') + (i < pasoActual ? ' hecho' : '');
+    d.innerHTML = `<div class="n">${i + 1}</div><div><div class="bl"></div><div class="ds"></div><div class="ac"></div></div><button>▶</button>`;
+    d.querySelector('.bl').textContent = p[0];
+    d.querySelector('.ds').textContent = p[1];
+    d.querySelector('.ac').textContent = p[2].map(a => ({ d: 'disparo', d2: 'disparo', on: 'mostrar', off: 'quitar', gc: 'GC', gcOff: 'quitar GC', limpiar: 'limpiar', avance: 'avance automático' }[a[0]] + (a[1] !== undefined && a[0] !== 'gc' ? ' ' + a[1] : ''))).join(' · ');
+    d.onclick = () => ejecutarPaso(i);
+    c.appendChild(d);
+  });
+  const act = c.querySelector('.actual'); if (act) act.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+$('#pSig').onclick = () => ejecutarPaso(pasoActual + 1);
+$('#pAnt').onclick = () => { pasoActual = Math.max(-1, pasoActual - 1); pintarPauta(); };
+
+/* ---------- textos ---------- */
+function ruta(obj, r) { return r.split('.').reduce((o, k) => o[k], obj); }
+function fijar(obj, r, v) { const ks = r.split('.'); const u = ks.pop(); ks.reduce((o, k) => o[k], obj)[u] = v; }
+function construirGCEditor() {
+  const c = $('#listaGC'); c.innerHTML = '';
+  E.gcs.forEach((g, i) => {
+    const f = document.createElement('div'); f.className = 'gcItem';
+    f.innerHTML = '<input type="text" placeholder="Nombre"><input type="text" placeholder="Cargo"><label title="Estilo paciente alienígena"><input type="checkbox"> 👽</label><button title="Eliminar">✕</button>';
+    const [a, b, pc] = f.querySelectorAll('input'); a.value = g.titulo; b.value = g.sub; pc.checked = !!g.paciente;
+    pc.onchange = () => { g.paciente = pc.checked; construirBotonera(); publicar(true); };
+    a.oninput = () => { g.titulo = a.value; construirBotonera(); publicar(); };
+    b.oninput = () => { g.sub = b.value; construirBotonera(); publicar(); };
+    f.querySelector('button').onclick = () => {
+      if (E.aire.gc === i) E.aire.gc = null; else if (E.aire.gc > i) E.aire.gc--;
+      E.gcs.splice(i, 1); construirGCEditor(); construirBotonera(); publicar(true);
+    };
+    c.appendChild(f);
+  });
+}
+function construirTitEditor() {
+  const c = $('#listaTit'); c.innerHTML = '';
+  E.titulares.forEach((h, i) => {
+    const f = document.createElement('div'); f.className = 'titItem';
+    f.innerHTML = '<select><option>TALCA</option><option>CHILE</option><option>INTERNACIONAL</option></select><input type="text" placeholder="Titular"><button class="mini" title="Eliminar">✕</button>';
+    const sel = f.querySelector('select'), inp = f.querySelector('input');
+    sel.value = (h.seccion || 'CHILE').toUpperCase(); inp.value = h.texto;
+    sel.onchange = () => { h.seccion = sel.value; construirBotonera(); pintar(); publicar(); };
+    inp.oninput = () => { h.texto = inp.value; construirBotonera(); pintar(); publicar(); };
+    f.querySelector('button').onclick = () => {
+      if (E.aire.titular === i) E.aire.titular = null; else if (E.aire.titular > i) E.aire.titular--;
+      E.titulares.splice(i, 1); construirTitEditor(); construirBotonera(); pintar(); publicar(true);
+    };
+    c.appendChild(f);
+  });
+}
+$('#agregarTit').onclick = () => { E.titulares.push({ seccion: 'TALCA', texto: 'Nuevo titular' }); construirTitEditor(); construirBotonera(); pintar(); publicar(true); };
+$('#agregarGC').onclick = () => { E.gcs.push({ titulo: 'Nuevo invitado', sub: 'Cargo' }); construirGCEditor(); construirBotonera(); publicar(true); };
+
+function enlazarCampos() {
+  $$('[data-t]').forEach(inp => {
+    const v = ruta(E.textos, inp.dataset.t);
+    inp.value = inp.hasAttribute('data-lista') ? v.join(' | ') : v;
+    inp.oninput = () => {
+      fijar(E.textos, inp.dataset.t, inp.hasAttribute('data-lista') ? inp.value.split('|').map(s => s.trim()) : inp.value);
+      construirBotonera(); pintar(); publicar();
+    };
+  });
+  $$('[data-c]').forEach(inp => {
+    const k = inp.dataset.c, v = E.config[k];
+    if (inp.type === 'checkbox') inp.checked = !!v; else inp.value = v;
+    const ev = (inp.tagName === 'SELECT' || inp.type === 'checkbox') ? 'onchange' : 'oninput';
+    inp[ev] = () => {
+      E.config[k] = inp.type === 'checkbox' ? inp.checked : (inp.hasAttribute('data-num') ? (parseFloat(inp.value) || 0) : inp.value);
+      if (k === 'programa') { E.textos.apertura.titulo = E.textos.cierre.titulo = inp.value; }
+      if (k === 'transicion') construirBotonera(), pintar();
+      publicar();
+    };
+  });
+  // colores
+  const nombres = { espacio: 'Espacio (barras)', violeta: 'Violeta', magenta: 'Magenta', rayo: 'Rayo', blanco: 'Texto', menta: 'Menta (logo)' };
+  const cc = $('#colores'); cc.innerHTML = '';
+  Object.keys(E.config.colores).forEach(k => {
+    const d = document.createElement('label'); d.className = 'color';
+    d.innerHTML = `<input type="color"><span>${nombres[k] || k}</span>`;
+    const i = d.querySelector('input'); i.value = E.config.colores[k];
+    i.oninput = () => { E.config.colores[k] = i.value; revisarVerdes(); publicar(); };
+    cc.appendChild(d);
+  });
+  revisarVerdes();
+  pintarLogo();
+}
+function revisarVerdes() {
+  const malos = Object.entries(E.config.colores).filter(([, h]) => {
+    const r = parseInt(h.slice(1, 3), 16), g = parseInt(h.slice(3, 5), 16), b = parseInt(h.slice(5, 7), 16);
+    return g > 120 && g - Math.max(r, b) > 60;
+  }).map(([k]) => k);
+  const a = $('#avisoVerde');
+  a.style.display = malos.length && E.config.fondo === 'verde' ? 'block' : 'none';
+  a.textContent = 'Ojo: ' + malos.join(', ') + ' es demasiado verde y el chroma lo va a borrar. Usa otro tono o cambia a fondo transparente.';
+}
+$$('#segFondo button').forEach(b => b.onclick = () => { E.config.fondo = b.dataset.f; revisarVerdes(); publicar(true); });
+
+/* ---------- logo ---------- */
+function pintarLogo() { const i = $('#logoPrev'); i.hidden = !E.config.logo; if (E.config.logo) i.src = E.config.logo; }
+$('#logoArchivo').onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const img = new Image();
+  img.onload = () => {
+    const esc = Math.min(1, 600 / img.height);
+    const cv = document.createElement('canvas'); cv.width = Math.round(img.width * esc); cv.height = Math.round(img.height * esc);
+    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+    E.config.logo = cv.toDataURL('image/png'); pintarLogo(); publicar(true); URL.revokeObjectURL(img.src);
+  };
+  img.src = URL.createObjectURL(f);
+};
+$('#logoQuitar').onclick = () => { E.config.logo = null; pintarLogo(); publicar(true); };
+
+/* ---------- respaldo ---------- */
+$('#exportar').onclick = () => {
+  const datos = TE.copia(E); datos.aire = TE.copia(TE.ESTADO_BASE.aire);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' }));
+  a.download = 'terapia-espacial-config.json'; a.click();
+};
+$('#importar').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try { const j = JSON.parse(await f.text()); E = TE.mezclar(TE.copia(TE.ESTADO_BASE), j); E.aire = TE.copia(TE.ESTADO_BASE.aire); todo(); publicar(true); }
+  catch (_) { alert('Ese archivo no es una configuración válida.'); }
+};
+$('#restablecer').onclick = () => { if (confirm('¿Volver a los textos y colores originales?')) { E = TE.copia(TE.ESTADO_BASE); todo(); publicar(true); } };
+
+/* ---------- pestañas, teclado, preview ---------- */
+$$('#tabs button').forEach(b => b.onclick = () => {
+  $$('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+  $$('.vista').forEach(v => v.classList.toggle('on', v.id === 'v-' + b.dataset.v));
+  if (b.dataset.v === 'pauta') pintarPauta();
+});
+$('#btnLimpiar').onclick = limpiar;
+$('#prevOn').onchange = e => { $('.prev').style.display = e.target.checked ? '' : 'none'; };
+if (matchMedia('(max-width:700px)').matches) { $('#prevOn').checked = false; $('.prev').style.display = 'none'; }
+
+addEventListener('keydown', e => {
+  if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
+  const k = e.key.toLowerCase();
+  if (e.shiftKey && (e.code === 'Digit3')) { alternar('triplex'); return e.preventDefault(); }
+  if (e.shiftKey && (e.code === 'Digit2')) { alternar('duplex'); return e.preventDefault(); }
+  if (/^[1-9]$/.test(e.key) && E.gcs[+e.key - 1]) { ponerGC(+e.key - 1); return; }
+  const mapa = { a: () => disparar('apertura'), c: () => disparar('cortina'), t: () => disparar('transicion'), x: () => disparar('cierre'),
+    r: () => alternar('cortinaTitulo'), v: () => alternar('volvemos'), n: () => alternar('aviso'), b: () => alternar('bug'), k: () => alternar('ticker'),
+    h: () => { avanceAutomatico(); construirBotonera(); pintar(); }, g: siguienteTitular,
+    escape: limpiar, ' ': () => ejecutarPaso(pasoActual + 1) };
+  if (mapa[k]) { e.preventDefault(); mapa[k](); }
+});
+
+function todo() { construirBotonera(); construirGCEditor(); construirTitEditor(); enlazarCampos(); pintar(); }
+
+/* ---------- conexión ---------- */
+function infoConexion(ok) {
+  const s = $('#estadoCon');
+  if (TE.conServidor) {
+    s.classList.toggle('ok', ok); s.querySelector('span').textContent = ok ? 'conectado' : 'sin servidor';
+    $('#infoConexion').innerHTML = ok
+      ? `Conectado al servidor. En OBS agrega una <b>Fuente de navegador</b> con la URL <b>${location.origin}/salida.html</b> (1920×1080). Desde el celular abre esta misma dirección cambiando <i>localhost</i> por la IP que muestra la ventana del servidor.`
+      : 'No hay conexión con el servidor. Revisa que la ventana negra de INICIAR.bat siga abierta.';
+  } else {
+    s.classList.add('ok'); s.querySelector('span').textContent = 'modo local';
+    $('#infoConexion').innerHTML = 'Modo local (archivo abierto directamente): funciona con la salida abierta <b>en este mismo navegador</b> o como dock de OBS. Para OBS + celular, usa <b>INICIAR.bat</b>.';
+  }
+}
+TE.escuchar(m => {
+  if (m.tipo === '_conexion') return infoConexion(m.ok);
+  if (m.tipo === 'estado' && m.id && !misIds.has(m.id) && m.id !== 'inicio') {   // cambios hechos desde otro panel (ej. celular)
+    E = TE.mezclar(TE.copia(TE.ESTADO_BASE), m.estado);
+    if (!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) todo(); else { construirBotonera(); pintar(); }
+  }
+});
+
+(async () => {
+  E = await TE.estadoInicial();
+  todo();
+  infoConexion(false);
+  TE.conectar();
+  if (!TE.conServidor) infoConexion(true);
+})();
+</script>
+</body>
+</html>
