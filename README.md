@@ -1,7 +1,14 @@
-# TERAPIA ESPACIAL — Paquete gráfico v3
+# TERAPIA ESPACIAL — Paquete gráfico v3.1
 
 **Concepto:** un ovni cae, enciende su rayo tractor y deja el GC. En la salida vuelve, lo absorbe y se va.
 **Premisa:** una consulta de psicología para pacientes de otro planeta. Una **terapeuta** toma notas mientras un **paciente alien**, despierto en el diván, le cuenta su abducción.
+
+**Novedades de la v3.1**
+- **Botón 🌌 Fondo espacio:** activa o desactiva el fondo del espacio y queda así hasta que lo vuelvas a tocar.
+- **✎ en cada botón** (o manteniendo presionado el botón): editas los textos de la gráfica, su fondo (General / Verde / Espacio) y el botón mismo (texto, color, tecla, posición). Los cambios se ven al instante, incluso al aire.
+- **Todo entra y sale con un toque.** La apertura, el cierre, la cortina y las transiciones también se sacan tocando de nuevo, si te equivocas.
+- **Titulares «Últimas Noticias»:** GC centrado con subtítulo y el lugar en la esquina superior derecha (con pin). Vienen 5 (Talca, Santiago, Barquisimeto, Buenos Aires y Hollywood), todos con fondo verde. Mientras el lugar está en pantalla, el bug se esconde.
+- **Duplex:** a la izquierda la cámara de la psicóloga (vertical, más chica) y al centro el video 16:9.
 
 **Novedades de la v3**
 - **Botonera táctil para tablet y celular:** botones grandes; un toque pone la gráfica al aire y otro la saca. La pauta avanza con ◀ ▶ y hay un botón grande de LIMPIAR. Cada botón se puede editar (acción, texto, color y tecla F13–F24).
@@ -63,6 +70,9 @@ Cada vez que subo cambios, la página se actualiza sola.
 - **Reglas al aire:** los GC, los titulares, la cortina título, «Volvemos» y el aviso comparten la zona baja, así que uno reemplaza al otro. El triplex y el duplex también se reemplazan entre sí.
 
 ## 4. Fondos
+- **Botón 🌌 Fondo espacio** en la botonera: alterna entre verde y espacio, y se mantiene.
+- **Fondo por gráfica** (desde el ✎ de cada botón): «General» sigue el botón 🌌; «Verde» o «Espacio» se aplican solo mientras esa gráfica está al aire. Si hay varias al aire, gana Espacio.
+
 | Fondo | Para qué |
 |---|---|
 | 🟩 Verde | Chroma key en OBS o en el ATEM. El rayo se dibuja opaco y con líneas para que el chroma quede limpio. |
@@ -79,14 +89,14 @@ También puedes forzar el fondo desde el link de OBS agregando `&fondo=verde` o 
 | Triplex | C1 Luis (vertical 9:16) | 180 | 280 | 287 | 510 |
 | | VTR avistamientos (16:9) | 507 | 280 | 907 | 510 |
 | | C3 Benjamín (vertical 9:16) | 1454 | 280 | 287 | 510 |
-| Duplex | C1 Luis | 96 | 230 | 832 | 468 |
-| | C3 Sophia | 992 | 230 | 832 | 468 |
+| Duplex | Cámara de la psicóloga (9:16) | 96 | 262 | 300 | 533 |
+| | Video / nota (16:9, al centro) | 440 | 210 | 1040 | 585 |
 
 ## 5. After Effects
 1. Ve a **Archivo → Scripts → Ejecutar archivo de script…** y elige `after_effects/TerapiaEspacial.jsx`. También puedes copiarlo en *ScriptUI Panels* para tenerlo como panel.
 2. Pestañas del panel:
    - **General:** fondo (Verde / Espacio / Transparente), fuentes, logo y duraciones.
-   - **Textos:** GC en formato `Nombre | Cargo | estilo`, donde el estilo es `terapeuta` o `alien`. También los titulares en formato `TALCA | texto`.
+   - **Textos:** GC en formato `Nombre | Cargo | estilo`, donde el estilo es `terapeuta` o `alien`. Titulares en formato `GC | subtítulo | Ciudad, Región | fondo` (verde o espacio).
    - **Colores.**
    - **Crear:** marca lo que necesitas y presiona el botón.
 3. La escena de sesión se crea como **capas de forma editables**. El brazo del alien gesticula, la boca habla, el globo late, la terapeuta asiente y escribe: todo con expresiones.

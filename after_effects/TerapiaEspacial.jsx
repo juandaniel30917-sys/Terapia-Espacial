@@ -54,21 +54,18 @@
             ["Paciente X-27", "Visitante de otro planeta", "alien"]
         ],
         avance: { titulo: "AVANCE INFORMATIVO", sub: "ÚLTIMAS NOTICIAS · TALCA · CHILE · INTERNACIONAL" },
-        // Titulares: [sección, texto]  — sección: TALCA | CHILE | INTERNACIONAL
+        // Titulares «Últimas Noticias»: [GC, subtítulo, esquina superior derecha (Ciudad, Región), fondo ("verde" | "espacio" | "" = general)]
         titulares: [
-            ["TALCA", "Avistamientos en El Enladrillado y San Clemente vuelven a repetirse"],
-            ["TALCA", "Lago Colbún y laguna del Maule, en la mira de los FANI"],
-            ["CHILE", "Aumenta el consumo de antidepresivos en jóvenes"],
-            ["CHILE", "Cae el consumo de alcohol entre los jóvenes"],
-            ["CHILE", "Salud mental estudiantil: el desafío de volver a la presencialidad"],
-            ["INTERNACIONAL", "Casa Blanca y Pentágono desclasifican registros OVNI"],
-            ["INTERNACIONAL", "Desde 2019 se disparan los registros de ovnis en el mundo"],
-            ["INTERNACIONAL", "Bélgica y Asturias: los videos que reabren el debate"]
+            ["Últimas Noticias", "Los últimos acontecimientos en materia meteorológica, deportiva y cultural", "Talca, Región del Maule", "verde"],
+            ["Últimas Noticias", "Los últimos sucesos de política y economía que afectan a nuestro país.", "Santiago, Región Metropolitana", "verde"],
+            ["Últimas Noticias", "Noticia Internacional", "Barquisimeto, Venezuela", "verde"],
+            ["Últimas Noticias", "Noticia Internacional", "Buenos Aires, Argentina", "verde"],
+            ["Últimas Noticias", "Noticia Internacional", "Hollywood, Estados Unidos", "verde"]
         ],
         etiquetaSesion: "SESIÓN EN CURSO",
         cortinaTitulo: { titulo: "OVNIS CAPTADOS EN CÁMARA", sub: "¿ESTAMOS SOLOS EN EL UNIVERSO?" },
         triplex: { titulo: "OVNI · OSNI · FANI", etiquetas: ["LUIS MONASTERIOS", "AVISTAMIENTOS", "BENJAMÍN CASTILLO"] },
-        duplex:  { titulo: "SALUD MENTAL", etiquetas: ["LUIS MONASTERIOS", "SOPHIA JAQUE"] },
+        duplex:  { titulo: "SALUD MENTAL", etiquetas: ["SOPHIA JAQUE", "NOTA · SALUD MENTAL"] },
         aviso:   { titulo: "¡NUEVO AVISTAMIENTO!", sub: "El Enladrillado · Región del Maule" },
         volvemos: { titulo: "VOLVEMOS ENSEGUIDA", sub: "LA SESIÓN CONTINÚA" },
         cierre:  { titulo: "TERAPIA ESPACIAL", sub: "FIN DE LA SESIÓN · NOS VEMOS EN UN NUEVO PROGRAMA" },
@@ -233,17 +230,17 @@
         return l;
     }
 
-    function ponerFondo(comp, completo) {
-        var l;
+    function ponerFondo(comp, completo, fondo) {
+        var l, f = fondo || CONFIG.fondo;
         if (completo) {
             estrellas(comp).moveToEnd();
             l = comp.layers.addSolid(hex(CONFIG.colores.espacio), N("FONDO_ESPACIO"), comp.width, comp.height, 1, comp.duration);
             l.moveToEnd();
-        } else if (CONFIG.fondo === "espacio") {
+        } else if (f === "espacio") {
             estrellas(comp).moveToEnd();
             l = comp.layers.addSolid(hex(CONFIG.colores.espacio), N("FONDO_ESPACIO"), comp.width, comp.height, 1, comp.duration);
             l.moveToEnd();
-        } else if (CONFIG.fondo === "verde") {
+        } else if (f === "verde") {
             l = comp.layers.addSolid(CONFIG.verde, N("FONDO_VERDE_CHROMA"), comp.width, comp.height, 1, comp.duration);
             l.comment = "Verde puro 0,255,0 para chroma key en OBS";
             l.moveToEnd();
@@ -573,7 +570,7 @@
         var u = ovni(comp, U);
 
         ctrl.moveToBeginning();
-        if (!o.sinFondo) { ponerFondo(comp, o.completo); }
+        if (!o.sinFondo) { ponerFondo(comp, o.completo, o.fondo); }
 
         // ---------- EXPRESIONES (ya existen todas las capas) ----------
         pAncho.expression = 'var L=thisComp.layer(' + q(TT) + ');var t=L.sourceRectAtTime(0,false).width*L.transform.scale[0]/100;' +
@@ -714,10 +711,42 @@
             tIn: 0, tOut: CONFIG.dur.avance - 2, dur: CONFIG.dur.avance });
     }
     function crearTitular(i) {
-        var h = CONFIG.titulares[i], n = (i < 9 ? "0" : "") + (i + 1);
-        return abduccion({ nombre: "TITULAR_" + n, titulo: h[1], sub: "", etiqueta: String(h[0]).toUpperCase(),
-            tamT: 52, tamS: 24, barY: 820, rayoLargo: 300, S: 120, centrado: true, minW: 760, maxW: 1720,
-            tIn: 0, tOut: CONFIG.dur.titular - 2, dur: CONFIG.dur.titular });
+        var h = CONFIG.titulares[i], n = (i < 9 ? "0" : "") + (i + 1), X = CONFIG.dur.titular - 2;
+        var lugarTxt = String(h[2] || ""), ciudad = lugarTxt.split(",")[0], limpio = ciudad.replace(/[^A-Za-z0-9áéíóúñÁÉÍÓÚÑ ]/g, "");
+        var comp = abduccion({ nombre: "TITULAR_" + n + (limpio ? "_" + limpio : ""), titulo: h[0], sub: h[1], fondo: h[3] || "",
+            tamT: 64, tamS: 30, barY: 850, rayoLargo: 300, S: 120, centrado: true, minW: 900, maxW: 1720,
+            tIn: 0, tOut: X, dur: CONFIG.dur.titular });
+        if (lugarTxt) { lugarEsquina(comp, lugarTxt, 1.0, X + 1.2); }
+        return comp;
+    }
+    // Esquina superior derecha: pin + «Ciudad» + «REGIÓN»
+    function lugarEsquina(comp, texto, tIn, tOut) {
+        var cs = CONFIG.colores, i = texto.indexOf(",");
+        var a = i >= 0 ? trim(texto.substr(0, i)) : trim(texto), b = i >= 0 ? trim(texto.substr(i + 1)).toUpperCase() : "";
+        var t1 = crearTexto(comp, a, CONFIG.fuentes.titulo, 34, hex(cs.blanco), 40, N("LUGAR_CIUDAD"), false);
+        var t2 = crearTexto(comp, b, CONFIG.fuentes.texto, 19, hex(cs.menta), 120, N("LUGAR_REGION"), false);
+        var pl = capaForma(comp, N("LUGAR_PLACA"));
+        var gpin = grupo(pl, "PIN");
+        trazo(gpin, [[0, 29], [-19, 5], [0, -27], [19, 5]], true, [[0, 0], [0, 12], [-11, 0], [0, -14]], [[0, 0], [0, -14], [11, 0], [0, 12]]);
+        elipse(gpin, [16, 16], [0, -5]);
+        contorno(gpin, hex(cs.blanco), 4, 100); relleno(gpin, hex(cs.magenta), 100);
+        var gp = grupo(pl, "PLACA");
+        var rp = rect(gp, [400, 112], [0, 0], 56);
+        contorno(gp, hex(cs.violeta), 4, 100); relleno(gp, hex(cs.espacio), 100);
+        // ancho automático según el texto más largo; alineado a la derecha (margen 96)
+        var EWL = 'var w=Math.max(thisComp.layer(' + q(N("LUGAR_CIUDAD")) + ').sourceRectAtTime(0,false).width,thisComp.layer(' + q(N("LUGAR_REGION")) + ').sourceRectAtTime(0,false).width)+110;';
+        rp.property("ADBE Vector Rect Size").expression = EWL + '[w,112]';
+        rp.property("ADBE Vector Rect Position").expression = EWL + '[-w/2,0]';
+        gtr(gpin, "ADBE Vector Position").expression = EWL + '[-w+46,0]';
+        tr(pl, "ADBE Position").setValue([1920 - 96, 54 + 56]);
+        tr(t1, "ADBE Position").expression = EWL + '[1920-96-w+82, 54+50]';
+        tr(t2, "ADBE Position").expression = EWL + '[1920-96-w+82, 54+82]';
+        pl.moveAfter(t2);
+        var capas = [pl, t1, t2], k;
+        for (k = 0; k < capas.length; k++) {
+            anim(tr(capas[k], "ADBE Opacity"), [[tIn, 0], [tIn + 0.35, 100], [tOut, 100], [tOut + 0.35, 0]]);
+        }
+        anim(tr(pl, "ADBE Scale"), [[tIn, [20, 20, 100]], [tIn + 0.45, [100, 100, 100]], [tOut, [100, 100, 100]], [tOut + 0.35, [20, 20, 100]]]);
     }
 
     function crearCortinaTitulo() {
@@ -1025,8 +1054,9 @@
     }
     function crearDuplex() {
         var c = CONFIG.duplex;
+        // izquierda: cámara de la psicóloga (9:16, más chica) · centro: video 16:9
         return crearMultiplex("DUPLEX", c.titulo, c.etiquetas,
-            [[96, 230, 832, 468], [992, 230, 832, 468]], false);
+            [[96, 262, 300, 533], [440, 210, 1040, 585]], true);
     }
 
     // ---------- BUG / LOGO de esquina ----------
@@ -1169,9 +1199,9 @@
         for (i = 0; i < CONFIG.gcs.length; i++) { lineas.push(CONFIG.gcs[i][0] + " | " + CONFIG.gcs[i][1] + (CONFIG.gcs[i][2] ? " | " + CONFIG.gcs[i][2] : "")); }
         var eGC = tx.add("edittext", undefined, lineas.join("\n"), { multiline: true });
         eGC.preferredSize = [360, 90];
-        tx.add("statictext", undefined, "Titulares — una línea cada uno:  TALCA | texto   (TALCA, CHILE o INTERNACIONAL)");
+        tx.add("statictext", undefined, "Titulares — una línea cada uno:  GC | subtítulo | Ciudad, Región | fondo (verde / espacio)");
         var lt = [];
-        for (i = 0; i < CONFIG.titulares.length; i++) { lt.push(CONFIG.titulares[i][0] + " | " + CONFIG.titulares[i][1]); }
+        for (i = 0; i < CONFIG.titulares.length; i++) { lt.push(CONFIG.titulares[i].join(" | ")); }
         var eTit = tx.add("edittext", undefined, lt.join("\n"), { multiline: true });
         eTit.preferredSize = [360, 110];
         var eAvT = campo(tx, "Avance título", CONFIG.avance.titulo);
@@ -1237,8 +1267,7 @@
             for (j = 0; j < lt2.length; j++) {
                 if (trim(lt2[j]) === "") { continue; }
                 p = separar(lt2[j]);
-                if (p.length < 2) { p = ["CHILE", p[0]]; }
-                CONFIG.titulares.push([p[0].toUpperCase(), p.slice(1).join(" | ")]);
+                CONFIG.titulares.push([p[0] || "Últimas Noticias", p[1] || "", p[2] || "", /esp/i.test(p[3] || "") ? "espacio" : (/verde/i.test(p[3] || "") ? "verde" : "")]);
             }
             CONFIG.avance = { titulo: trim(eAvT.text), sub: trim(eAvS.text) };
             CONFIG.dur.multiplex = Math.max(10, parseFloat(eDurMx.text) || 60);

@@ -80,6 +80,16 @@
   .bug{transition:opacity .4s, transform .5s cubic-bezier(.2,1.4,.4,1);}
   .bug.fuera{opacity:0;transform:scale(.2) translateY(-60px);}
 
+  /* ---------- LUGAR (esquina superior derecha de los titulares) ---------- */
+  .lugar{position:absolute;right:96px;top:54px;height:112px;display:flex;align-items:center;gap:16px;padding:0 34px 0 22px;background:var(--espacio);
+       border:4px solid var(--violeta);border-radius:56px;box-sizing:border-box;transform-origin:100% 0;transition:opacity .4s, transform .55s cubic-bezier(.2,1.4,.4,1);}
+  .lugar.fuera{opacity:0;transform:scale(.2) translateY(-60px);}
+  .lugar svg{width:46px;height:62px;flex:0 0 auto}
+  .lugar .t1{font-family:var(--ft);font-weight:700;font-size:34px;letter-spacing:.04em;color:var(--blanco);line-height:1;white-space:nowrap}
+  .lugar .t2{font-family:var(--fx);font-weight:700;font-size:19px;letter-spacing:.12em;color:var(--menta);text-transform:uppercase;margin-top:8px;white-space:nowrap}
+  .lugar .txt{transition:opacity .25s}
+  .abortando{transition:opacity .3s;opacity:0!important}
+
   /* ---------- TICKER ---------- */
   .ticker{position:absolute;left:0;right:0;bottom:18px;height:52px;background:var(--espacio);border-top:4px solid var(--violeta);
        display:flex;align-items:center;overflow:hidden;transform:translateY(90px);transition:transform .6s cubic-bezier(.3,1.3,.5,1);}
@@ -244,7 +254,7 @@ class Abduccion {
   }
   textos(t, s) {
     if (this.tit.textContent !== (t || '')) { this.tit.textContent = t || ''; this.fs = this.o.tamT; this.tit.style.fontSize = this.fs + 'px'; }
-    this.stx.textContent = (s || '').toUpperCase();
+    if (this.stx.textContent !== (s || '').toUpperCase()) { this.stx.textContent = (s || '').toUpperCase(); this.fsS = this.o.tamS; this.stx.style.fontSize = this.fsS + 'px'; }
   }
   salir() {
     if (this.fase === 'salida' || this.fase === 'fin') return this.fin;
@@ -296,7 +306,11 @@ class Abduccion {
       this.fs = Math.max(24, Math.floor(this.fs * (o.maxW - this.mT * 2 - this.icoW) / wt));
       this.tit.style.fontSize = this.fs + 'px'; wt = this.tit.offsetWidth;
     }
-    const ws0 = this.stx.offsetWidth;
+    let ws0 = this.stx.offsetWidth;
+    if (o.maxW && ws0 + this.mS * 2 > o.maxW && ws0 > 0) {
+      this.fsS = Math.max(16, Math.floor((this.fsS || o.tamS) * (o.maxW - this.mS * 2) / ws0));
+      this.stx.style.fontSize = this.fsS + 'px'; ws0 = this.stx.offsetWidth;
+    }
     const w = Math.max(wt + this.mT * 2 + this.icoW, o.minW || 360);
     const ws = ws0 > 2 ? ws0 + this.mS * 2 : 0;
     const cx = o.centrado ? 960 : c.bordeIzq + w / 2;
@@ -352,7 +366,13 @@ class Abduccion {
       });
     }
   }
+  abortar() {
+    if (this.fase === 'fin') return;
+    this.el.classList.add('abortando');
+    setTimeout(() => this.destruir(), 320);
+  }
   destruir() {
+    if (this.fase === 'fin') return;
     this.fase = 'fin'; clearTimeout(this.timerAuto);
     this.el.remove(); Abduccion.vivos.delete(this); this._resolver();
   }
@@ -450,11 +470,7 @@ function cortina() {
   const colm = sv('polygon', { fill: col.rayo, stroke: '#fff', 'stroke-width': 4 }, s);
   const u = el('div', 'ufo', raiz); u.appendChild(svgOvni());
   const kx = [[0, -200], [1.1, 2150], [1.3, 2150], [2.3, -200]], kr = [[0, 12], [1.1, 12], [1.3, -12], [2.3, -12]];
-  const t0 = ahora();
-  return new Promise(res => {
-    (function paso() {
-      const t = (ahora() - t0) * cfg().velocidad;
-      if (t > 2.5) { raiz.remove(); res(); return; }
+  return animar(2.5, raiz, t => {
       const x = pista(kx, t), y = 200 + Math.sin(t * 6) * 8, r = pista(kr, t), xB = pista(kx, t - .12);
       pA.style.width = Math.max(0, x + 60) + 'px';
       pB.style.width = Math.max(0, xB + 60) + 'px';
@@ -465,23 +481,26 @@ function cortina() {
       tx.style.transform = `scale(${pista([[.85, .9], [1.55, 1.04]], t)})`;
       esc.style.opacity = pista([[.8, 0], [1.0, 1], [1.35, 1], [1.55, 0]], t);
       esc.style.transform = `translateY(${pista([[.8, 30], [1.55, -10]], t)}px)`;
-      requestAnimationFrame(paso);
-    })();
   });
 }
 
 /* ===================================================================
    TRANSICIONES VARIADAS (2 s · punto de corte 1,0 s)
    =================================================================== */
+// devuelve una promesa con .abortar() para sacarla antes de tiempo (fundido de 0,3 s)
 function animar(dur, raiz, fn) {
-  const t0 = ahora();
-  return new Promise(res => {
+  const t0 = ahora(); let cortar = false, listo;
+  const pr = new Promise(res => {
+    listo = res;
     (function paso() {
       const t = (ahora() - t0) * cfg().velocidad;
+      if (cortar) return;
       if (t > dur) { raiz.remove(); res(); return; }
       fn(t); requestAnimationFrame(paso);
     })();
   });
+  pr.abortar = () => { if (cortar) return; raiz.classList.add('abortando'); setTimeout(() => { cortar = true; raiz.remove(); listo(); }, 320); };
+  return pr;
 }
 const TRANSICIONES = {
   // 1) El rayo del ovni se abre a pantalla completa
@@ -590,6 +609,30 @@ function transicion(variante) {
   return TRANSICIONES[v]();
 }
 
+/* ---------- Lugar (esquina superior derecha) ---------- */
+let lugarEl = null;
+function lugar(texto) {
+  if (texto && !lugarEl) {
+    lugarEl = el('div', 'lugar fuera', $('#cBug'));
+    const pin = sv('svg', { viewBox: '0 0 46 62' }, lugarEl);
+    sv('path', { d: 'M23,60 C23,60 4,36 4,22 C4,11 12,3 23,3 C34,3 42,11 42,22 C42,36 23,60 23,60 Z', fill: 'var(--magenta)', stroke: 'var(--blanco)', 'stroke-width': 4 }, pin);
+    sv('circle', { cx: 23, cy: 22, r: 8, fill: 'var(--blanco)' }, pin);
+    const t = el('div', 'txt', lugarEl); el('div', 't1', t); el('div', 't2', t);
+    requestAnimationFrame(() => requestAnimationFrame(() => lugarEl && lugarEl.classList.remove('fuera')));
+  }
+  if (texto && lugarEl) {
+    const i = texto.indexOf(','), a = i >= 0 ? texto.slice(0, i).trim() : texto.trim(), b = i >= 0 ? texto.slice(i + 1).trim() : '';
+    const t = lugarEl.querySelector('.txt');
+    if (t.dataset.v !== texto) {
+      const pon = () => { t.querySelector('.t1').textContent = a; t.querySelector('.t2').textContent = b; t.dataset.v = texto; t.style.opacity = 1; };
+      if (t.dataset.v) { t.style.opacity = 0; setTimeout(pon, 250); } else pon();
+    }
+  } else if (!texto && lugarEl) {
+    const l = lugarEl; lugarEl = null; l.classList.add('fuera'); setTimeout(() => l.remove(), 600);
+  }
+  return !!texto;
+}
+
 /* ---------- Bug ---------- */
 let bugEl = null;
 function bug(on) {
@@ -650,7 +693,7 @@ function conf(tipo) {
       colorAcento: col.violetaClaro, auto: c.autoSalidaGC || 0 };
     case 'cortinaTitulo': return { tamT: 72, tamS: 36, barY: 800, rayoLargo: 300, S: 130, centrado: true, minW: 700, maxW: 1720 };
     case 'avance': return { tamT: 84, tamS: 30, barY: 600, rayoLargo: 260, S: 140, centrado: true, minW: 900, maxW: 1720 };
-    case 'titular': return { tamT: 52, tamS: 0, barY: 820, rayoLargo: 300, S: 120, centrado: true, minW: 760, maxW: 1720 };
+    case 'titular': return { tamT: 64, tamS: 30, barY: 850, rayoLargo: 300, S: 120, centrado: true, minW: 900, maxW: 1720 };
     case 'aviso': return { tamT: 50, tamS: 28, barY: c.gcY, rayoLargo: 230, S: 100, colorBarra: col.magenta, colorAcento: col.rayo, colorSub: col.espacio };
     case 'volvemos': return { tamT: 84, tamS: 36, barY: 800, rayoLargo: 420, S: 140, centrado: true, minW: 800, maxW: 1720, ilustracion: 'sesion', anchoIlus: 560 };
     case 'multiplex': return { tamT: 46, tamS: 24, barY: 965, rayoLargo: 50, S: 80, centrado: true, minW: 520, sub: '' };
@@ -658,10 +701,10 @@ function conf(tipo) {
     case 'cierre': return { tamT: 110, tamS: 34, barY: 760, rayoLargo: 420, S: 170, centrado: true, minW: 900, maxW: 1720, retraso: .5, auto: 5, logo: c.logo, ilustracion: 'sesion' };
   }
 }
-// Triplex: costados verticales 9:16 y centro 16:9 · Duplex: dos 16:9 grandes
+// Triplex: costados verticales 9:16 y centro 16:9 · Duplex: cámara de la psicóloga (9:16, chica) + video 16:9 al centro
 const VENTANAS = {
   triplex: [{ b: [180, 280, 287, 510], etq: 'arriba' }, { b: [507, 280, 907, 510], etq: 'arriba' }, { b: [1454, 280, 287, 510], etq: 'arriba' }],
-  duplex: [{ b: [96, 230, 832, 468], etq: 'abajo' }, { b: [992, 230, 832, 468], etq: 'abajo' }]
+  duplex: [{ b: [96, 262, 300, 533], etq: 'arriba' }, { b: [440, 210, 1040, 585], etq: 'arriba' }]
 };
 
 /* ===================================================================
@@ -677,12 +720,21 @@ async function cambiarSlot(nombre, clave, crear) {
   if (clave !== null && clave !== false) slots[nombre].pieza = crear();
 }
 
+function fondoEfectivo() {
+  const a = E.aire, pedidos = [];
+  if (a.gc !== null && a.gc !== undefined && E.gcs[a.gc]) pedidos.push(E.gcs[a.gc].fondo);
+  if (a.titular !== null && a.titular !== undefined) pedidos.push(a.titular < 0 ? E.textos.avance.fondo : (E.titulares[a.titular] || {}).fondo);
+  ['cortinaTitulo', 'aviso', 'volvemos'].forEach(k => { if (a[k]) pedidos.push(E.textos[k].fondo); });
+  if (pedidos.includes('espacio')) return 'espacio';
+  if (pedidos.includes('verde')) return 'verde';
+  return FORZAR_FONDO || cfg().fondo;
+}
 function aplicarConfig() {
   const c = cfg(), r = document.documentElement.style;
   for (const k in c.colores) r.setProperty('--' + k, c.colores[k]);
   r.setProperty('--ft', `'${c.fuenteTitulo}', 'Arial Black', Arial, sans-serif`);
   r.setProperty('--fx', `'${c.fuenteTexto}', Arial, sans-serif`);
-  const f = FORZAR_FONDO || c.fondo;
+  const f = fondoEfectivo();
   document.body.classList.toggle('verde', f === 'verde');
   document.body.classList.toggle('fondo-espacio', f === 'espacio');
   if (f === 'espacio' && !$('#fondoEspacio canvas')) $('#fondoEspacio').appendChild(estrellas(2400, 1080, 260));
@@ -706,12 +758,12 @@ function aplicar(nuevo) {
   const claveT = ti === null || ti === undefined ? null : (ti < 0 ? 'portada' : 't' + ti);
   if (slots.titular && slots.titular.pieza && slots.titular.clave === claveT) {
     if (ti < 0) slots.titular.pieza.textos(tx.avance.titulo, tx.avance.sub);
-    else if (E.titulares[ti]) slots.titular.pieza.textos(E.titulares[ti].texto, '');
+    else if (E.titulares[ti]) slots.titular.pieza.textos(E.titulares[ti].titulo, E.titulares[ti].sub);
   } else {
     cambiarSlot('titular', claveT, () => {
       if (ti < 0) return new Abduccion(Object.assign(conf('avance'), { titulo: tx.avance.titulo, sub: tx.avance.sub }), $('#cGraficas'));
-      const h = E.titulares[ti] || { seccion: '', texto: '' };
-      return new Abduccion(Object.assign(conf('titular'), { titulo: h.texto, sub: '', etiqueta: (h.seccion || '').toUpperCase() }), $('#cGraficas'));
+      const h = E.titulares[ti] || { titulo: '', sub: '' };
+      return new Abduccion(Object.assign(conf('titular'), { titulo: h.titulo, sub: h.sub }), $('#cGraficas'));
     });
   }
   ['cortinaTitulo', 'aviso', 'volvemos'].forEach(n => {
@@ -724,30 +776,41 @@ function aplicar(nuevo) {
     const clave = a[n] ? n + '|' + t.titulo + '|' + t.etiquetas.join(',') : null;
     cambiarSlot(n, clave, () => new Multiplex(VENTANAS[n], t.etiquetas, t.titulo));
   });
-  bug(!!a.bug);
+  const h = (ti !== null && ti !== undefined && ti >= 0) ? E.titulares[ti] : null;
+  const hayLugar = lugar(h && h.lugar ? h.lugar : '');
+  bug(!!a.bug && !hayLugar);           // el lugar ocupa la esquina del bug mientras está al aire
   ticker(!!a.ticker);
-  // disparos (apertura, cortina, transición, cierre): se lanzan una sola vez por id
-  const d = E.disparo;
-  if (d && d.id && d.id !== ultimoDisparo) {
-    const nuevo = ultimoDisparo !== undefined;
-    ultimoDisparo = d.id;
-    if (nuevo) disparar(d.que, d.variante);
-  } else if (ultimoDisparo === undefined) ultimoDisparo = null;
+  // gráficas con duración: entran con un toque y se pueden sacar con otro
+  ['apertura', 'cierre', 'cortina', 'transicion'].forEach(k => {
+    const v = a[k], id = v && v.id, cur = enCurso[k];
+    if (primeraVez) { if (id) enCurso[k] = { id, pr: null }; return; }   // al abrir OBS no relanza lo viejo
+    if (id && (!cur || cur.id !== id)) {
+      if (cur && cur.pr) cur.pr.abortar();
+      const pr = lanzar(k, v.variante);
+      enCurso[k] = { id, pr };
+      pr.then(() => { if (enCurso[k] && enCurso[k].pr === pr) enCurso[k] = null; });
+    } else if (!id && cur) {
+      if (cur.pr) cur.pr.abortar();
+      enCurso[k] = null;
+    }
+  });
+  primeraVez = false;
 }
-let ultimoDisparo;
+const enCurso = {};
+let primeraVez = true;
 
-async function disparar(que, variante) {
+function lanzar(que, variante) {
   const tx = E.textos;
   if (que === 'cortina') return cortina();
   if (que === 'transicion') return transicion(variante);
-  if (que === 'apertura' || que === 'cierre') {
-    espacio(true);
-    const p = new Abduccion(Object.assign(conf(que), { titulo: tx[que].titulo, sub: tx[que].sub }), $('#cGraficas'));
-    await p.fin;
-    espacio(false);
-  }
-  if (que === 'limpiar') Abduccion.vivos.forEach(p => p.salir());
+  // apertura / cierre
+  espacio(true);
+  const p = new Abduccion(Object.assign(conf(que), { titulo: tx[que].titulo, sub: tx[que].sub }), $('#cGraficas'));
+  const pr = p.fin.then(() => espacio(false));
+  pr.abortar = () => { espacio(false); p.abortar(); };
+  return pr;
 }
+function disparar(que, variante) { return lanzar(que, variante); }   // para pruebas desde la consola
 
 /* ===================================================================
    BUCLE Y CONEXIÓN
@@ -772,6 +835,7 @@ if (PARAMS.has('debug')) document.body.classList.add('debug');
 (async function iniciar() {
   ajustar();
   aplicar(TE.copia(TE.ESTADO_BASE));
+  primeraVez = true;
   bucle();
   if (PARAMS.has('demo')) { const d = TE.copia(E); d.aire.gc = 0; d.aire.bug = true; aplicar(d); return; }
   const con = await TE_RT.abrir('salida');

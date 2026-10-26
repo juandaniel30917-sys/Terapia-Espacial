@@ -25,15 +25,13 @@
       { titulo: 'Sophia Jaque', sub: 'Psicóloga', icono: 'terapeuta' },
       { titulo: 'Paciente X-27', sub: 'Visitante de otro planeta', icono: 'alien' }
     ],
+    // Titulares «Últimas Noticias»: GC centrado + lugar en la esquina superior derecha. fondo: '' (el general) | 'verde' | 'espacio'
     titulares: [
-      { seccion: 'TALCA', texto: 'Avistamientos en El Enladrillado y San Clemente vuelven a repetirse' },
-      { seccion: 'TALCA', texto: 'Lago Colbún y laguna del Maule, en la mira de los FANI' },
-      { seccion: 'CHILE', texto: 'Aumenta el consumo de antidepresivos en jóvenes' },
-      { seccion: 'CHILE', texto: 'Cae el consumo de alcohol entre los jóvenes' },
-      { seccion: 'CHILE', texto: 'Salud mental estudiantil: el desafío de volver a la presencialidad' },
-      { seccion: 'INTERNACIONAL', texto: 'Casa Blanca y Pentágono desclasifican registros OVNI' },
-      { seccion: 'INTERNACIONAL', texto: 'Desde 2019 se disparan los registros de ovnis en el mundo' },
-      { seccion: 'INTERNACIONAL', texto: 'Bélgica y Asturias: los videos que reabren el debate' }
+      { titulo: 'Últimas Noticias', sub: 'Los últimos acontecimientos en materia meteorológica, deportiva y cultural', lugar: 'Talca, Región del Maule', fondo: 'verde' },
+      { titulo: 'Últimas Noticias', sub: 'Los últimos sucesos de política y economía que afectan a nuestro país.', lugar: 'Santiago, Región Metropolitana', fondo: 'verde' },
+      { titulo: 'Últimas Noticias', sub: 'Noticia Internacional', lugar: 'Barquisimeto, Venezuela', fondo: 'verde' },
+      { titulo: 'Últimas Noticias', sub: 'Noticia Internacional', lugar: 'Buenos Aires, Argentina', fondo: 'verde' },
+      { titulo: 'Últimas Noticias', sub: 'Noticia Internacional', lugar: 'Hollywood, Estados Unidos', fondo: 'verde' }
     ],
     textos: {
       cortinaTitulo: { titulo: 'OVNIS CAPTADOS EN CÁMARA', sub: '¿ESTAMOS SOLOS EN EL UNIVERSO?' },
@@ -41,15 +39,16 @@
       volvemos: { titulo: 'VOLVEMOS ENSEGUIDA', sub: 'LA SESIÓN CONTINÚA' },
       avance: { titulo: 'AVANCE INFORMATIVO', sub: 'ÚLTIMAS NOTICIAS · TALCA · CHILE · INTERNACIONAL' },
       triplex: { titulo: 'OVNI · OSNI · FANI', etiquetas: ['LUIS MONASTERIOS', 'AVISTAMIENTOS', 'BENJAMÍN CASTILLO'] },
-      duplex: { titulo: 'SALUD MENTAL', etiquetas: ['LUIS MONASTERIOS', 'SOPHIA JAQUE'] },
+      duplex: { titulo: 'SALUD MENTAL', etiquetas: ['SOPHIA JAQUE', 'NOTA · SALUD MENTAL'] },
       apertura: { titulo: 'TERAPIA ESPACIAL', sub: 'CON LUIS A. MONASTERIOS' },
       cierre: { titulo: 'TERAPIA ESPACIAL', sub: 'FIN DE LA SESIÓN · NOS VEMOS EN UN NUEVO PROGRAMA' }
     },
     aire: {
       gc: null, titular: null, cortinaTitulo: false, aviso: false, volvemos: false,
-      triplex: false, duplex: false, bug: false, ticker: false
+      triplex: false, duplex: false, bug: false, ticker: false,
+      // gráficas con duración (se pueden sacar antes con otro toque): { id, variante } o null
+      apertura: null, cierre: null, cortina: null, transicion: null
     },
-    disparo: null,          // { id, que, variante } — la salida lo lanza una sola vez
     paso: -1,               // paso actual de la pauta (compartido entre equipos)
     botonera: null          // { botones: [...] } — se siembra en el panel
   };
@@ -67,7 +66,12 @@
   // compatibilidad con la v2 (paciente: true)
   function normalizar(e) {
     const est = mezclar(copia(ESTADO_BASE), e || {});
-    (est.gcs || []).forEach(g => { if (g.paciente && !g.icono) g.icono = 'alien'; delete g.paciente; if (g.icono === undefined) g.icono = ''; });
+    (est.gcs || []).forEach(g => { if (g.paciente && !g.icono) g.icono = 'alien'; delete g.paciente; if (g.icono === undefined) g.icono = ''; if (g.fondo === undefined) g.fondo = ''; });
+    // titulares de la v2 ({seccion, texto}) → formato nuevo
+    est.titulares = (est.titulares || []).map(h => h.texto !== undefined && h.titulo === undefined
+      ? { titulo: h.texto, sub: '', lugar: '', fondo: '' } : Object.assign({ titulo: '', sub: '', lugar: '', fondo: '' }, h));
+    Object.keys(est.textos).forEach(k => { if (est.textos[k].fondo === undefined) est.textos[k].fondo = ''; });
+    delete est.disparo;
     if (['verde', 'espacio', 'transparente'].indexOf(est.config.fondo) < 0) est.config.fondo = 'verde';
     return est;
   }

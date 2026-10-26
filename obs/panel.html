@@ -65,7 +65,10 @@
   .bt:active{transform:scale(.96)}
   .bt b{font-weight:800;font-size:16px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
   .bt small{color:var(--tenue);font-size:12px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .bt kbd{position:absolute;right:8px;top:7px;font:600 10px Inter,Arial;color:var(--tenue);border:1px solid var(--borde);border-radius:5px;padding:1px 5px;background:var(--bg)}
+  .bt .lapiz{position:absolute;right:6px;top:6px;width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:var(--panel3);border:1px solid var(--borde);font-size:17px;z-index:2}
+  .bt .lapiz:active{background:var(--violeta)}
+  .bt{padding-right:52px}
+  .bt kbd{position:absolute;right:54px;top:7px;font:600 10px Inter,Arial;color:var(--tenue);border:1px solid var(--borde);border-radius:5px;padding:1px 5px;background:var(--bg)}
   .bt .tipo{position:absolute;right:9px;bottom:7px;font-size:13px;opacity:.8}
   .bt.aire{background:linear-gradient(135deg,#3a0f2a,#1d0b2e);border-color:var(--aire)}
   .bt.aire::after{content:"AL AIRE";position:absolute;right:8px;bottom:8px;font:700 10px Orbitron,Arial;letter-spacing:.1em;color:#fff;background:var(--aire);padding:3px 6px;border-radius:4px}
@@ -75,7 +78,7 @@
   .bt.oculto{opacity:.35}
   .edicion .bt{border-style:dashed}
   .edicion .bt .ed{display:flex}
-  .bt .ed{display:none;position:absolute;inset:auto 6px 6px auto;gap:4px}
+  .bt .ed{display:none!important}
   .bt .ed span{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:var(--panel3);border:1px solid var(--borde);font-size:15px}
   .barraEd{display:none;gap:8px;flex-wrap:wrap;margin:10px 0}
   .edicion~.barraEd,.barraEd.on{display:flex}
@@ -86,6 +89,7 @@
   body.modo-botonera .bot{grid-template-columns:repeat(2,1fr);gap:10px}
   body.modo-botonera .bt{min-height:112px}
   body.modo-botonera .bt b{font-size:18px}
+  body.modo-botonera .bt kbd{display:none}
   body.modo-botonera .ahora{position:sticky;top:calc(58px + var(--safeT));z-index:10;background:var(--bg);margin:0 -10px;padding:8px 10px;box-shadow:0 10px 20px var(--bg)}
   @media(min-width:600px){body.modo-botonera .bot{grid-template-columns:repeat(3,1fr)}}
   @media(min-width:900px){body.modo-botonera .bot{grid-template-columns:repeat(4,1fr)}}
@@ -138,6 +142,11 @@
   .caja{width:min(640px,100%);max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--borde);border-radius:20px;padding:20px}
   .caja h3{margin:0 0 4px;font-family:Orbitron,Arial;font-size:16px;letter-spacing:.06em}
   @media(max-width:700px){.modal{align-items:flex-end;padding:0}.caja{border-radius:20px 20px 0 0;padding-bottom:calc(20px + var(--safeB))}}
+  .hoja h2{margin:18px 0 8px}
+  .hoja .seg button{padding:14px 8px;font-size:15px}
+  .hoja input[type=text],.hoja textarea,.hoja select{font-size:16px}
+  .fondoTag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.08em;padding:2px 6px;border-radius:4px;margin-left:6px;vertical-align:middle}
+  .fondoTag.verde{background:#0a3d12;color:#6dff8a}.fondoTag.espacio{background:#20124a;color:#c9b3ff}
   .link{display:grid;grid-template-columns:1fr auto;gap:8px;margin:6px 0 14px}
   .link input{font-size:13px;font-family:ui-monospace,monospace}
   .qr{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
@@ -337,21 +346,32 @@
   </div>
 </div></div>
 
-<!-- ventana: editar botón -->
-<div class="modal" id="mBoton"><div class="caja">
-  <h3>Editar botón</h3>
+<!-- hoja: editar gráfica + botón -->
+<div class="modal" id="mBoton"><div class="caja hoja">
+  <h3 id="ebTitulo">Editar</h3>
+  <p class="nota" id="ebAyuda">Los cambios se ven al instante, incluso al aire.</p>
+  <div id="ebGrafica"></div>
+  <div id="ebFondoBox">
+    <h2>Fondo de esta gráfica</h2>
+    <div class="seg" id="ebFondo">
+      <button data-f="">General</button><button data-f="verde">🟩 Verde</button><button data-f="espacio">🌌 Espacio</button>
+    </div>
+    <p class="nota" style="margin-top:6px">«General» usa el fondo del botón 🌌 / Configuración. Verde o Espacio se aplican solo mientras esta gráfica está al aire.</p>
+  </div>
+  <h2>Botón</h2>
   <div class="campo"><label>Acción</label><select id="ebAccion"></select></div>
   <div class="campo"><label>Texto del botón (vacío = automático)</label><input type="text" id="ebTexto"></div>
   <div class="fila">
     <div class="campo"><label>Color</label><input type="color" id="ebColor" style="height:44px;width:100%;background:none;border:0"></div>
-    <div class="campo"><label>Tecla</label>
-      <select id="ebTecla"></select>
-      <button class="mini" id="ebCapturar" type="button">⌨️ Otra tecla…</button></div>
+    <div class="campo"><label>Tecla</label><select id="ebTecla"></select><button class="mini" id="ebCapturar" type="button">⌨️ Otra tecla…</button></div>
   </div>
   <div class="acciones">
-    <button class="mini prim" id="ebGuardar">Guardar</button>
-    <button class="mini" id="ebQuitar">Quitar de la botonera</button>
-    <button class="mini" id="ebCancelar">Cancelar</button>
+    <button class="mini" id="ebIzq">◀ Mover</button>
+    <button class="mini" id="ebDer">Mover ▶</button>
+    <button class="mini" id="ebQuitar">Quitar botón</button>
+  </div>
+  <div class="acciones">
+    <button class="mini prim" id="ebGuardar" style="flex:1">✓ Listo</button>
   </div>
 </div></div>
 <div class="toast" id="toast"></div>
@@ -382,7 +402,23 @@ function publicar(inmediato) {
 /* =============== acciones (lo que puede hacer un botón) =============== */
 const INFERIOR = ['cortinaTitulo', 'aviso', 'volvemos'];
 function limpiarInferior() { E.aire.gc = null; INFERIOR.forEach(k => E.aire[k] = false); }
-function disparar(que, variante) { E.disparo = { id: TE.id(), que, variante: variante || null }; publicar(true); }
+// gráficas con duración: un toque las lanza, otro toque las saca (aunque no hayan terminado)
+const DUR = { apertura: 15.7, cierre: 10, cortina: 2.5, transicion: 2.05 };
+const timersDur = {};
+function disparar(que, variante, soloEntrar) {
+  const v = variante || null, actual = E.aire[que];
+  clearTimeout(timersDur[que]);
+  if (actual && !soloEntrar && (actual.variante || null) === v) { E.aire[que] = null; publicar(true); dibujarBotonera(); return; }
+  const id = TE.id();
+  E.aire[que] = { id, variante: v };
+  timersDur[que] = setTimeout(() => { if (E.aire[que] && E.aire[que].id === id) { E.aire[que] = null; publicar(true); dibujarBotonera(); } }, (DUR[que] / (E.config.velocidad || 1) + .4) * 1000);
+  publicar(true);
+}
+function alternarFondo() {
+  E.config.fondo = E.config.fondo === 'espacio' ? 'verde' : 'espacio';
+  publicar(true); enlazarCampos(); dibujarBotonera();
+  toast(E.config.fondo === 'espacio' ? '🌌 Fondo del espacio: activado' : '🟩 Fondo verde');
+}
 function ponerGC(i) {
   clearTimeout(timerGC);
   const nuevo = E.aire.gc === i ? null : i;
@@ -418,6 +454,7 @@ function siguienteTitular() {
 function limpiar() {
   clearTimeout(timerGC); detenerAvance();
   limpiarInferior(); E.aire.titular = null; E.aire.triplex = false; E.aire.duplex = false;
+  ['apertura', 'cierre', 'cortina', 'transicion'].forEach(k => E.aire[k] = null);
   publicar(true); toast('Salida limpia (bug y ticker se mantienen)');
 }
 
@@ -430,17 +467,19 @@ function catalogo() {
   add('tit:auto', '▶ Avance informativo', 'portada + ' + E.titulares.length + ' titulares', '#FFF4C2', 'AVANCE', avanceAutomatico, () => avanceAuto);
   add('tit:sig', 'Siguiente titular', 'paso a paso', '#FFF4C2', 'AVANCE', siguienteTitular);
   add('tit:-1', 'Portada avance', t.avance.titulo, '#FFF4C2', 'AVANCE', () => ponerTitular(-1), () => E.aire.titular === -1);
-  E.titulares.forEach((h, i) => add('tit:' + i, h.texto, h.seccion, { TALCA: '#FF3DCB', CHILE: '#7B2FF7', INTERNACIONAL: '#FFF4C2' }[h.seccion] || '#7B2FF7', 'TITULAR', () => ponerTitular(i), () => E.aire.titular === i));
+  E.titulares.forEach((h, i) => add('tit:' + i, '📍 ' + ((h.lugar || '').split(',')[0] || h.titulo || 'Titular ' + (i + 1)), (h.titulo ? h.titulo + ' · ' : '') + (h.sub || ''), '#FFF4C2', 'TITULAR', () => ponerTitular(i), () => E.aire.titular === i));
+  add('fondo:espacio', '🌌 Fondo espacio', 'activado / desactivado (se mantiene)', '#4A1A9E', 'FONDO', alternarFondo, () => E.config.fondo === 'espacio');
   add('k:cortinaTitulo', 'Cortina título', t.cortinaTitulo.titulo, '#FF3DCB', 'TÍTULO', () => alternar('cortinaTitulo'), () => E.aire.cortinaTitulo);
   add('k:volvemos', 'Volvemos', t.volvemos.titulo, '#FF3DCB', 'TÍTULO', () => alternar('volvemos'), () => E.aire.volvemos);
   add('k:aviso', 'Aviso', t.aviso.titulo, '#FF3DCB', 'TÍTULO', () => alternar('aviso'), () => E.aire.aviso);
   add('k:triplex', 'Triplex', t.triplex.titulo, '#A77BFF', 'PANTALLA', () => alternar('triplex'), () => E.aire.triplex);
   add('k:duplex', 'Duplex', t.duplex.titulo, '#A77BFF', 'PANTALLA', () => alternar('duplex'), () => E.aire.duplex);
-  add('d:apertura', 'Apertura', '15 s · intro', '#5BE3A8', 'DISPARO', () => disparar('apertura'));
-  add('d:cortina', 'Cortina', 'stinger · corte 1,2 s', '#5BE3A8', 'DISPARO', () => disparar('cortina'));
-  add('d:transicion', 'Transición', (E.config.transicion === 'aleatoria' ? 'aleatoria' : NOMBRE_TRANS[E.config.transicion]) + ' · corte 1 s', '#5BE3A8', 'DISPARO', () => disparar('transicion'));
-  Object.keys(NOMBRE_TRANS).forEach(v => add('d:transicion:' + v, 'Transición ' + NOMBRE_TRANS[v], '2 s · corte 1 s', '#5BE3A8', 'DISPARO', () => disparar('transicion', v)));
-  add('d:cierre', 'Cierre', 'fin de la sesión', '#5BE3A8', 'DISPARO', () => disparar('cierre'));
+  const enAire = (k, v) => () => !!E.aire[k] && (v === undefined || (E.aire[k].variante || null) === v);
+  add('d:apertura', 'Apertura', '15 s · toca otra vez para sacarla', '#5BE3A8', 'DISPARO', () => disparar('apertura'), enAire('apertura'));
+  add('d:cortina', 'Cortina', 'stinger · corte 1,2 s', '#5BE3A8', 'DISPARO', () => disparar('cortina'), enAire('cortina'));
+  add('d:transicion', 'Transición', (E.config.transicion === 'aleatoria' ? 'aleatoria' : NOMBRE_TRANS[E.config.transicion]) + ' · corte 1 s', '#5BE3A8', 'DISPARO', () => disparar('transicion'), enAire('transicion', null));
+  Object.keys(NOMBRE_TRANS).forEach(v => add('d:transicion:' + v, 'Transición ' + NOMBRE_TRANS[v], '2 s · corte 1 s', '#5BE3A8', 'DISPARO', () => disparar('transicion', v), enAire('transicion', v)));
+  add('d:cierre', 'Cierre', 'fin de la sesión · toca otra vez para sacarlo', '#5BE3A8', 'DISPARO', () => disparar('cierre'), enAire('cierre'));
   add('k:bug', 'Bug / logo', 'esquina superior', '#9B98B8', 'FIJO', () => alternar('bug'), () => E.aire.bug);
   add('k:ticker', 'Ticker', 'cinta inferior', '#9B98B8', 'FIJO', () => alternar('ticker'), () => E.aire.ticker);
   add('paso:sig', 'Paso siguiente ▶', 'pauta', '#FFC83D', 'PAUTA', () => irPaso(E.paso + 1));
@@ -452,7 +491,7 @@ function catalogo() {
 /* =============== botonera (sembrar / dibujar / editar) =============== */
 const TECLAS = ['F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20', 'F21', 'F22', 'F23', 'F24'];
 function botonesIniciales() {
-  const ids = E.gcs.map((_, i) => 'gc:' + i).concat(['tit:auto', 'tit:sig', 'k:cortinaTitulo', 'k:volvemos', 'k:aviso', 'k:triplex', 'k:duplex',
+  const ids = E.gcs.map((_, i) => 'gc:' + i).concat(['fondo:espacio'], E.titulares.map((_, i) => 'tit:' + i), ['tit:auto', 'k:cortinaTitulo', 'k:volvemos', 'k:aviso', 'k:triplex', 'k:duplex',
     'd:cortina', 'd:transicion', 'd:transicion:hipnosis', 'd:transicion:rorschach', 'd:apertura', 'd:cierre', 'k:bug', 'k:ticker', 'paso:sig', 'limpiar']);
   return ids.map((a, i) => ({ id: TE.id() + i, accion: a, texto: '', color: '', tecla: TECLAS[i] || '' }));
 }
@@ -467,8 +506,10 @@ function dibujarBotonera() {
     el.className = 'bt' + (a ? '' : ' oculto');
     el.dataset.i = i;
     el.style.setProperty('--c', b.color || (a && a.color) || '#7B2FF7');
-    el.innerHTML = '<b></b><small></small>' + (b.tecla ? '<kbd></kbd>' : '') + '<span class="tipo"></span><div class="ed"><span data-e="izq">◀</span><span data-e="der">▶</span><span data-e="edit">✎</span></div>';
+    el.innerHTML = '<span class="lapiz" title="Editar textos, fondo y botón">✎</span><b></b><small></small>' + (b.tecla ? '<kbd></kbd>' : '') + '<span class="tipo"></span>';
     el.querySelector('b').textContent = b.texto || (a ? a.titulo : '(acción no disponible)');
+    const fd = fondoDe(b.accion);
+    if (fd) { const tg = document.createElement('span'); tg.className = 'fondoTag ' + fd; tg.textContent = fd === 'verde' ? 'VERDE' : 'ESPACIO'; el.querySelector('b').appendChild(tg); }
     el.querySelector('small').textContent = a ? a.sub || '' : b.accion;
     if (b.tecla) el.querySelector('kbd').textContent = b.tecla;
     el.querySelector('.tipo').textContent = a && a.tipo === 'DISPARO' ? '✨' : '';
@@ -479,15 +520,17 @@ function dibujarBotonera() {
 $('#bot').addEventListener('click', e => {
   const el = e.target.closest('.bt'); if (!el) return;
   const i = +el.dataset.i, b = botones()[i];
-  if (editando) {
-    const acc = e.target.dataset.e;
-    if (acc === 'izq' && i > 0) { const l = botones(); [l[i - 1], l[i]] = [l[i], l[i - 1]]; publicar(); dibujarBotonera(); }
-    else if (acc === 'der' && i < botones().length - 1) { const l = botones(); [l[i + 1], l[i]] = [l[i], l[i + 1]]; publicar(); dibujarBotonera(); }
-    else editarBoton(i);
-    return;
-  }
+  if (editando || e.target.closest('.lapiz')) { editarBoton(i); return; }
   ejecutarBoton(b, el);
 });
+// mantener presionado (0,6 s) también abre la edición — cómodo en tablet
+let tLargo = null;
+$('#bot').addEventListener('pointerdown', e => {
+  const el = e.target.closest('.bt'); if (!el || e.target.closest('.lapiz')) return;
+  tLargo = setTimeout(() => { tLargo = 'hecho'; vibrar(); editarBoton(+el.dataset.i); }, 600);
+});
+['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => $('#bot').addEventListener(ev, () => { if (tLargo !== 'hecho') clearTimeout(tLargo); }));
+$('#bot').addEventListener('click', e => { if (tLargo === 'hecho') { e.stopImmediatePropagation(); tLargo = null; } }, true);
 function ejecutarBoton(b, el) {
   const a = catalogo()[b.accion]; if (!a) return;
   vibrar(); a.hacer();
@@ -504,24 +547,83 @@ function pintar() {
   $('#sigueTxt').textContent = s ? 'Sigue: ' + (E.paso + 2) + '. ' + s[1] : 'Fin de la pauta';
 }
 
-// edición de un botón
+// ¿qué objeto de datos controla esta acción? (para editar textos y fondo)
+function objetivo(accion) {
+  let m;
+  if ((m = /^gc:(\d+)$/.exec(accion))) return { tipo: 'gc', o: E.gcs[+m[1]] };
+  if (accion === 'tit:-1') return { tipo: 'titulo', o: E.textos.avance };
+  if ((m = /^tit:(\d+)$/.exec(accion))) return { tipo: 'titular', o: E.titulares[+m[1]] };
+  if ((m = /^k:(cortinaTitulo|volvemos|aviso)$/.exec(accion))) return { tipo: 'titulo', o: E.textos[m[1]] };
+  if ((m = /^k:(triplex|duplex)$/.exec(accion))) return { tipo: 'multiplex', o: E.textos[m[1]] };
+  if ((m = /^d:(apertura|cierre)$/.exec(accion))) return { tipo: 'sub', o: E.textos[m[1]] };
+  if (accion === 'k:ticker') return { tipo: 'ticker', o: E.config };
+  if (accion === 'tit:auto' || accion === 'tit:sig') return { tipo: 'avance', o: E.textos.avance };
+  return null;
+}
+function fondoDe(accion) { const ob = objetivo(accion); return ob && ob.o && ob.o.fondo ? ob.o.fondo : ''; }
+
 let ebIndice = -1, ebNuevaTecla = '';
+function campoTexto(cont, etiqueta, obj, clave, largo) {
+  const d = document.createElement('div'); d.className = 'campo';
+  d.innerHTML = '<label></label>' + (largo ? '<textarea></textarea>' : '<input type="text">');
+  d.querySelector('label').textContent = etiqueta;
+  const i = d.querySelector('input,textarea');
+  i.value = Array.isArray(obj[clave]) ? obj[clave].join(' | ') : (obj[clave] || '');
+  i.oninput = () => { obj[clave] = Array.isArray(obj[clave]) ? i.value.split('|').map(x => x.trim()) : i.value; publicar(); dibujarBotonera(); };
+  cont.appendChild(d); return i;
+}
+function pintarGrafica(accion) {
+  const g = $('#ebGrafica'); g.innerHTML = '';
+  const ob = objetivo(accion), o = ob && ob.o;
+  $('#ebFondoBox').hidden = !(ob && ['gc', 'titular', 'titulo'].includes(ob.tipo));
+  if (!ob || !o) { g.innerHTML = '<p class="nota">Esta acción no tiene textos para editar.</p>'; return; }
+  const h = document.createElement('h2'); h.textContent = 'Textos de la gráfica'; g.appendChild(h);
+  if (ob.tipo === 'gc') {
+    campoTexto(g, 'Nombre', o, 'titulo'); campoTexto(g, 'Cargo', o, 'sub');
+    const d = document.createElement('div'); d.className = 'campo';
+    d.innerHTML = '<label>Estilo</label><div class="seg"><button data-i="">Normal</button><button data-i="terapeuta">🧠 Terapeuta</button><button data-i="alien">👽 Paciente</button></div>';
+    d.querySelectorAll('button').forEach(b => { b.classList.toggle('on', (o.icono || '') === b.dataset.i); b.onclick = () => { o.icono = b.dataset.i; d.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); publicar(true); dibujarBotonera(); }; });
+    g.appendChild(d);
+  } else if (ob.tipo === 'titular') {
+    campoTexto(g, 'GC (título)', o, 'titulo'); campoTexto(g, 'Subtítulo', o, 'sub', true); campoTexto(g, 'Esquina superior derecha (Ciudad, Región)', o, 'lugar');
+  } else if (ob.tipo === 'titulo') {
+    campoTexto(g, 'Título', o, 'titulo'); campoTexto(g, 'Subtítulo', o, 'sub');
+  } else if (ob.tipo === 'multiplex') {
+    campoTexto(g, 'Título', o, 'titulo'); campoTexto(g, 'Etiquetas de las ventanas (separadas por | )', o, 'etiquetas');
+  } else if (ob.tipo === 'sub') {
+    campoTexto(g, 'Subtítulo', o, 'sub');
+  } else if (ob.tipo === 'ticker') {
+    campoTexto(g, 'Frases (separadas por · )', o, 'ticker', true);
+  } else if (ob.tipo === 'avance') {
+    campoTexto(g, 'Portada · título', o, 'titulo'); campoTexto(g, 'Portada · subtítulo', o, 'sub');
+    const p = document.createElement('p'); p.className = 'nota'; p.textContent = 'Cada titular se edita con el ✎ de su propio botón (o en la pestaña Textos).'; g.appendChild(p);
+  }
+  $$('#ebFondo button').forEach(b => b.classList.toggle('on', (o.fondo || '') === b.dataset.f));
+  $$('#ebFondo button').forEach(b => b.onclick = () => { o.fondo = b.dataset.f; $$('#ebFondo button').forEach(x => x.classList.toggle('on', x === b)); publicar(true); dibujarBotonera(); });
+}
 function editarBoton(i) {
-  ebIndice = i; const b = i >= 0 ? botones()[i] : { accion: 'gc:0', texto: '', color: '', tecla: '' };
-  const cat = catalogo(), sel = $('#ebAccion'); sel.innerHTML = '';
+  ebIndice = i;
+  if (i < 0) { botones().push({ id: TE.id(), accion: 'gc:0', texto: '', color: '', tecla: '' }); ebIndice = botones().length - 1; }
+  const b = botones()[ebIndice], cat = catalogo(), sel = $('#ebAccion'); sel.innerHTML = '';
   const grupos = {};
   Object.values(cat).forEach(a => { (grupos[a.tipo] = grupos[a.tipo] || []).push(a); });
-  Object.keys(grupos).forEach(g => {
-    const og = document.createElement('optgroup'); og.label = g;
-    grupos[g].forEach(a => { const o = document.createElement('option'); o.value = a.id; o.textContent = a.titulo + (a.sub ? ' — ' + a.sub : ''); og.appendChild(o); });
+  Object.keys(grupos).forEach(gn => {
+    const og = document.createElement('optgroup'); og.label = gn;
+    grupos[gn].forEach(a => { const o = document.createElement('option'); o.value = a.id; o.textContent = a.titulo + (a.sub ? ' — ' + a.sub : ''); og.appendChild(o); });
     sel.appendChild(og);
   });
-  sel.value = b.accion; $('#ebTexto').value = b.texto || ''; $('#ebColor').value = b.color || (cat[b.accion] && cat[b.accion].color) || '#7B2FF7';
+  sel.value = b.accion;
+  $('#ebTitulo').textContent = '✎ ' + (b.texto || (cat[b.accion] ? cat[b.accion].titulo : 'Botón'));
+  $('#ebTexto').value = b.texto || '';
+  $('#ebColor').value = b.color || (cat[b.accion] && cat[b.accion].color) || '#7B2FF7';
   ebNuevaTecla = b.tecla || '';
-  pintarTeclas();
-  $('#ebQuitar').hidden = i < 0;
+  pintarTeclas(); pintarGrafica(b.accion);
   $('#mBoton').classList.add('on');
 }
+function botonActual() { return botones()[ebIndice]; }
+$('#ebAccion').onchange = e => { const b = botonActual(); b.accion = e.target.value; pintarGrafica(b.accion); publicar(true); dibujarBotonera(); };
+$('#ebTexto').oninput = e => { botonActual().texto = e.target.value.trim(); publicar(); dibujarBotonera(); };
+$('#ebColor').oninput = e => { botonActual().color = e.target.value; publicar(); dibujarBotonera(); };
 function pintarTeclas() {
   const s = $('#ebTecla'); s.innerHTML = '<option value="">Sin tecla</option>';
   const usadas = botones().filter((_, j) => j !== ebIndice).map(b => b.tecla);
@@ -530,25 +632,29 @@ function pintarTeclas() {
   });
   s.value = ebNuevaTecla;
 }
-$('#ebTecla').onchange = e => { ebNuevaTecla = e.target.value; };
+function ponerTecla(t) {
+  ebNuevaTecla = t;
+  if (t) botones().forEach((x, j) => { if (j !== ebIndice && x.tecla === t) x.tecla = ''; });
+  botonActual().tecla = t; pintarTeclas(); publicar(); dibujarBotonera();
+}
+$('#ebTecla').onchange = e => ponerTecla(e.target.value);
 $('#ebCapturar').onclick = () => {
   $('#ebCapturar').textContent = 'Presiona una tecla…';
-  const f = e => { e.preventDefault(); ebNuevaTecla = e.key.length === 1 ? e.key.toUpperCase() : e.key; removeEventListener('keydown', f, true); $('#ebCapturar').textContent = '⌨️ Otra tecla…'; pintarTeclas(); };
+  const f = e => { e.preventDefault(); removeEventListener('keydown', f, true); $('#ebCapturar').textContent = '⌨️ Otra tecla…'; ponerTecla(e.key.length === 1 ? e.key.toUpperCase() : e.key); };
   addEventListener('keydown', f, true);
 };
-$('#ebGuardar').onclick = () => {
-  const b = { id: ebIndice >= 0 ? botones()[ebIndice].id : TE.id(), accion: $('#ebAccion').value, texto: $('#ebTexto').value.trim(), color: $('#ebColor').value, tecla: ebNuevaTecla };
-  const cat = catalogo(); if (cat[b.accion] && b.color.toLowerCase() === cat[b.accion].color.toLowerCase()) b.color = '';
-  if (b.tecla) botones().forEach((x, j) => { if (j !== ebIndice && x.tecla === b.tecla) x.tecla = ''; });
-  if (ebIndice >= 0) botones()[ebIndice] = b; else botones().push(b);
-  $('#mBoton').classList.remove('on'); publicar(true); dibujarBotonera();
-};
-$('#ebQuitar').onclick = () => { botones().splice(ebIndice, 1); $('#mBoton').classList.remove('on'); publicar(true); dibujarBotonera(); };
-$('#ebCancelar').onclick = () => $('#mBoton').classList.remove('on');
-function modoEdicion(on) { editando = on; $('#barraEd').classList.toggle('on', on); dibujarBotonera(); if (on) toast('Toca un botón para editarlo · ◀ ▶ para moverlo'); }
+function mover(d) {
+  const l = botones(), j = ebIndice + d; if (j < 0 || j >= l.length) return;
+  [l[j], l[ebIndice]] = [l[ebIndice], l[j]]; ebIndice = j; publicar(true); dibujarBotonera(); toast('Movido a la posición ' + (j + 1));
+}
+$('#ebIzq').onclick = () => mover(-1);
+$('#ebDer').onclick = () => mover(1);
+$('#ebGuardar').onclick = () => { $('#mBoton').classList.remove('on'); publicar(true); dibujarBotonera(); construirGCEditor(); construirTitEditor(); enlazarCampos(); };
+$('#ebQuitar').onclick = () => { if (!confirm('¿Quitar este botón? (la gráfica no se borra)')) return; botones().splice(ebIndice, 1); $('#mBoton').classList.remove('on'); publicar(true); dibujarBotonera(); };
+function modoEdicion(on) { editando = on; $('#barraEd').classList.toggle('on', on); dibujarBotonera(); if (on) toast('Toca un botón para editarlo'); }
 $('#edAgregar').onclick = () => editarBoton(-1);
 $('#edListo').onclick = () => modoEdicion(false);
-$('#edRestaurar').onclick = () => { if (confirm('¿Volver a la botonera inicial? (no cambia textos ni gráficas)')) { E.botonera = { botones: botonesIniciales() }; publicar(true); dibujarBotonera(); } };
+$('#edRestaurar').onclick = () => { if (confirm('¿Volver a la botonera inicial? (no cambia textos ni gráficas)')) { E.botonera = { v: 3, botones: botonesIniciales() }; publicar(true); dibujarBotonera(); } };
 
 /* =============== pauta =============== */
 function pasos() {
@@ -556,7 +662,7 @@ function pasos() {
   return [
     ['Intro', 'VTR apertura «Terapia Espacial» (15″)', [['d', 'apertura']]],
     ['Intro', 'GC ' + n(0), [['gc', 0]]],
-    ['Intro', 'Avance informativo: Talca, Chile e internacional', [['avance']]],
+    ['Intro', 'Últimas noticias: Talca, Santiago e internacional', [['avance']]],
     ['Intro', 'Cortina + título del compilado de avistamientos', [['d', 'cortina'], ['on', 'cortinaTitulo']]],
     ['Lead a nota', 'Quitar título', [['off', 'cortinaTitulo']]],
     ['Nota VTR ovnis', 'Cortina de entrada a la nota', [['d', 'cortina']]],
@@ -580,8 +686,8 @@ function irPaso(i, soloMarcar) {
   E.paso = i;
   if (!soloMarcar && i >= 0) {
     lista[i][2].forEach(([acc, x]) => {
-      if (acc === 'd') disparar(x);
-      if (acc === 'd2') setTimeout(() => disparar(x), 300);
+      if (acc === 'd') disparar(x, null, true);
+      if (acc === 'd2') setTimeout(() => disparar(x, null, true), 300);
       if (acc === 'on') alternar(x, true);
       if (acc === 'off') alternar(x, false);
       if (acc === 'gc') { if (E.aire.gc !== x) ponerGC(x); }
@@ -636,16 +742,19 @@ function construirTitEditor() {
   const c = $('#listaTit'); c.innerHTML = '';
   E.titulares.forEach((h, i) => {
     const f = document.createElement('div'); f.className = 'itemT';
-    f.innerHTML = '<select><option>TALCA</option><option>CHILE</option><option>INTERNACIONAL</option></select><input type="text" placeholder="Titular"><button class="mini" title="Eliminar">✕</button>';
-    const sel = f.querySelector('select'), inp = f.querySelector('input');
-    sel.value = (h.seccion || 'CHILE').toUpperCase(); inp.value = h.texto;
-    sel.onchange = () => { h.seccion = sel.value; dibujarBotonera(); publicar(); };
-    inp.oninput = () => { h.texto = inp.value; dibujarBotonera(); publicar(); };
-    f.querySelector('button').onclick = () => { if (E.aire.titular === i) E.aire.titular = null; else if (E.aire.titular > i) E.aire.titular--; E.titulares.splice(i, 1); construirTitEditor(); dibujarBotonera(); publicar(true); };
+    f.style.gridTemplateColumns = '1fr'; f.style.border = '1px solid var(--borde)'; f.style.borderRadius = '12px'; f.style.padding = '10px';
+    f.innerHTML = '<input type="text" placeholder="GC (ej: Últimas Noticias)"><input type="text" placeholder="Subtítulo"><input type="text" placeholder="Esquina: Ciudad, Región"><div class="seg"><button data-f="">General</button><button data-f="verde">🟩 Verde</button><button data-f="espacio">🌌 Espacio</button></div><button class="mini" title="Eliminar">✕ Quitar titular</button>';
+    const [ti, su, lu] = f.querySelectorAll('input');
+    ti.value = h.titulo || ''; su.value = h.sub || ''; lu.value = h.lugar || '';
+    ti.oninput = () => { h.titulo = ti.value; dibujarBotonera(); publicar(); };
+    su.oninput = () => { h.sub = su.value; dibujarBotonera(); publicar(); };
+    lu.oninput = () => { h.lugar = lu.value; dibujarBotonera(); publicar(); };
+    f.querySelectorAll('.seg button').forEach(b => { b.classList.toggle('on', (h.fondo || '') === b.dataset.f); b.onclick = () => { h.fondo = b.dataset.f; f.querySelectorAll('.seg button').forEach(x => x.classList.toggle('on', x === b)); publicar(true); dibujarBotonera(); }; });
+    f.querySelector('button.mini').onclick = () => { if (E.aire.titular === i) E.aire.titular = null; else if (E.aire.titular > i) E.aire.titular--; E.titulares.splice(i, 1); construirTitEditor(); dibujarBotonera(); publicar(true); };
     c.appendChild(f);
   });
 }
-$('#agregarTit').onclick = () => { E.titulares.push({ seccion: 'TALCA', texto: 'Nuevo titular' }); construirTitEditor(); dibujarBotonera(); publicar(true); };
+$('#agregarTit').onclick = () => { E.titulares.push({ titulo: 'Últimas Noticias', sub: 'Subtítulo', lugar: 'Ciudad, Región', fondo: 'verde' }); construirTitEditor(); dibujarBotonera(); publicar(true); };
 
 function enlazarCampos() {
   $$('[data-t]').forEach(inp => {
@@ -799,7 +908,7 @@ addEventListener('keydown', e => {
   if (e.key === 'PageUp') { e.preventDefault(); irPaso(Math.max(-1, E.paso - 1), true); }
 });
 
-function todo() { if (!E.botonera) E.botonera = { botones: botonesIniciales() }; dibujarBotonera(); construirGCEditor(); construirTitEditor(); enlazarCampos(); pintarPauta(); pintar(); }
+function todo() { if (!E.botonera || E.botonera.v !== 3) E.botonera = { v: 3, botones: botonesIniciales() }; dibujarBotonera(); construirGCEditor(); construirTitEditor(); enlazarCampos(); pintarPauta(); pintar(); }
 
 /* =============== conexión =============== */
 function chipRed(r) {
@@ -829,7 +938,7 @@ function chipSalidas(n) {
     const r = await con.conectar();
     const tenia = r && r.estado && r.estado.config;
     E = TE.normalizar(tenia ? r.estado : {});
-    if (!tenia || !E.botonera) { if (!E.botonera) E.botonera = { botones: botonesIniciales() }; publicar(true); }
+    if (!tenia || !E.botonera) { if (!E.botonera || E.botonera.v !== 3) E.botonera = { v: 3, botones: botonesIniciales() }; publicar(true); }
     todo();
     if (con.modo === 'local') { chipRed('local'); chipSalidas(null); }
     if (con.modo === 'sala') { const p = TE_RT.params(); guardarSalaLocal(p.sala, p.t); }
