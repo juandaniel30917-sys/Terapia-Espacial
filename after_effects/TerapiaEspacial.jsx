@@ -1048,9 +1048,9 @@
 
     function crearTriplex() {
         var c = CONFIG.triplex;
-        // costados verticales 9:16 · centro 16:9
+        // costados anchos para las personas · centro 16:9
         return crearMultiplex("TRIPLEX", c.titulo, c.etiquetas,
-            [[180, 280, 287, 510], [507, 280, 907, 510], [1454, 280, 287, 510]], true);
+            [[40, 280, 447, 510], [507, 280, 907, 510], [1434, 280, 446, 510]], true);
     }
     function crearDuplex() {
         var c = CONFIG.duplex;

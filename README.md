@@ -87,9 +87,9 @@ También puedes forzar el fondo desde el link de OBS agregando `&fondo=verde` o 
 ### Coordenadas de las ventanas
 | | Ventana | x | y | ancho | alto |
 |---|---|---|---|---|---|
-| Triplex | C1 Luis (vertical 9:16) | 180 | 280 | 287 | 510 |
+| Triplex | C1 Luis (ancho) | 40 | 280 | 447 | 510 |
 | | VTR avistamientos (16:9) | 507 | 280 | 907 | 510 |
-| | C3 Benjamín (vertical 9:16) | 1454 | 280 | 287 | 510 |
+| | C3 Benjamín (ancho) | 1434 | 280 | 446 | 510 |
 | Duplex | Cámara de la psicóloga (9:16) | 96 | 262 | 300 | 533 |
 | | Video / nota (16:9, al centro) | 440 | 210 | 1040 | 585 |
 
