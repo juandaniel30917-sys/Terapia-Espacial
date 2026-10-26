@@ -68,8 +68,10 @@
     const est = mezclar(copia(ESTADO_BASE), e || {});
     (est.gcs || []).forEach(g => { if (g.paciente && !g.icono) g.icono = 'alien'; delete g.paciente; if (g.icono === undefined) g.icono = ''; if (g.fondo === undefined) g.fondo = ''; });
     // titulares de la v2 ({seccion, texto}) → formato nuevo
-    est.titulares = (est.titulares || []).map(h => h.texto !== undefined && h.titulo === undefined
-      ? { titulo: h.texto, sub: '', lugar: '', fondo: '' } : Object.assign({ titulo: '', sub: '', lugar: '', fondo: '' }, h));
+    // si la sala o el navegador traen los titulares viejos de la v2 (sin «lugar»), se reemplazan por los de «Últimas Noticias»
+    const viejos = !Array.isArray(e && e.titulares) || !e.titulares.length || e.titulares.some(h => h.texto !== undefined || h.lugar === undefined);
+    est.titulares = viejos ? copia(ESTADO_BASE.titulares)
+      : est.titulares.map(h => Object.assign({ titulo: '', sub: '', lugar: '', fondo: '' }, h));
     Object.keys(est.textos).forEach(k => { if (est.textos[k].fondo === undefined) est.textos[k].fondo = ''; });
     delete est.disparo;
     if (['verde', 'espacio', 'transparente'].indexOf(est.config.fondo) < 0) est.config.fondo = 'verde';

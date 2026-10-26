@@ -7,6 +7,7 @@
 - **Botón 🌌 Fondo espacio:** activa o desactiva el fondo del espacio y queda así hasta que lo vuelvas a tocar.
 - **✎ en cada botón** (o manteniendo presionado el botón): editas los textos de la gráfica, su fondo (General / Verde / Espacio) y el botón mismo (texto, color, tecla, posición). Los cambios se ven al instante, incluso al aire.
 - **Todo entra y sale con un toque.** La apertura, el cierre, la cortina y las transiciones también se sacan tocando de nuevo, si te equivocas.
+- **Filtros arriba de la botonera** (Todo · 📰 Últimas Noticias · GC · Títulos · Duplex/Triplex · Cortinas · Fondo y más) para encontrar rápido cada botón en el celular.
 - **Titulares «Últimas Noticias»:** GC centrado con subtítulo y el lugar en la esquina superior derecha (con pin). Vienen 5 (Talca, Santiago, Barquisimeto, Buenos Aires y Hollywood), todos con fondo verde. Mientras el lugar está en pantalla, el bug se esconde.
 - **Duplex:** a la izquierda la cámara de la psicóloga (vertical, más chica) y al centro el video 16:9.
 
