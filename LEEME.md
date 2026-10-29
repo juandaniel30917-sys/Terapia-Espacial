@@ -112,14 +112,14 @@ Cada vez que subo cambios, la página se actualiza sola.
 - **Reglas al aire:** los GC, los titulares, la cortina título, «Volvemos» y el aviso comparten la zona baja, así que uno reemplaza al otro. El triplex y el duplex también se reemplazan entre sí.
 
 ### Gráficas nuevas y viejas en la misma botonera
-- **⋯ → 🧩 Elegir botones** (también en ✏️ Editar botonera): aparecen **todas** las gráficas, agrupadas en 🛸 *Entre Ovnis y Fantasmas*, 🧠 *Terapia Espacial* y 🎬 *Videos*. Marca las que quieres como botón y desmarca las que no. Desmarcar solo quita el botón; la gráfica no se borra.
+- **➕ Agregar / quitar botones** (arriba de la botonera, también en ⋯ y en ✏️ Editar botonera): aparecen **todas** las gráficas, agrupadas en 🛸 *Entre Ovnis y Fantasmas*, 🧠 *Terapia Espacial* y 🎬 *Videos*. Marca las que quieres como botón y desmarca las que no. Desmarcar solo quita el botón; la gráfica no se borra.
 - Las gráficas de Terapia Espacial conservan sus colores originales aunque estés en el programa nuevo.
 - Para filtrar la botonera están **🎬 Videos** y **🧠 Terapia Espacial**.
 
 ### 🎬 Videos (cortinas en video)
 - Vienen incluidos **LLÁMENOS AL 666-9999** e **INTRO**, tal cual los videos originales, con fondo transparente. En OBS se ven sobre el azul del programa.
 - **Un toque** pone el video al aire con su sonido. Sale solo cuando termina; si lo tocas **otra vez**, se saca antes.
-- **⋯ → 🎬 Subir video**: elige un MP4 o WebM y queda como botón nuevo.
+- **🎬 Subir video** (arriba de la botonera, al lado de «Agregar / quitar botones»): elige un MP4 o WebM y queda como botón nuevo.
   - En modo sala el video puede pesar hasta 50 MB.
   - Si el video tiene fondo verde o azul, indícalo y la salida quita ese color.
   - Desde ✎ puedes cambiar el nombre, el croma y el sonido, o borrar el video.
