@@ -170,9 +170,41 @@
   };
   RT.yo = yo;
 
+  /* ---------- VÍA RÁPIDA (salida inmediata en OBS) ----------
+     Al apretar un botón, además de guardar en la base, el panel avisa al tiro por Realtime SOLO qué está al aire
+     (aire del programa, aire de EOYF y paso) + una huella del resto del estado. La salida usa el contenido que ya
+     leyó de la base; si la huella no calza (texto editado, gráfica nueva) espera la lectura normal de la base. */
+  function canon(o) {
+    if (o === null || typeof o !== "object") { return JSON.stringify(o === undefined ? null : o); }
+    if (Array.isArray(o)) { return "[" + o.map(canon).join(",") + "]"; }
+    return "{" + Object.keys(o).sort().filter(function (k) { return o[k] !== undefined; }).map(function (k) { return JSON.stringify(k) + ":" + canon(o[k]); }).join(",") + "}";
+  }
+  RT.huella = function (o) {
+    var s = canon(o), h = 2166136261;
+    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return (h >>> 0).toString(36) + "." + s.length.toString(36);
+  };
+  function partes(est) {
+    var resto = Object.assign({}, est || {}), e = resto.eoyf;
+    var r = {aire: resto.aire === undefined ? null : resto.aire, eaire: e && e.aire !== undefined ? e.aire : null, paso: resto.paso === undefined ? null : resto.paso};
+    delete resto.aire; delete resto.paso; delete resto.seq;
+    if (e && typeof e === "object") { resto.eoyf = Object.assign({}, e); delete resto.eoyf.aire; }
+    r.h = RT.huella(resto);
+    return r;
+  }
+  function conPartes(est, d) {
+    var n = Object.assign({}, est, {aire: d.aire, paso: d.paso, seq: d.seq});
+    if (n.eoyf && typeof n.eoyf === "object") { n.eoyf = Object.assign({}, n.eoyf, {aire: d.eaire}); }
+    return n;
+  }
+
   /* ======================= CONTROL (panel / botonera) ======================= */
   function SalaControl(sala, token) {
-    var ev = emisor(), rt = null, rev = 0, outKey = null, guardando = false, pendiente = null, falla = 0, tReint = 0;
+    var ev = emisor(), rt = null, rev = 0, outKey = null, guardando = false, pendiente = null, falla = 0, tReint = 0, seq = 0;
+    function rapido(est) {
+      if (!rt || !rt.conectado()) { return; }
+      try { var d = partes(est); d.seq = est.seq; d.de = yo; rt.enviar("ya", d); } catch (e) { console.warn("[via rapida]", e); }
+    }
     function guardar() {
       if (guardando || !pendiente) { return; }
       guardando = true; var est = pendiente; pendiente = null; ev.emit("guardado", "guardando");
@@ -215,7 +247,10 @@
           });
         });
       },
-      publicar: function (estado) { pendiente = JSON.parse(JSON.stringify(estado)); guardar(); },
+      publicar: function (estado) {
+        seq = Math.max(seq + 1, Date.now()); pendiente = JSON.parse(JSON.stringify(estado)); pendiente.seq = seq;
+        rapido(pendiente); guardar();
+      },
       links: function () {
         var base = location.href.replace(/[?#].*$/, "").replace(/[^/]*$/, "");
         return {control: base + "panel.html?sala=" + sala + "#t=" + token, salida: base + "salida.html?sala=" + sala + "&k=" + outKey};
@@ -227,13 +262,20 @@
   }
 
   function SalaSalida(sala, clave) {
-    var ev = emisor(), rt = null, rev = -1, leyendo = false, otraVez = false;
+    var ev = emisor(), rt = null, rev = -1, leyendo = false, otraVez = false, seq = 0, ultimo = null;
+    function emitir(e) { ultimo = e; ev.emit("estado", e); }
+    function rapido(d) {
+      if (!ultimo || !d || !(+d.seq > seq)) { return; }
+      if (partes(ultimo).h !== d.h) { return; } /* el contenido cambió: que llegue desde la base */
+      seq = +d.seq; emitir(conPartes(ultimo, d));
+    }
     function leer() {
       if (leyendo) { otraVez = true; return; }
       leyendo = true;
       RT.rpc("cg_leer", {p_sala: sala, p_clave: clave}).then(function (r) {
         leyendo = false;
-        if (r.rev !== rev) { rev = r.rev; ev.emit("estado", r.estado || {}); }
+        var s = (r.estado && +r.estado.seq) || 0;
+        if (r.rev !== rev && s >= seq) { rev = r.rev; seq = s; emitir(r.estado || {}); }
         ev.emit("red", rt && rt.conectado() ? "conectado" : "respaldo");
         if (otraVez) { otraVez = false; leer(); }
       }, function (e) { leyendo = false; ev.emit("red", "sin-conexion", e.message); if (otraVez) { otraVez = false; setTimeout(leer, 1500); } });
@@ -242,11 +284,14 @@
       on: ev.on, modo: "sala",
       conectar: function () {
         return RT.rpc("cg_leer", {p_sala: sala, p_clave: clave}).then(function (r) {
-          rev = r.rev; ev.emit("estado", r.estado || {});
+          rev = r.rev; seq = (r.estado && +r.estado.seq) || 0; emitir(r.estado || {});
           return (r.rol === "control" ? RT.claveSalida(clave) : Promise.resolve(clave)).then(nombreCanal).then(function (canal) {
             rt = RT.Realtime(canal, {presencia: {rol: RT.params().vista ? "vista" : "salida", id: yo, desde: Date.now()}});
             rt.on("estado", function (s) { if (s === "conectado") { ev.emit("red", "conectado"); leer(); rt.enviar("hola", {}); } else { ev.emit("red", "reconectando"); } });
-            rt.on("mensaje", function (evento, d) { if (evento === "rev" && +d.rev !== rev) { leer(); } });
+            rt.on("mensaje", function (evento, d) {
+              if (evento === "ya") { rapido(d); return; }
+              if (evento === "rev" && +d.rev !== rev) { leer(); }
+            });
             var ult = 0;
             setInterval(function () {
               var ahora = Date.now(), cada = rt.conectado() ? 15000 : 2000;
