@@ -155,6 +155,17 @@
   .caja{width:min(640px,100%);max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--borde);border-radius:20px;padding:20px}
   .caja h3{margin:0 0 4px;font-family:Orbitron,Arial;font-size:16px;letter-spacing:.06em}
   @media(max-width:700px){.modal{align-items:flex-end;padding:0}.caja{border-radius:20px 20px 0 0;padding-bottom:calc(20px + var(--safeB))}}
+  .elegir .grupoE{margin:16px 0 6px;font:700 12px Orbitron,Arial;letter-spacing:.14em;color:var(--tenue);text-transform:uppercase}
+  .elegir .filaE{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--borde);border-radius:12px;background:var(--panel);margin-bottom:6px;cursor:pointer}
+  .elegir .filaE i{width:10px;align-self:stretch;border-radius:4px;flex:0 0 auto}
+  .elegir .filaE div{flex:1;min-width:0}
+  .elegir .filaE b{display:block;font-size:15px}
+  .elegir .filaE small{display:block;color:var(--tenue);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .elegir .filaE input{width:24px;height:24px;accent-color:var(--violeta);flex:0 0 auto}
+  .elegir .filaE.on{border-color:var(--violeta);background:var(--panel2)}
+  .progreso{height:8px;border-radius:4px;background:var(--panel3);overflow:hidden;margin-top:8px;display:none}
+  .progreso.on{display:block}
+  .progreso i{display:block;height:100%;width:0;background:var(--violeta);transition:width .2s}
   .hoja h2{margin:18px 0 8px}
   .hoja .seg button{padding:14px 8px;font-size:15px}
   .hoja input[type=text],.hoja textarea,.hoja select{font-size:16px}
@@ -189,6 +200,8 @@
 <div class="menu" id="menu">
   <button data-m="programa" id="mPrograma">👁 Mostrar el programa anterior (Terapia Espacial)</button>
   <button data-m="links">🔗 Links de control y de OBS</button>
+  <button data-m="elegir">🧩 Elegir botones (nuevas y viejas)</button>
+  <button data-m="video">🎬 Subir video (cortina)</button>
   <button data-m="editar">✏️ Editar botonera</button>
   <button data-m="botonera">🎛️ Este equipo: solo botonera</button>
   <button data-m="completo">🖥️ Este equipo: panel completo</button>
@@ -215,7 +228,9 @@
         <div class="filtros" id="filtros"></div>
         <div class="bot" id="bot"></div>
         <div class="barraEd" id="barraEd">
-          <button class="mini prim" id="edAgregar">+ Agregar botón</button>
+          <button class="mini prim" id="edElegir">🧩 Elegir botones (todas las gráficas)</button>
+          <button class="mini prim" id="edVideo">🎬 Subir video</button>
+          <button class="mini" id="edAgregar">+ Agregar botón</button>
           <button class="mini" id="edRestaurar">Restaurar botonera</button>
           <button class="mini" id="edListo">✓ Listo</button>
         </div>
@@ -362,6 +377,20 @@
   </div>
 </div></div>
 
+<!-- elegir botones: todas las gráficas (programa nuevo, programa anterior y videos) -->
+<div class="modal" id="mElegir"><div class="caja hoja elegir">
+  <h3>🧩 Elegir botones</h3>
+  <p class="nota">Marca las gráficas que quieres en tu botonera. Están todas: las del programa nuevo, las de Terapia Espacial y tus videos. Desmarcar solo quita el botón (la gráfica no se borra).</p>
+  <div class="acciones" style="margin-top:6px">
+    <button class="mini prim" id="elVideo">🎬 Subir video</button>
+  </div>
+  <div class="progreso" id="progVideo"><i></i></div>
+  <div class="campo" style="margin-top:10px"><input type="text" id="elBuscar" placeholder="Buscar gráfica…"></div>
+  <div id="elLista"></div>
+  <div class="acciones"><button class="mini prim" id="elListo" style="flex:1">✓ Listo</button></div>
+</div></div>
+<input type="file" id="archivoVideo" accept="video/mp4,video/webm,.mp4,.webm,.mov,.m4v" hidden>
+
 <!-- hoja: editar gráfica + botón -->
 <div class="modal" id="mBoton"><div class="caja hoja">
   <h3 id="ebTitulo">Editar</h3>
@@ -392,13 +421,13 @@
 </div></div>
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=330"></script>
-<script src="comun.js?v=330"></script>
-<script src="eoyf-datos.js?v=330"></script>
-<script src="conexion.js?v=330"></script>
-<script src="escena.js?v=330"></script>
-<script src="qrcode.js?v=330"></script>
-<script src="eoyf-panel.js?v=330"></script>
+<script src="config.js?v=340"></script>
+<script src="comun.js?v=340"></script>
+<script src="eoyf-datos.js?v=340"></script>
+<script src="conexion.js?v=340"></script>
+<script src="escena.js?v=340"></script>
+<script src="qrcode.js?v=340"></script>
+<script src="eoyf-panel.js?v=340"></script>
 <script>
 const $ = (s, p = document) => p.querySelector(s);
 const $$ = (s, p = document) => [...p.querySelectorAll(s)];
@@ -470,7 +499,14 @@ function siguienteTitular() {
   limpiarInferior(); E.aire.titular = sig < E.titulares.length ? sig : null; publicar(true);
 }
 function limpiar() {
-  if (esEOYF()) { EOYF_PANEL.limpiar(); dibujarBotonera(); return; }
+  clearTimeout(timerVideo); E.aire.video = null;
+  if (esEOYF()) {
+    // también saca las gráficas del programa anterior que se hayan lanzado desde la botonera nueva
+    clearTimeout(timerGC); detenerAvance();
+    limpiarInferior(); E.aire.titular = null; E.aire.triplex = false; E.aire.duplex = false;
+    ['apertura', 'cierre', 'cortina', 'transicion'].forEach(k => E.aire[k] = null);
+    EOYF_PANEL.limpiar(); dibujarBotonera(); return;
+  }
   clearTimeout(timerGC); detenerAvance();
   limpiarInferior(); E.aire.titular = null; E.aire.triplex = false; E.aire.duplex = false;
   ['apertura', 'cierre', 'cortina', 'transicion'].forEach(k => E.aire[k] = null);
@@ -481,8 +517,35 @@ function limpiar() {
 const NOMBRE_TRANS = { rayo: 'Rayo', hipnosis: 'Hipnosis', rorschach: 'Rorschach', onda: 'Onda cerebral' };
 const esEOYF = () => E.programa === 'eoyf';
 EOYF_PANEL.iniciar({ E: () => E, publicar: inm => publicar(inm), redibujar: () => dibujarBotonera(), toast: t => toast(t) });
+// catálogo completo: en el programa nuevo están también las gráficas de Terapia Espacial y los videos
 function catalogo() {
-  if (esEOYF()) return EOYF_PANEL.catalogo();
+  const c = {};
+  if (esEOYF()) {
+    Object.assign(c, EOYF_PANEL.catalogo());
+    const te = catalogoTE();
+    Object.keys(te).forEach(k => { const a = te[k]; c[k] = Object.assign({}, a, { tipo: 'TERAPIA ESPACIAL', tipoTE: a.tipo, sub: '🧠 Terapia Espacial · ' + (a.sub || '') }); });
+  } else Object.assign(c, catalogoTE());
+  Object.assign(c, catalogoVideos());
+  return c;
+}
+function catalogoVideos() {
+  const c = {};
+  (E.videos || []).forEach(v => {
+    c['v:' + v.id] = { id: 'v:' + v.id, titulo: '🎬 ' + (v.nombre || 'Video'), sub: (v.dur ? v.dur.toFixed(1) + ' s' : 'video') + (v.chroma ? ' · quita el ' + v.chroma : '') + ' · toca otra vez para sacarlo',
+      color: '#FF7A1A', tipo: 'VIDEO', hacer: () => lanzarVideo(v.id), aire: () => !!(E.aire.video && E.aire.video.vid === v.id) };
+  });
+  return c;
+}
+let timerVideo = null;
+function lanzarVideo(vid) {
+  clearTimeout(timerVideo);
+  if (E.aire.video && E.aire.video.vid === vid) { E.aire.video = null; publicar(true); dibujarBotonera(); return; }
+  const v = (E.videos || []).find(x => x.id === vid); if (!v) return;
+  const id = TE.id(); E.aire.video = { id, vid };
+  timerVideo = setTimeout(() => { if (E.aire.video && E.aire.video.id === id) { E.aire.video = null; publicar(true); dibujarBotonera(); } }, ((v.dur || 10) + .6) * 1000);
+  publicar(true);
+}
+function catalogoTE() {
   const c = {}, t = E.textos;
   const add = (id, titulo, sub, color, tipo, hacer, aire) => c[id] = { id, titulo, sub, color, tipo, hacer, aire: aire || (() => false) };
   E.gcs.forEach((g, i) => add('gc:' + i, (g.icono === 'alien' ? '👽 ' : g.icono === 'terapeuta' ? '🧠 ' : '') + (g.titulo || 'GC ' + (i + 1)), g.sub, '#7B2FF7', 'GC', () => ponerGC(i), () => E.aire.gc === i));
@@ -524,10 +587,10 @@ function sembrar(forzar) {
 }
 const GRUPOS_TE = { gc: ['GC'], noticias: ['TITULAR', 'AVANCE'], titulos: ['TÍTULO'], pantallas: ['PANTALLA'], trans: ['DISPARO'], otros: ['FONDO', 'FIJO', 'PAUTA', 'ACCIÓN'] };
 const FILTROS_TE = [['todo', 'Todo'], ['noticias', '📰 Últimas Noticias'], ['gc', '👤 GC'], ['titulos', '🏷️ Títulos'], ['pantallas', '🖥️ Duplex / Triplex'], ['trans', '✨ Cortinas'], ['otros', '⚙️ Fondo y más']];
-const GRUPOS_ = () => esEOYF() ? EOYF_PANEL.GRUPOS : GRUPOS_TE;
+const GRUPOS_ = () => Object.assign({}, esEOYF() ? EOYF_PANEL.GRUPOS : GRUPOS_TE, { te: ['TERAPIA ESPACIAL'], videos: ['VIDEO'] });
 let filtro = LS('te_filtro') || 'todo';
 function pintarFiltros() {
-  const lista = esEOYF() ? EOYF_PANEL.FILTROS : FILTROS_TE, c = $('#filtros');
+  const lista = (esEOYF() ? EOYF_PANEL.FILTROS : FILTROS_TE).concat([['videos', '🎬 Videos']], esEOYF() ? [['te', '🧠 Terapia Espacial']] : []), c = $('#filtros');
   if (!lista.some(f => f[0] === filtro)) filtro = 'todo';
   const clave = lista.map(f => f[0]).join();
   if (c.dataset.k !== clave) {
@@ -555,8 +618,8 @@ function dibujarBotonera() {
     if (fd) { const tg = document.createElement('span'); tg.className = 'fondoTag ' + fd; tg.textContent = fd === 'verde' ? 'VERDE' : 'ESPACIO'; el.querySelector('b').appendChild(tg); }
     el.querySelector('small').textContent = a ? a.sub || '' : b.accion;
     if (b.tecla) el.querySelector('kbd').textContent = b.tecla;
-    el.querySelector('.tipo').textContent = a && (a.tipo === 'DISPARO' || a.tipo === 'CORTINA' || a.tipo === 'TRANSICIÓN') ? '✨' : '';
-    if (esEOYF() && a) EOYF_PANEL.decorar(el, b.accion);
+    el.querySelector('.tipo').textContent = a && (a.tipo === 'VIDEO' ? '🎬' : (a.tipo === 'DISPARO' || a.tipoTE === 'DISPARO' || a.tipo === 'CORTINA' || a.tipo === 'TRANSICIÓN') ? '✨' : '');
+    if (esEOYF() && a && /^e:/.test(b.accion)) EOYF_PANEL.decorar(el, b.accion);
     cont.appendChild(el);
   });
   pintar();
@@ -578,7 +641,7 @@ $('#bot').addEventListener('click', e => { if (tLargo === 'hecho') { e.stopImmed
 function ejecutarBoton(b, el) {
   const a = catalogo()[b.accion]; if (!a) return;
   vibrar(); a.hacer();
-  if (el && (a.tipo === 'DISPARO' || a.tipo === 'CORTINA' || a.tipo === 'TRANSICIÓN')) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 350); }
+  if (el && (a.tipo === 'DISPARO' || a.tipoTE === 'DISPARO' || a.tipo === 'VIDEO' || a.tipo === 'CORTINA' || a.tipo === 'TRANSICIÓN')) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 350); }
   dibujarBotonera();
 }
 function pasoActual() { return esEOYF() ? E.eoyf.paso : E.paso; }
@@ -595,7 +658,8 @@ function pintar() {
 
 // ¿qué objeto de datos controla esta acción? (para editar textos y fondo)
 function objetivo(accion) {
-  if (esEOYF()) return EOYF_PANEL.objetivo(accion);
+  if (/^v:/.test(accion)) { const v = (E.videos || []).find(x => 'v:' + x.id === accion); return v ? { tipo: 'video', o: v } : null; }
+  if (/^e:/.test(accion)) return EOYF_PANEL.objetivo(accion);
   let m;
   if ((m = /^gc:(\d+)$/.exec(accion))) return { tipo: 'gc', o: E.gcs[+m[1]] };
   if (accion === 'tit:-1') return { tipo: 'titulo', o: E.textos.avance };
@@ -626,6 +690,7 @@ function pintarGrafica(accion) {
   if (!ob || !o) { g.innerHTML = '<p class="nota">Esta acción no tiene textos para editar.</p>'; return; }
   const h = document.createElement('h2'); h.textContent = 'Textos de la gráfica'; g.appendChild(h);
   if (ob.tipo === 'campos') { EOYF_PANEL.campos(g, ob, inm => { publicar(inm); dibujarBotonera(); }); return; }
+  if (ob.tipo === 'video') { editorVideo(g, o); return; }
   if (ob.tipo === 'gc') {
     campoTexto(g, 'Nombre', o, 'titulo'); campoTexto(g, 'Cargo', o, 'sub');
     const d = document.createElement('div'); d.className = 'campo';
@@ -649,6 +714,120 @@ function pintarGrafica(accion) {
   $$('#ebFondo button').forEach(b => b.classList.toggle('on', (o.fondo || '') === b.dataset.f));
   $$('#ebFondo button').forEach(b => b.onclick = () => { o.fondo = b.dataset.f; $$('#ebFondo button').forEach(x => x.classList.toggle('on', x === b)); publicar(true); dibujarBotonera(); });
 }
+// ---------- videos (cortinas en video) ----------
+function editorVideo(g, v) {
+  g.querySelector('h2').textContent = 'Video';
+  campoTexto(g, 'Nombre del botón / video', v, 'nombre');
+  const d = document.createElement('div'); d.className = 'campo';
+  d.innerHTML = '<label>Quitar fondo (croma)</label><div class="seg"><button data-c="">Ninguno (ya es transparente)</button><button data-c="verde">🟩 Verde</button><button data-c="azul">🟦 Azul</button></div>' +
+    '<label style="margin-top:12px">Sonido del video</label><div class="seg"><button data-s="1">🔊 Con sonido</button><button data-s="0">🔇 Sin sonido</button></div>';
+  const pint = () => {
+    d.querySelectorAll('[data-c]').forEach(b => b.classList.toggle('on', (v.chroma || '') === b.dataset.c));
+    d.querySelectorAll('[data-s]').forEach(b => b.classList.toggle('on', (v.sonido ? '1' : '0') === b.dataset.s));
+  };
+  d.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { v.chroma = b.dataset.c; pint(); publicar(true); dibujarBotonera(); });
+  d.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { v.sonido = b.dataset.s === '1'; pint(); publicar(true); });
+  pint(); g.appendChild(d);
+  const n = document.createElement('p'); n.className = 'nota';
+  n.textContent = 'Dura ' + (v.dur ? v.dur.toFixed(1) + ' s' : '—') + '. Sale solo al terminar; si lo tocas otra vez mientras está al aire, se saca.' + (v.fijo ? ' (Video del paquete, viene incluido.)' : '');
+  g.appendChild(n);
+  if (!v.fijo) {
+    const q = document.createElement('button'); q.className = 'mini'; q.textContent = '🗑 Borrar este video';
+    q.onclick = () => {
+      if (!confirm('¿Borrar el video «' + v.nombre + '» y sus botones?')) return;
+      E.videos = E.videos.filter(x => x !== v);
+      [E.botonera, E.eoyf.botonera].forEach(bt => { if (bt) bt.botones = bt.botones.filter(b => b.accion !== 'v:' + v.id); });
+      if (E.aire.video && E.aire.video.vid === v.id) E.aire.video = null;
+      $('#mBoton').classList.remove('on'); publicar(true); dibujarBotonera();
+    };
+    g.appendChild(q);
+  }
+}
+function duracionVideo(file) {
+  return new Promise(res => {
+    const v = document.createElement('video'); v.preload = 'metadata'; v.muted = true;
+    const u = URL.createObjectURL(file); let listo = false;
+    const fin = d => { if (listo) return; listo = true; URL.revokeObjectURL(u); res(d); };
+    v.onloadedmetadata = () => fin(isFinite(v.duration) ? v.duration : 0);
+    v.onerror = () => fin(-1);
+    setTimeout(() => fin(0), 8000);
+    v.src = u;
+  });
+}
+async function subirVideo(file) {
+  if (!file) return;
+  const prog = $('#progVideo'), barra = prog.querySelector('i');
+  const dur = await duracionVideo(file);
+  if (dur < 0 || /\.mov$/i.test(file.name) && dur === 0) {
+    alert('Este video no se puede reproducir en el navegador ni en OBS (los .mov ProRes no funcionan en navegador).\n\nConviértelo a MP4 (H.264) o a WebM. Si tiene fondo transparente, expórtalo como WebM VP9 con alfa; si tiene fondo verde o azul, MP4 sirve y aquí eliges quitar ese color.');
+    return;
+  }
+  if (file.size > 50 * 1024 * 1024 && con.modo === 'sala') { alert('En modo sala el video puede pesar hasta 50 MB. Este pesa ' + Math.round(file.size / 1048576) + ' MB: comprímelo o usa el servidor local.'); return; }
+  const nombre = prompt('Nombre del botón:', file.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').toUpperCase());
+  if (nombre === null) return;
+  const chroma = confirm('¿El video tiene fondo VERDE o AZUL que hay que quitar?\n\nAceptar = sí (luego eliges cuál)\nCancelar = no, ya es transparente o se ve completo') ? (confirm('¿El fondo es AZUL?\n\nAceptar = azul · Cancelar = verde') ? 'azul' : 'verde') : '';
+  try {
+    $('#mElegir').classList.add('on'); prog.classList.add('on'); barra.style.width = '0%';
+    toast('Subiendo video…');
+    const r = await con.subir(file, f => { barra.style.width = Math.round(f * 100) + '%'; });
+    const v = { id: TE.id(), nombre: nombre.trim() || file.name, url: r.url, path: r.path || '', dur: dur || 10, chroma, sonido: true, fijo: false };
+    E.videos.push(v);
+    botones().push({ id: TE.id(), accion: 'v:' + v.id, texto: '', color: '', tecla: '' });
+    publicar(true); dibujarBotonera(); pintarElegir();
+    toast('🎬 Video agregado a la botonera');
+    if (con.modo === 'local') alert('Ojo: en modo local el video queda guardado solo en ESTE navegador. Para que OBS lo vea, abre la salida en el mismo navegador o usa el servidor local / sala.');
+  } catch (e) { alert('No se pudo subir el video: ' + e.message); }
+  finally { prog.classList.remove('on'); }
+}
+$('#archivoVideo').onchange = e => { const f = e.target.files[0]; e.target.value = ''; subirVideo(f); };
+$('#edVideo').onclick = () => $('#archivoVideo').click();
+$('#elVideo').onclick = () => $('#archivoVideo').click();
+
+// ---------- elegir botones: todas las gráficas del programa nuevo, del anterior y los videos ----------
+function abrirElegir() { $('#elBuscar').value = ''; pintarElegir(); $('#mElegir').classList.add('on'); }
+function pintarElegir() {
+  const cont = $('#elLista'); if (!cont) return; cont.innerHTML = '';
+  const cat = catalogo(), q = $('#elBuscar').value.trim().toLowerCase();
+  const usadas = new Set(botones().map(b => b.accion));
+  const nombreGrupo = a => a.tipo === 'VIDEO' ? '🎬 Videos' : a.tipo === 'TERAPIA ESPACIAL' ? '🧠 Terapia Espacial · ' + (a.tipoTE || '') : (esEOYF() ? '🛸 Entre Ovnis y Fantasmas · ' : '') + a.tipo;
+  const grupos = {};
+  Object.values(cat).forEach(a => {
+    if (q && !((a.titulo || '') + ' ' + (a.sub || '') + ' ' + a.tipo).toLowerCase().includes(q)) return;
+    (grupos[nombreGrupo(a)] = grupos[nombreGrupo(a)] || []).push(a);
+  });
+  const orden = Object.keys(grupos).sort((x, y) => (x[0] === '🎬' ? -1 : 0) - (y[0] === '🎬' ? -1 : 0) || (x.includes('Terapia') ? 1 : 0) - (y.includes('Terapia') ? 1 : 0));
+  if (!orden.length) cont.innerHTML = '<p class="nota">Nada coincide con la búsqueda.</p>';
+  orden.forEach(gn => {
+    const h = document.createElement('div'); h.className = 'grupoE'; h.textContent = gn; cont.appendChild(h);
+    grupos[gn].forEach(a => {
+      const f = document.createElement('label'); f.className = 'filaE' + (usadas.has(a.id) ? ' on' : '');
+      f.innerHTML = '<i></i><div><b></b><small></small></div><input type="checkbox">';
+      f.querySelector('i').style.background = a.color || '#7B2FF7';
+      f.querySelector('b').textContent = a.titulo; f.querySelector('small').textContent = a.sub || '';
+      const c = f.querySelector('input'); c.checked = usadas.has(a.id);
+      c.onchange = () => {
+        const l = botones();
+        if (c.checked) l.push({ id: TE.id(), accion: a.id, texto: '', color: '', tecla: '' });
+        else for (let j = l.length - 1; j >= 0; j--) if (l[j].accion === a.id) l.splice(j, 1);
+        f.classList.toggle('on', c.checked); publicar(true); dibujarBotonera();
+      };
+      cont.appendChild(f);
+    });
+  });
+}
+$('#elBuscar').oninput = pintarElegir;
+$('#elListo').onclick = () => $('#mElegir').classList.remove('on');
+$('#edElegir').onclick = abrirElegir;
+// botones de los videos del paquete (una sola vez por botonera, para respetar si los quitas)
+function sembrarVideos() {
+  let cambio = false;
+  [E.botonera, E.eoyf && E.eoyf.botonera].forEach(bt => {
+    if (!bt || bt.videos) return; bt.videos = 1; cambio = true;
+    TE.VIDEOS_BASE.forEach(v => { if (!bt.botones.some(b => b.accion === 'v:' + v.id)) bt.botones.push({ id: TE.id(), accion: 'v:' + v.id, texto: '', color: '', tecla: '' }); });
+  });
+  return cambio;
+}
+
 function editarBoton(i) {
   ebIndice = i;
   if (i < 0) { botones().push({ id: TE.id(), accion: esEOYF() ? 'e:gc:0' : 'gc:0', texto: '', color: '', tecla: '' }); ebIndice = botones().length - 1; }
@@ -904,6 +1083,8 @@ document.addEventListener('click', () => $('#menu').classList.remove('on'));
 $('#menu').onclick = e => {
   const m = e.target.dataset.m; if (!m) return;
   if (m === 'programa') cambiarPrograma();
+  if (m === 'elegir') abrirElegir();
+  if (m === 'video') $('#archivoVideo').click();
   if (m === 'links') abrirLinks();
   if (m === 'editar') { if (document.body.classList.contains('modo-botonera') === false) cambiarVista('bot'); modoEdicion(!editando); }
   if (['botonera', 'completo', 'auto'].includes(m)) modoDisp(m);
@@ -1013,6 +1194,8 @@ function chipSalidas(n) {
     const faltaNuevo = !E.eoyf.botonera || E.eoyf.botonera.v !== 2;
     if (!tenia || viejos || !E.botonera || E.botonera.v !== 4 || faltaNuevo) { sembrar(); publicar(true); }
     if (E.eoyf.aire.cortina) { E.eoyf.aire.cortina = null; publicar(true); }
+    if (sembrarVideos()) publicar(true);
+    if (E.aire.video) { E.aire.video = null; publicar(true); }
     // al abrir, las gráficas con duración que quedaron marcadas ya terminaron
     ['apertura', 'cierre', 'cortina', 'transicion'].forEach(k => { if (E.aire[k]) { E.aire[k] = null; publicar(true); } });
     todo();

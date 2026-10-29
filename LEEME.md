@@ -111,6 +111,21 @@ Cada vez que subo cambios, la página se actualiza sola.
 - **Teclas:** F13–F24 (para un Stream Deck o un teclado externo), o cualquier tecla con «Otra tecla…». También funcionan Av Pág / Re Pág para la pauta y Esc para limpiar.
 - **Reglas al aire:** los GC, los titulares, la cortina título, «Volvemos» y el aviso comparten la zona baja, así que uno reemplaza al otro. El triplex y el duplex también se reemplazan entre sí.
 
+### Gráficas nuevas y viejas en la misma botonera
+- **⋯ → 🧩 Elegir botones** (también en ✏️ Editar botonera): aparecen **todas** las gráficas, agrupadas en 🛸 *Entre Ovnis y Fantasmas*, 🧠 *Terapia Espacial* y 🎬 *Videos*. Marca las que quieres como botón y desmarca las que no. Desmarcar solo quita el botón; la gráfica no se borra.
+- Las gráficas de Terapia Espacial conservan sus colores originales aunque estés en el programa nuevo.
+- Para filtrar la botonera están **🎬 Videos** y **🧠 Terapia Espacial**.
+
+### 🎬 Videos (cortinas en video)
+- Vienen incluidos **LLÁMENOS AL 666-9999** e **INTRO**, tal cual los videos originales, con fondo transparente. En OBS se ven sobre el azul del programa.
+- **Un toque** pone el video al aire con su sonido. Sale solo cuando termina; si lo tocas **otra vez**, se saca antes.
+- **⋯ → 🎬 Subir video**: elige un MP4 o WebM y queda como botón nuevo.
+  - En modo sala el video puede pesar hasta 50 MB.
+  - Si el video tiene fondo verde o azul, indícalo y la salida quita ese color.
+  - Desde ✎ puedes cambiar el nombre, el croma y el sonido, o borrar el video.
+- Los **.mov ProRes** (los que salen de After Effects) no se reproducen en el navegador ni en OBS. Hay que convertirlos a **WebM VP9 con alfa** (para mantener la transparencia) o a MP4.
+- En `obs/videos/azul/` están los mismos videos en **MP4 sobre pantalla azul**, para usarlos directo como fuente multimedia en OBS si lo prefieres.
+
 ## 4. Fondos
 - **Botón 🌌 Fondo espacio** en la botonera: alterna entre verde y espacio, y se mantiene.
 - **Fondo por gráfica** (desde el ✎ de cada botón): «General» sigue el botón 🌌; «Verde» o «Espacio» se aplican solo mientras esa gráfica está al aire. Si hay varias al aire, gana Espacio.

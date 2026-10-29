@@ -220,7 +220,9 @@
         var base = location.href.replace(/[?#].*$/, "").replace(/[^/]*$/, "");
         return {control: base + "panel.html?sala=" + sala + "#t=" + token, salida: base + "salida.html?sala=" + sala + "&k=" + outKey};
       },
-      regenerar: function () { return RT.rpc("cg_regenerar", {p_sala: sala, p_token: token}); }
+      regenerar: function () { return RT.rpc("cg_regenerar", {p_sala: sala, p_token: token}); },
+      // sube un video a la sala (Supabase Storage, bucket cg-media, máx. 50 MB) con permiso firmado por la función cg-media
+      subir: function (archivo, progreso) { return subirSala(sala, token, archivo, progreso); }
     };
   }
 
@@ -281,7 +283,18 @@
         fetch("/cmd", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({tipo: "estado", estado: estado, de: yo})})
           .then(function () { ev.emit("guardado", "ok"); }, function () { ev.emit("guardado", "error"); });
       },
-      links: function () { return RT.infoServidor ? {control: RT.infoServidor.control, salida: RT.infoServidor.salida} : null; }
+      links: function () { return RT.infoServidor ? {control: RT.infoServidor.control, salida: RT.infoServidor.salida} : null; },
+      // sube el video al computador del servidor (carpeta obs/videos/subidos)
+      subir: function (archivo, progreso) {
+        return new Promise(function (ok, mal) {
+          var x = new XMLHttpRequest();
+          x.open("POST", "/subir?nombre=" + encodeURIComponent(archivo.name));
+          x.upload.onprogress = function (e) { if (e.lengthComputable && progreso) { progreso(e.loaded / e.total); } };
+          x.onload = function () { try { var j = JSON.parse(x.responseText); if (x.status === 200 && j.url) { ok({url: j.url}); } else { mal(new Error(j.error || "La subida falló")); } } catch (e) { mal(new Error("La subida falló")); } };
+          x.onerror = function () { mal(new Error("Se cortó la conexión con el servidor")); };
+          x.send(archivo);
+        });
+      }
     };
   }
 
@@ -302,9 +315,61 @@
       links: function () {
         var base = location.href.replace(/[?#].*$/, "").replace(/[^/]*$/, "");
         return {control: base + "panel.html?local=1", salida: base + "salida.html?local=1"};
+      },
+      // modo local: el video queda guardado en este navegador (sirve para el panel como dock de OBS + la salida en el mismo OBS)
+      subir: function (archivo, progreso) {
+        var id = "v" + Date.now().toString(36);
+        if (progreso) { progreso(0.5); }
+        return RT.mediaLocal.guardar(id, archivo).then(function () { if (progreso) { progreso(1); } return {url: "idb:" + id}; });
       }
     };
   }
+
+  /* ======================= ARCHIVOS ======================= */
+  function subirSala(sala, token, archivo, progreso) {
+    var tipo = archivo.type || (/\.webm$/i.test(archivo.name) ? "video/webm" : /\.mp4$/i.test(archivo.name) ? "video/mp4" : /\.mov$/i.test(archivo.name) ? "video/quicktime" : "");
+    return fetch(URL_SB + "/functions/v1/cg-media", {method: "POST", headers: {"apikey": KEY, "Authorization": "Bearer " + KEY, "Content-Type": "application/json"},
+      body: JSON.stringify({accion: "subir", sala: sala, token: token, tipo: tipo, tam: archivo.size})})
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) { throw new Error(j.error || ("Error " + r.status)); } return j; }); },
+        function (e) { throw new Error(traducir(e, 0)); })
+      .then(function (p) {
+        return new Promise(function (ok, mal) {
+          var x = new XMLHttpRequest();
+          x.open("PUT", p.signedUrl);
+          x.setRequestHeader("Content-Type", tipo); x.setRequestHeader("x-upsert", "false"); x.setRequestHeader("apikey", KEY);
+          x.upload.onprogress = function (e) { if (e.lengthComputable && progreso) { progreso(e.loaded / e.total); } };
+          x.onload = function () { if (x.status >= 200 && x.status < 300) { ok({url: p.url, path: p.path}); } else { mal(new Error("La subida falló (" + x.status + ")")); } };
+          x.onerror = function () { mal(new Error("Se cortó la conexión durante la subida")); };
+          x.send(archivo);
+        });
+      });
+  }
+  var dbP = null;
+  function db() {
+    if (dbP) { return dbP; }
+    dbP = new Promise(function (ok, mal) {
+      if (!window.indexedDB) { mal(new Error("Este navegador no permite guardar videos")); return; }
+      var r = indexedDB.open("te_media_v1", 1);
+      r.onupgradeneeded = function () { r.result.createObjectStore("archivos"); };
+      r.onsuccess = function () { ok(r.result); }; r.onerror = function () { mal(r.error || new Error("No se pudo abrir el almacenamiento local")); };
+    });
+    return dbP;
+  }
+  RT.mediaLocal = {
+    guardar: function (id, blob) { return db().then(function (d) { return new Promise(function (ok, mal) { var t = d.transaction("archivos", "readwrite"); t.objectStore("archivos").put(blob, id); t.oncomplete = function () { ok(); }; t.onerror = function () { mal(t.error || new Error("Sin espacio para guardar el video")); }; }); }); },
+    leer: function (id) { return db().then(function (d) { return new Promise(function (ok, mal) { var q = d.transaction("archivos").objectStore("archivos").get(id); q.onsuccess = function () { ok(q.result || null); }; q.onerror = function () { mal(q.error); }; }); }); }
+  };
+  var urlsLocales = {};
+  // convierte la url guardada en una que el navegador pueda reproducir
+  RT.resolverVideo = function (url) {
+    if (!url) { return Promise.resolve(null); }
+    if (/^idb:/.test(url)) {
+      var id = url.slice(4);
+      if (urlsLocales[id]) { return Promise.resolve(urlsLocales[id]); }
+      return RT.mediaLocal.leer(id).then(function (b) { if (!b) { return null; } urlsLocales[id] = URL.createObjectURL(b); return urlsLocales[id]; }, function () { return null; });
+    }
+    return Promise.resolve(url);
+  };
 
   /* Elige el modo según el link. rol = "control" | "salida" */
   RT.abrir = function (rol) {

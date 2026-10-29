@@ -89,6 +89,10 @@
   .lugar .t2{font-family:var(--fx);font-weight:700;font-size:19px;letter-spacing:.12em;color:var(--menta);text-transform:uppercase;margin-top:8px;white-space:nowrap}
   .lugar .txt{transition:opacity .25s}
   .abortando{transition:opacity .3s;opacity:0!important}
+  /* cortinas en video (subidas por el usuario) */
+  #cVideo .vid{position:absolute;inset:0;opacity:0;transition:opacity .25s}
+  #cVideo .vid.on{opacity:1}
+  #cVideo video,#cVideo canvas{position:absolute;left:0;top:0;width:1920px;height:1080px;object-fit:contain}
 
   /* ---------- TICKER ---------- */
   .ticker{position:absolute;left:0;right:0;bottom:18px;height:52px;background:var(--espacio);border-top:4px solid var(--violeta);
@@ -301,15 +305,17 @@
   <div class="capa" id="cTicker"></div>
   <div class="capa" id="cBug"></div>
   <div class="capa" id="cCortina"></div>
+  <div class="capa" id="cVideo"></div>
 </div>
 <div id="estadoRed">conectando…</div>
 
-<script src="config.js?v=330"></script>
-<script src="comun.js?v=330"></script>
-<script src="eoyf-datos.js?v=330"></script>
-<script src="conexion.js?v=330"></script>
-<script src="escena.js?v=330"></script>
-<script src="eoyf.js?v=330"></script>
+<script src="config.js?v=340"></script>
+<script src="comun.js?v=340"></script>
+<script src="eoyf-datos.js?v=340"></script>
+<script src="conexion.js?v=340"></script>
+<script src="escena.js?v=340"></script>
+<script src="chroma.js?v=340"></script>
+<script src="eoyf.js?v=340"></script>
 <script>
 /* ===================================================================
    MOTOR DE ANIMACIÓN — replica las llaves del script de After Effects
@@ -397,7 +403,7 @@ class Abduccion {
     this.icoW = o.icono ? Math.round(this.barH * .9) : 0;
     this.ufoY = o.barY - this.barH / 2 - o.rayoLargo - 20 * this.S / 100;
     this.hoverY = o.barY - this.barH / 2 - 18 * this.S / 100;
-    this.el = el('div', 'abd' + (o.skin ? ' ' + o.skin + ' t-' + (o.tema || 'neutro') : ''), capa);
+    this.el = el('div', 'abd' + (o.skin ? ' ' + o.skin + ' t-' + (o.tema || 'neutro') : ' te-orig'), capa);
 
     // rayo
     this.svg = sv('svg', { class: 'full rayo', viewBox: '0 0 1920 1080' }, this.el);
@@ -630,7 +636,7 @@ function espacio(on) {
 class Multiplex {
   constructor(ventanas, etiquetas, titulo, opc) {
     opc = opc || {};
-    this.cont = el('div', opc.skin || '', $('#cVentanas'));
+    this.cont = el('div', opc.skin || 'te-orig', $('#cVentanas'));
     const vel = cfg().velocidad;
     // fondo: espacio con estrellas en todo el cuadro; solo el interior de cada ventana queda en verde (o transparente)
     this.fondo = el('div', 'mxFondo', this.cont);
@@ -898,7 +904,7 @@ function lugar(texto) {
 let bugEl = null;
 function bug(on) {
   if (on && !bugEl) {
-    bugEl = el('div', 'bug fuera', $('#cBug'));
+    bugEl = el('div', 'bug fuera te-orig', $('#cBug'));
     el('div', 'placa', bugEl);
     const u = el('div', 'ufo', bugEl); u.appendChild(svgOvni()); u.dataset.bug = 1;
     const v = el('div', 'vivo', bugEl); v.textContent = 'EN VIVO';
@@ -923,7 +929,7 @@ function pintarBug() {
 let tickerEl = null, tickerAnim = null;
 function ticker(on) {
   if (!tickerEl) {
-    tickerEl = el('div', 'ticker', $('#cTicker'));
+    tickerEl = el('div', 'ticker te-orig', $('#cTicker'));
     el('div', 'etiq', tickerEl);
     el('div', 'cinta', tickerEl);
   }
@@ -993,6 +999,9 @@ function fondoEfectivo() {
 function aplicarConfig() {
   const c = cfg(), r = document.documentElement.style;
   for (const k in c.colores) r.setProperty('--' + k, c.colores[k]);
+  // las gráficas de Terapia Espacial conservan su paleta aunque esté activo el programa nuevo
+  let st = $('#teVars'); if (!st) { st = document.createElement('style'); st.id = 'teVars'; document.head.appendChild(st); }
+  st.textContent = '.te-orig{' + Object.keys(c.colores).map(k => '--' + k + ':' + c.colores[k]).join(';') + '}';
   r.setProperty('--ft', `'${c.fuenteTitulo}', 'Arial Black', Arial, sans-serif`);
   r.setProperty('--fx', `'${c.fuenteTexto}', Arial, sans-serif`);
   const f = E.programa === 'eoyf' ? 'transparente' : fondoEfectivo();
@@ -1004,7 +1013,7 @@ function aplicarConfig() {
 
 function aplicar(nuevo) {
   E = TE.normalizar(nuevo);
-  if (E.programa === 'eoyf') E.aire = TE.copia(TE.ESTADO_BASE.aire);   // el programa anterior queda oculto
+  // las gráficas del programa anterior también se pueden lanzar desde la botonera nueva (no se borran)
   aplicarConfig();
   const a = E.aire, tx = E.textos;
   // GC (y paciente)
@@ -1039,7 +1048,7 @@ function aplicar(nuevo) {
     cambiarSlot(n, clave, () => new Multiplex(VENTANAS[n], t.etiquetas, t.titulo));
   });
   const h = (ti !== null && ti !== undefined && ti >= 0) ? E.titulares[ti] : null;
-  const hayLugar = lugar(E.programa === 'eoyf' ? EOYF_SAL.lugar(E) : (h && h.lugar ? h.lugar : ''));
+  const hayLugar = lugar((E.programa === 'eoyf' && EOYF_SAL.lugar(E)) || (h && h.lugar ? h.lugar : ''));
   bug(!!a.bug && !hayLugar);           // el lugar ocupa la esquina del bug mientras está al aire
   ticker(!!a.ticker);
   // gráficas con duración: entran con un toque y se pueden sacar con otro
@@ -1056,16 +1065,57 @@ function aplicar(nuevo) {
       enCurso[k] = null;
     }
   });
+  videoAire(a.video);
   primeraVez = false;
   EOYF_SAL.aplicar(E);
 }
 const enCurso = {};
 let primeraVez = true;
 
+/* ---------- cortinas en video ---------- */
+let vidActual = null;   // { id, el, keyer }
+function sacarVideo() {
+  if (!vidActual) return;
+  const v = vidActual; vidActual = null;
+  v.el.classList.remove('on');
+  setTimeout(() => { if (v.keyer) v.keyer.destruir(); const vd = v.el.querySelector('video'); if (vd) { vd.pause(); vd.removeAttribute('src'); vd.load(); } v.el.remove(); }, 300);
+}
+function videoAire(av) {
+  const id = av && av.id;
+  if (primeraVez) { if (id) vidActual = { id, el: el('div', 'vid'), keyer: null }; return; }
+  if (!id) { sacarVideo(); return; }
+  if (vidActual && vidActual.id === id) return;
+  sacarVideo();
+  const info = (E.videos || []).find(x => x.id === av.vid);
+  if (!info) return;
+  const caja = el('div', 'vid', $('#cVideo')), yo = { id, el: caja, keyer: null };
+  vidActual = yo;
+  const v = document.createElement('video');
+  v.playsInline = true; v.preload = 'auto';
+  v.muted = PARAMS.has('vista') || !info.sonido;           // la vista previa del panel nunca suena
+  TE_RT.resolverVideo(info.url).then(src => {
+    if (vidActual !== yo || !src) return;
+    if (/^https?:/.test(src) && !src.startsWith(location.origin)) v.crossOrigin = 'anonymous';
+    v.src = src;
+    if (info.chroma) {
+      const cv = document.createElement('canvas'); caja.appendChild(cv);
+      try { yo.keyer = CG.Chroma(cv, v); yo.keyer.config({ keyColor: info.chroma === 'azul' ? '#0000ff' : '#00ff00', similitud: info.similitud || 40, suavizado: 8, derrame: 10 }); }
+      catch (e) { cv.remove(); caja.appendChild(v); }
+    } else caja.appendChild(v);
+    v.onended = () => { if (vidActual === yo) sacarVideo(); };
+    v.oncanplay = () => { v.oncanplay = null; caja.classList.add('on'); };
+    const pl = v.play(); if (pl && pl.catch) pl.catch(() => { v.muted = true; v.play().catch(() => {}); });
+  });
+}
+
 function lanzar(que, variante) {
   const tx = E.textos;
-  if (que === 'cortina') return cortina();
-  if (que === 'transicion') return transicion(variante);
+  if (que === 'cortina' || que === 'transicion') {
+    const cc = $('#cCortina'), antes = new Set(cc.children); delete cc.dataset.pal;
+    const pr = que === 'cortina' ? cortina() : transicion(variante);
+    [...cc.children].forEach(n => { if (!antes.has(n)) n.classList.add('te-orig'); });
+    return pr;
+  }
   // apertura / cierre
   espacio(true);
   const p = new Abduccion(Object.assign(conf(que), { titulo: tx[que].titulo, sub: tx[que].sub }), $('#cGraficas'));

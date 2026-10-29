@@ -47,8 +47,11 @@
       gc: null, titular: null, cortinaTitulo: false, aviso: false, volvemos: false,
       triplex: false, duplex: false, bug: false, ticker: false,
       // gráficas con duración (se pueden sacar antes con otro toque): { id, variante } o null
-      apertura: null, cierre: null, cortina: null, transicion: null
+      apertura: null, cierre: null, cortina: null, transicion: null,
+      video: null            // { id, vid } — cortina en video que está sonando
     },
+    // Cortinas en video (las sube el usuario desde la botonera). chroma: '' | 'verde' | 'azul'
+    videos: [],
     programa: 'eoyf',        // programa activo: 'eoyf' (Entre Ovnis y Fantasmas) | 'te' (Terapia Espacial, oculto)
     eoyf: null,              // datos del programa nuevo (eoyf-datos.js)
     paso: -1,               // paso actual de la pauta (compartido entre equipos)
@@ -76,12 +79,19 @@
       : est.titulares.map(h => Object.assign({ titulo: '', sub: '', lugar: '', fondo: '' }, h));
     Object.keys(est.textos).forEach(k => { if (est.textos[k].fondo === undefined) est.textos[k].fondo = ''; });
     delete est.disparo;
+    if (!Array.isArray(est.videos)) est.videos = [];
+    VIDEOS_BASE.forEach(v => { if (!est.videos.some(x => x.id === v.id)) est.videos.push(copia(v)); });
     if (est.programa !== 'te') est.programa = 'eoyf';
     if (window.EOYF_DATOS) est.eoyf = EOYF_DATOS.normalizar(est.eoyf);
     if (['verde', 'espacio', 'transparente'].indexOf(est.config.fondo) < 0) est.config.fondo = 'verde';
     return est;
   }
+  // videos que vienen con el programa (convertidos desde los .mov ProRes 4444 originales, con transparencia)
+  const VIDEOS_BASE = [
+    { id: 'llamen', nombre: 'LLÁMENOS AL 666-9999', url: 'videos/llamen_ya.webm', dur: 6.43, chroma: '', sonido: true, fijo: true },
+    { id: 'intro', nombre: 'INTRO · Entre Ovnis y Fantasmas', url: 'videos/intro.webm', dur: 5.9, chroma: '', sonido: true, fijo: true }
+  ];
   function id() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
-  window.TE = { ESTADO_BASE, copia, mezclar, normalizar, id };
+  window.TE = { ESTADO_BASE, VIDEOS_BASE, copia, mezclar, normalizar, id };
 })();

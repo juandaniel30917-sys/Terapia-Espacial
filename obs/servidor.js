@@ -92,6 +92,23 @@ const servidor = http.createServer((req, res) => {
     return;
   }
 
+  // subir un video (cortinas en video): se guarda en obs/videos/subidos
+  if (url.pathname === '/subir' && req.method === 'POST') {
+    const nombre = String(url.searchParams.get('nombre') || 'video.mp4');
+    const ext = (path.extname(nombre).toLowerCase().match(/^\.(mp4|webm|mov|m4v)$/) || [])[0];
+    if (!ext) { res.writeHead(415, { 'Content-Type': 'application/json' }); res.end('{"error":"Formato no permitido. Usa MP4 o WebM."}'); return; }
+    const dir = path.join(CARPETA, 'videos', 'subidos');
+    fs.mkdirSync(dir, { recursive: true });
+    const archivo = Date.now().toString(36) + Math.random().toString(36).slice(2, 6) + ext;
+    const destino = fs.createWriteStream(path.join(dir, archivo));
+    let total = 0;
+    req.on('data', d => { total += d.length; if (total > 500e6) { req.destroy(); destino.destroy(); } });
+    req.pipe(destino);
+    destino.on('finish', () => { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ url: 'videos/subidos/' + archivo })); });
+    destino.on('error', () => { res.writeHead(500, { 'Content-Type': 'application/json' }); res.end('{"error":"No se pudo guardar"}'); });
+    return;
+  }
+
   // archivos estáticos
   let ruta = decodeURIComponent(url.pathname);
   if (ruta === '/') ruta = '/index.html';
