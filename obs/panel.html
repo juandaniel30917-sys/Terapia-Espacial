@@ -81,6 +81,13 @@
   .bt.aire .tipo{display:none}
   .bt.flash{background:var(--violeta)}
   .bt.ancho{grid-column:span 2}
+  .bt.conChips{padding-bottom:46px}
+  .bt .chips{position:absolute;left:16px;bottom:8px;display:flex;gap:5px;z-index:2}
+  .bt .chips i{font:700 12px/1 Inter,Arial;font-style:normal;min-width:30px;height:28px;display:grid;place-items:center;padding:0 6px;border-radius:8px;
+       background:var(--panel3);border:1px solid var(--borde);color:var(--tenue)}
+  .bt .chips i.on{background:var(--c,var(--violeta));color:#111;border-color:transparent}
+  .bt.aire .chips{bottom:8px}
+  .bt.aire.conChips::after{bottom:auto;top:auto;bottom:44px}
   .bt.oculto{opacity:.35}
   .edicion .bt{border-style:dashed}
   .edicion .bt .ed{display:flex}
@@ -385,13 +392,13 @@
 </div></div>
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=320"></script>
-<script src="comun.js?v=320"></script>
-<script src="eoyf-datos.js?v=320"></script>
-<script src="conexion.js?v=320"></script>
-<script src="escena.js?v=320"></script>
-<script src="qrcode.js?v=320"></script>
-<script src="eoyf-panel.js?v=320"></script>
+<script src="config.js?v=330"></script>
+<script src="comun.js?v=330"></script>
+<script src="eoyf-datos.js?v=330"></script>
+<script src="conexion.js?v=330"></script>
+<script src="escena.js?v=330"></script>
+<script src="qrcode.js?v=330"></script>
+<script src="eoyf-panel.js?v=330"></script>
 <script>
 const $ = (s, p = document) => p.querySelector(s);
 const $$ = (s, p = document) => [...p.querySelectorAll(s)];
@@ -513,7 +520,7 @@ function botonesIniciales() {
 function botones() { const fuente = esEOYF() ? E.eoyf.botonera : E.botonera; return (fuente && fuente.botones) || []; }
 function sembrar(forzar) {
   if (!E.botonera || E.botonera.v !== 4) E.botonera = { v: 4, botones: botonesIniciales() };
-  if (forzar || !E.eoyf.botonera || E.eoyf.botonera.v !== 1) E.eoyf.botonera = { v: 1, botones: EOYF_PANEL.botonesIniciales() };
+  if (forzar || !E.eoyf.botonera || E.eoyf.botonera.v !== 2) E.eoyf.botonera = { v: 2, botones: EOYF_PANEL.botonesIniciales() };
 }
 const GRUPOS_TE = { gc: ['GC'], noticias: ['TITULAR', 'AVANCE'], titulos: ['TÍTULO'], pantallas: ['PANTALLA'], trans: ['DISPARO'], otros: ['FONDO', 'FIJO', 'PAUTA', 'ACCIÓN'] };
 const FILTROS_TE = [['todo', 'Todo'], ['noticias', '📰 Últimas Noticias'], ['gc', '👤 GC'], ['titulos', '🏷️ Títulos'], ['pantallas', '🖥️ Duplex / Triplex'], ['trans', '✨ Cortinas'], ['otros', '⚙️ Fondo y más']];
@@ -544,17 +551,18 @@ function dibujarBotonera() {
     el.style.setProperty('--c', b.color || (a && a.color) || '#7B2FF7');
     el.innerHTML = '<span class="lapiz" title="Editar textos, fondo y botón">✎</span><b></b><small></small>' + (b.tecla ? '<kbd></kbd>' : '') + '<span class="tipo"></span>';
     el.querySelector('b').textContent = b.texto || (a ? a.titulo : '(acción no disponible)');
-    const fd = fondoDe(b.accion);
+    const fd = esEOYF() ? null : fondoDe(b.accion);
     if (fd) { const tg = document.createElement('span'); tg.className = 'fondoTag ' + fd; tg.textContent = fd === 'verde' ? 'VERDE' : 'ESPACIO'; el.querySelector('b').appendChild(tg); }
     el.querySelector('small').textContent = a ? a.sub || '' : b.accion;
     if (b.tecla) el.querySelector('kbd').textContent = b.tecla;
-    el.querySelector('.tipo').textContent = a && (a.tipo === 'DISPARO' || a.tipo === 'CORTINA') ? '✨' : '';
+    el.querySelector('.tipo').textContent = a && (a.tipo === 'DISPARO' || a.tipo === 'CORTINA' || a.tipo === 'TRANSICIÓN') ? '✨' : '';
+    if (esEOYF() && a) EOYF_PANEL.decorar(el, b.accion);
     cont.appendChild(el);
   });
   pintar();
 }
 $('#bot').addEventListener('click', e => {
-  const el = e.target.closest('.bt'); if (!el) return;
+  const el = e.target.closest('.bt'); if (!el || e.target.closest('.chips')) return;
   const i = +el.dataset.i, b = botones()[i];
   if (editando || e.target.closest('.lapiz')) { editarBoton(i); return; }
   ejecutarBoton(b, el);
@@ -562,7 +570,7 @@ $('#bot').addEventListener('click', e => {
 // mantener presionado (0,6 s) también abre la edición — cómodo en tablet
 let tLargo = null;
 $('#bot').addEventListener('pointerdown', e => {
-  const el = e.target.closest('.bt'); if (!el || e.target.closest('.lapiz')) return;
+  const el = e.target.closest('.bt'); if (!el || e.target.closest('.lapiz') || e.target.closest('.chips')) return;
   tLargo = setTimeout(() => { tLargo = 'hecho'; vibrar(); editarBoton(+el.dataset.i); }, 600);
 });
 ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => $('#bot').addEventListener(ev, () => { if (tLargo !== 'hecho') clearTimeout(tLargo); }));
@@ -570,7 +578,7 @@ $('#bot').addEventListener('click', e => { if (tLargo === 'hecho') { e.stopImmed
 function ejecutarBoton(b, el) {
   const a = catalogo()[b.accion]; if (!a) return;
   vibrar(); a.hacer();
-  if (el && (a.tipo === 'DISPARO' || a.tipo === 'CORTINA')) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 350); }
+  if (el && (a.tipo === 'DISPARO' || a.tipo === 'CORTINA' || a.tipo === 'TRANSICIÓN')) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 350); }
   dibujarBotonera();
 }
 function pasoActual() { return esEOYF() ? E.eoyf.paso : E.paso; }
@@ -694,7 +702,7 @@ $('#ebQuitar').onclick = () => { if (!confirm('¿Quitar este botón? (la gráfic
 function modoEdicion(on) { editando = on; $('#barraEd').classList.toggle('on', on); dibujarBotonera(); if (on) toast('Toca un botón para editarlo'); }
 $('#edAgregar').onclick = () => editarBoton(-1);
 $('#edListo').onclick = () => modoEdicion(false);
-$('#edRestaurar').onclick = () => { if (!confirm('¿Volver a la botonera inicial? (no cambia textos ni gráficas)')) return; if (esEOYF()) E.eoyf.botonera = { v: 1, botones: EOYF_PANEL.botonesIniciales() }; else E.botonera = { v: 4, botones: botonesIniciales() }; publicar(true); dibujarBotonera(); };
+$('#edRestaurar').onclick = () => { if (!confirm('¿Volver a la botonera inicial? (no cambia textos ni gráficas)')) return; if (esEOYF()) E.eoyf.botonera = { v: 2, botones: EOYF_PANEL.botonesIniciales() }; else E.botonera = { v: 4, botones: botonesIniciales() }; publicar(true); dibujarBotonera(); };
 
 /* =============== pauta =============== */
 function pasos() {
@@ -1002,7 +1010,7 @@ function chipSalidas(n) {
     const tenia = r && r.estado && r.estado.config;
     E = TE.normalizar(tenia ? r.estado : {});
     const viejos = !tenia || !(r.estado.titulares || []).length || r.estado.titulares.some(h => h.lugar === undefined);
-    const faltaNuevo = !E.eoyf.botonera || E.eoyf.botonera.v !== 1;
+    const faltaNuevo = !E.eoyf.botonera || E.eoyf.botonera.v !== 2;
     if (!tenia || viejos || !E.botonera || E.botonera.v !== 4 || faltaNuevo) { sembrar(); publicar(true); }
     if (E.eoyf.aire.cortina) { E.eoyf.aire.cortina = null; publicar(true); }
     // al abrir, las gráficas con duración que quedaron marcadas ya terminaron

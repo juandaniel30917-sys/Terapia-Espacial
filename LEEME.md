@@ -1,4 +1,4 @@
-# ENTRE OVNIS Y FANTASMAS — programa nuevo (v3.2)
+# ENTRE OVNIS Y FANTASMAS — programa nuevo (v3.3)
 
 El panel y la salida abren directo en **ENTRE OVNIS Y FANTASMAS**. El programa anterior (Terapia Espacial) **no se borró**:
 queda oculto y se muestra desde el menú **⋯ → 👁 Mostrar el programa anterior** (el mismo botón lo vuelve a ocultar).
@@ -7,6 +7,17 @@ queda oculto y se muestra desde el menú **⋯ → 👁 Mostrar el programa ante
 GC de fantasmas cae un **fantasma** en vez del ovni) con la identidad de After Effects del programa nuevo:
 barras carbón en diagonal, acentos **verde alien** (ovnis), **naranjo calabaza** (fantasmas), **rojo** (neutro),
 Cinzel + Special Elite + Montserrat.
+
+**Novedades v3.3**
+- **11 cortinas y transiciones**, cada una con duración **2 · 3 · 4 · 5 s** elegible con los chips del mismo botón (o su ✎):
+  Cortina OVNI, Cortina FANTASMA, Barrido OVNI, Expediente, Señal perdida, Murciélagos, Apagón,
+  y las del programa anterior con la paleta nueva: Rayo tractor, Hipnosis alien, Ectoplasma (Rorschach) y Psicofonía (onda cerebral). Más 🎲 Transición al azar.
+  Al alargarlas se mantienen la entrada y la salida; el tiempo extra se suma mientras la pantalla está tapada (con el logo).
+- **Efecto de entrada y salida en cada gráfica:** 🛸 Ovni (cae el platillo, rayo, baja la gráfica) o 👻 Fantasma (el espectro cruza y la gráfica se materializa; al salir se desvanece).
+  Chips Auto / 🛸 / 👻 en cada botón; en el ✎ se elige por separado al aparecer y al desaparecer. Botón «Efecto» general para las que están en Auto.
+- **Fondo azul fijo por defecto:** LIMPIAR no lo saca (solo se cambia en Textos o con el botón Fondo).
+- **Nuevas gráficas:** 🔴 EN VIVO, ⏺ Visor REC (visión nocturna), 📍 Ubicación (el pin del programa anterior), 📡 Medidor EMF, 📱 Redes, 🎞️ Créditos (rollo final con logos de auspiciadores).
+- La pauta del piloto usa las cortinas nuevas, el visor, la ubicación, el EMF y termina con los créditos.
 
 | Botón | Qué sale |
 |---|---|
@@ -22,7 +33,7 @@ Cinzel + Special Elite + Montserrat.
 
 - La **Pauta** sigue el libreto del piloto (29 pasos, ◀ ▶ o Av Pág / Re Pág).
 - Todos los textos se editan en **Textos** o con el **✎** de cada botón.
-- **Fondo** (botón): transparente (OBS) · azul (recomendado para chroma) · verde (ojo: el verde alien se borra con chroma verde).
+- **Fondo:** azul fijo por defecto (chroma; el verde alien no se borra) · verde · transparente.
 - Archivos: `obs/eoyf-datos.js` (textos), `obs/eoyf.js` (salida), `obs/eoyf-panel.js` (botonera y pauta), `obs/eoyf/` (logos, glitch, mano zombie, menciones).
   Prompt de diseño: `PROMPT_EntreOvnisYFantasmas.md`.
 

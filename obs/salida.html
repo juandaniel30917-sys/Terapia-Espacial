@@ -25,7 +25,7 @@
   .escena-sesion{overflow:visible;}
   #estadoRed{position:absolute;left:8px;bottom:8px;font:600 14px Inter,Arial;color:#fff;background:rgba(0,0,0,.6);padding:4px 10px;border-radius:6px;display:none;z-index:9}
   body.debug #estadoRed{display:block}
-  .capa{position:absolute;inset:0;pointer-events:none;}
+  .capa{position:absolute;inset:0;pointer-events:none;isolation:isolate;}
 
   /* ---------- ABDUCCIÓN ---------- */
   .abd{position:absolute;inset:0;}
@@ -129,7 +129,7 @@
   body.eoyf:not(.e-azul):not(.e-verde) .abd.eoyf.t-fantasma .ufo svg{filter:drop-shadow(0 0 14px rgba(255,180,120,.85)) drop-shadow(0 0 30px rgba(255,255,255,.35))}
 
   /* tarjeta lateral de dato (Maitenes / Colbún) con el ovni o el fantasma que la ilumina */
-  .eTarjeta{position:absolute;right:110px;top:210px;width:620px;opacity:0;transform:translateX(90px) skewX(-6deg);filter:blur(6px);
+  .eTarjeta{position:absolute;right:110px;top:400px;width:620px;opacity:0;transform:translateX(90px) skewX(-6deg);filter:blur(6px);
        transition:opacity .45s, transform .6s cubic-bezier(.2,1.3,.4,1), filter .4s}
   .eTarjeta.on{opacity:1;transform:none;filter:none;animation:eGlitch .5s steps(2) .15s 1}
   .eTarjeta.sale{opacity:0;transform:translateY(-140px) scale(.4);filter:blur(10px);transition:opacity .5s, transform .6s cubic-bezier(.6,0,.8,.3), filter .5s}
@@ -195,6 +195,98 @@
   .eTriplex .etq,.eDuplex .etq{font-family:var(--e-ft);background:var(--e-carbon);letter-spacing:.06em;border-radius:0;clip-path:polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%)}
   .eTriplex .etq::before{background:var(--e-verde);border-radius:0} .eDuplex .etq::before{background:var(--e-naranjo);border-radius:0}
   .eTriplex .sesion,.eDuplex .sesion{display:none}
+
+  /* ===== v3.3 · programa nuevo ===== */
+  /* los efectos del programa anterior (ovni, rayo, pin, cabeza alien) con la paleta nueva */
+  body.eoyf{--violeta:var(--e-verde);--magenta:var(--e-rojo);--espacio:var(--e-carbon);--rayo:#D9FFB0;--menta:var(--e-verde);--blanco:#FFFFFF;--violetaClaro:#B8F07A}
+  body.eoyf:not(.e-azul):not(.e-verde) .ufo svg, body.eoyf:not(.e-azul):not(.e-verde) svg.rayo{filter:drop-shadow(0 0 10px rgba(124,194,66,.85)) drop-shadow(0 0 22px rgba(217,255,176,.35))}
+  body.eoyf .abd.serFantasma .ufo svg{filter:drop-shadow(0 0 14px rgba(255,210,170,.9)) drop-shadow(0 0 34px rgba(255,255,255,.45))!important}
+  #cCortina[data-pal=fantasma]{--violeta:var(--e-naranjo);--magenta:#8A1C00;--rayo:#FFE2C2;--menta:#FFC48A}
+  #cCortina[data-pal=neutro]{--violeta:var(--e-rojo);--magenta:#5A0010;--rayo:#FFD6DC;--menta:#FF8A9A}
+  body.eoyf .lugar{left:70px;right:auto;transform-origin:0 0;background:var(--e-carbon);border:0;border-left:10px solid var(--e-naranjo);border-radius:0;
+       clip-path:polygon(0 0,100% 0,calc(100% - 26px) 100%,0 100%);padding-right:58px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+  body.eoyf .lugar.ovni{border-left-color:var(--e-verde)}
+  body.eoyf.e-visor .lugar{top:224px}
+  body.eoyf .lugar .t1{font-family:var(--e-ft);letter-spacing:.05em;text-shadow:2px 0 rgba(255,0,60,.4),-2px 0 rgba(0,255,220,.3)}
+  body.eoyf .lugar .t2{font-family:var(--e-tx);color:var(--e-hueso);font-weight:800}
+
+  /* tarjeta lateral: entra/sale con efecto ovni (baja por el haz / se la lleva) o fantasma (se materializa / se desvanece) */
+  .eTarjeta.efO{transform:translateY(-260px) scale(.2);filter:blur(4px);transition:opacity .5s, transform .9s cubic-bezier(.2,1.25,.4,1), filter .5s}
+  .eTarjeta.efF{transform:translateX(-60px) scale(1.04);filter:blur(22px);transition:opacity .9s, transform 1.1s ease-out, filter 1.1s}
+  .eTarjeta.efF.on{animation:eMaterializa 1.1s steps(1) 1}
+  .eTarjeta.efO.on,.eTarjeta.efF.on{opacity:1;transform:none;filter:none}
+  .eTarjeta.sale.salF{opacity:0;transform:translateX(120px) skewX(-10deg) scale(1.06);filter:blur(24px);transition:opacity .9s, transform 1s ease-in, filter .9s;animation:eMaterializa .9s steps(1) 1}
+  @keyframes eMaterializa{0%{opacity:.2}12%{opacity:.8}20%{opacity:.25}34%{opacity:.9}42%{opacity:.4}60%{opacity:1}68%{opacity:.6}80%{opacity:1}}
+
+  /* EN VIVO bajo la marca de agua */
+  .eVivo{position:absolute;right:92px;top:300px;display:flex;align-items:center;gap:10px;padding:8px 18px 8px 14px;background:var(--e-rojo);color:#fff;
+       font:800 20px/1 var(--e-tx);letter-spacing:.2em;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);opacity:0;transform:translateY(-14px);transition:.5s}
+  .eVivo.on{opacity:1;transform:none}
+  .eVivo i{width:12px;height:12px;border-radius:50%;background:#fff;animation:parpadeo 1s steps(1) infinite}
+  body.e-cred .eMarca,body.e-cred .eVivo,body.e-mx .eMarca,body.e-mx .eVivo{opacity:0!important}
+  .eEmf .eSello{top:26px;bottom:auto}
+
+  /* visor de cámara (REC · visión nocturna) para VTR y notas de terreno */
+  .eVisor{position:absolute;inset:0;opacity:0;transition:opacity .4s}
+  .eVisor.on{opacity:1}
+  .eVisor .esq{position:absolute;width:120px;height:90px;border:0 solid rgba(255,255,255,.9);filter:drop-shadow(0 0 3px rgba(0,0,0,.8))}
+  .eVisor .esq.a{left:70px;top:60px;border-left-width:6px;border-top-width:6px} .eVisor .esq.b{right:70px;top:60px;border-right-width:6px;border-top-width:6px}
+  .eVisor .esq.c{left:70px;bottom:110px;border-left-width:6px;border-bottom-width:6px} .eVisor .esq.d{right:70px;bottom:110px;border-right-width:6px;border-bottom-width:6px}
+  .eVisor .rec{position:absolute;left:110px;top:96px;display:flex;align-items:center;gap:14px;font:700 40px/1 var(--e-exp);color:#fff;text-shadow:0 0 6px #000}
+  .eVisor .rec i{width:26px;height:26px;border-radius:50%;background:#FF1A1A;box-shadow:0 0 12px #f00;animation:parpadeo 1s steps(1) infinite}
+  .eVisor .tc{position:absolute;left:112px;top:156px;font:400 36px/1 var(--e-exp);color:#fff;text-shadow:0 0 6px #000;letter-spacing:.04em}
+  .eVisor .modo{position:absolute;left:110px;bottom:150px;font:400 28px/1 var(--e-exp);color:#B8FF8A;text-shadow:0 0 8px rgba(0,0,0,.9);letter-spacing:.12em}
+  .eVisor .bat{position:absolute;right:110px;bottom:150px;width:70px;height:32px;border:4px solid #fff;border-radius:4px;box-sizing:border-box;filter:drop-shadow(0 0 3px #000)}
+  .eVisor .bat::before{content:"";position:absolute;left:4px;top:4px;bottom:4px;width:62%;background:#fff;animation:eBat 4s steps(1) infinite}
+  .eVisor .bat::after{content:"";position:absolute;right:-12px;top:6px;width:6px;height:12px;background:#fff}
+  .eVisor .mira{position:absolute;left:930px;top:510px;width:60px;height:60px}
+  .eVisor .mira::before,.eVisor .mira::after{content:"";position:absolute;background:rgba(255,255,255,.75)}
+  .eVisor .mira::before{left:28px;top:0;width:4px;height:60px} .eVisor .mira::after{top:28px;left:0;height:4px;width:60px}
+  @keyframes eBat{50%{width:40%}}
+
+  /* medidor EMF (actividad paranormal) */
+  .eEmf .eCaja{padding-bottom:40px}
+  .eEmfBarras{display:flex;gap:12px;align-items:flex-end;height:150px;margin:6px 0 18px}
+  .eEmfBarras span{flex:1;border:3px solid rgba(255,255,255,.25);background:rgba(255,255,255,.05);transition:background .15s, box-shadow .15s}
+  .eEmfBarras span.on{border-color:transparent}
+  .eEmfNivel{font:700 30px/1 var(--e-ft);color:#fff;letter-spacing:.08em}
+  .eEmfNivel em{font-style:normal;color:var(--ac)}
+
+  /* créditos */
+  .eCred{position:absolute;inset:0;overflow:hidden;opacity:0;transition:opacity .8s;
+       background:linear-gradient(180deg,rgba(12,6,18,.86),rgba(30,6,24,.9)),url(eoyf/textura.jpg) center/cover}
+  .eCred.on{opacity:1}
+  .eCred .logo{position:absolute;left:50%;top:40px;width:420px;transform:translateX(-50%);filter:drop-shadow(0 0 18px rgba(0,0,0,.8));z-index:2}
+  .eCred .rollo{position:absolute;left:0;right:0;top:1080px;text-align:center}
+  .eCred .rollo h3{margin:60px 0 14px;font:800 24px/1 var(--e-tx);letter-spacing:.3em;color:var(--e-naranjo);text-transform:uppercase}
+  .eCred .rollo h3:nth-of-type(2n){color:var(--e-verde)}
+  .eCred .rollo p{margin:8px 0;font:700 48px/1.15 var(--e-ft);color:#fff;letter-spacing:.04em;text-shadow:2px 0 rgba(255,0,60,.35),-2px 0 rgba(0,255,220,.25)}
+  .eCred .rollo .logos{display:flex;gap:70px;justify-content:center;align-items:center;margin-top:30px}
+  .eCred .rollo .logos img{max-height:140px;max-width:360px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.6))}
+  .eCred .rollo .fin{margin-top:160px;font:700 64px/1.1 var(--e-ft);color:#fff}
+  .eCred::after{content:"";position:absolute;left:0;right:0;top:0;height:300px;background:linear-gradient(180deg,rgba(12,6,18,1) 55%,transparent)}
+
+  /* cortinas nuevas */
+  .eExp{position:absolute;inset:0;background:#1A1712 url(eoyf/textura.jpg) center/cover;background-blend-mode:multiply}
+  .eExp .hoja{position:absolute;left:260px;top:140px;width:1400px;height:800px;background:#E9E2D0;box-shadow:0 30px 80px rgba(0,0,0,.7);
+       background-image:repeating-linear-gradient(180deg,transparent 0 58px,rgba(120,90,60,.18) 58px 60px)}
+  .eExp .pest{position:absolute;left:260px;top:96px;width:420px;height:60px;background:#D8CDB0;clip-path:polygon(0 100%,8% 0,92% 0,100% 100%)}
+  .eExp .maq{position:absolute;left:340px;top:220px;width:1240px;font:400 52px/1.5 var(--e-exp);color:#1C1712;white-space:pre-wrap}
+  .eExp .sello{position:absolute;left:640px;top:610px;font:900 86px/1 var(--e-ft);color:#C8102E;border:10px solid #C8102E;padding:14px 36px;letter-spacing:.1em;
+       transform:rotate(-12deg);mix-blend-mode:multiply;opacity:0}
+  .eEst{position:absolute;inset:0;background:#000}
+  .eEst canvas{position:absolute;left:0;top:0;width:1920px;height:1080px;image-rendering:pixelated}
+  .eEst .txt{position:absolute;left:0;right:0;top:470px;text-align:center;font:400 96px/1 var(--e-exp);color:#fff;letter-spacing:.12em;text-shadow:6px 0 #f0f,-6px 0 #0ff}
+  .eEst .rec{position:absolute;left:110px;top:90px;font:700 44px/1 var(--e-exp);color:#fff} .eEst .rec b{color:#f22}
+  .eEst .barra{position:absolute;left:0;right:0;height:120px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.35),transparent)}
+  .eMurcC{position:absolute;inset:0}
+  .eMurcC .cielo{position:absolute;inset:0;background:radial-gradient(circle at 70% 26%,#FFF3E0 0 110px,rgba(255,190,140,.45) 111px 190px,transparent 191px),
+       linear-gradient(180deg,#2B0004 0%,#7A0A0A 55%,#160002 100%)}
+  .eMurcC svg{position:absolute;inset:0;width:1920px;height:1080px;overflow:visible}
+  .eApag{position:absolute;inset:0;background:#000}
+  .eApag .luz{position:absolute;inset:0}
+  .eApag .fant{position:absolute;left:50%;top:50%;opacity:.0;filter:drop-shadow(0 0 30px rgba(255,255,255,.7))}
+  .eLogoHold{position:absolute;left:50%;top:50%;width:1000px;transform:translate(-50%,-50%);opacity:0;filter:drop-shadow(0 0 24px rgba(0,0,0,.95))}
 </style>
 </head>
 <body class="verde">
@@ -203,6 +295,7 @@
   <div id="fondoEspacio"></div>
   <div class="capa" id="cEspacio"></div>
   <div class="capa" id="cVentanas"></div>
+  <div class="capa" id="cCreditos"></div>
   <div class="capa" id="cGraficas"></div>
   <div class="capa" id="cEOYF"></div>
   <div class="capa" id="cTicker"></div>
@@ -211,12 +304,12 @@
 </div>
 <div id="estadoRed">conectando…</div>
 
-<script src="config.js?v=320"></script>
-<script src="comun.js?v=320"></script>
-<script src="eoyf-datos.js?v=320"></script>
-<script src="conexion.js?v=320"></script>
-<script src="escena.js?v=320"></script>
-<script src="eoyf.js?v=320"></script>
+<script src="config.js?v=330"></script>
+<script src="comun.js?v=330"></script>
+<script src="eoyf-datos.js?v=330"></script>
+<script src="conexion.js?v=330"></script>
+<script src="escena.js?v=330"></script>
+<script src="eoyf.js?v=330"></script>
 <script>
 /* ===================================================================
    MOTOR DE ANIMACIÓN — replica las llaves del script de After Effects
@@ -276,7 +369,7 @@ function estrellas(ancho, alto, n) {
   const g = cv.getContext('2d');
   for (let i = 0; i < n; i++) {
     const r = Math.random() * 2.2 + .4; g.globalAlpha = .35 + Math.random() * .65;
-    g.fillStyle = Math.random() < .12 ? cfg().colores.menta : '#fff';
+    g.fillStyle = Math.random() < .12 ? colT().menta : '#fff';
     g.beginPath(); g.arc(Math.random() * ancho, Math.random() * alto, r, 0, 7); g.fill();
   }
   return cv;
@@ -342,15 +435,24 @@ class Abduccion {
     if (o.colorSubTxt) this.stx.style.color = o.colorSubTxt;
     this.textos(o.titulo, o.sub);
 
-    // ovni
+    // ovni (o fantasma, según el efecto de entrada)
     this.ufo = el('div', 'ufo', this.el);
-    this.ufo.appendChild(o.espectro && window.EOYF_ESPECTRO ? EOYF_ESPECTRO() : svgOvni());
+    this.ponerSer(this.ef('entrada'));
 
     this.fase = 'entrada';
     this.tFase = ahora() + (o.retraso || 0);
     Abduccion.vivos.add(this);
     this.fin = new Promise(r => (this._resolver = r));
     this.render(-1);
+  }
+  // efecto de la fase: 'ovni' (cae, rayo y baja por el rayo) o 'fantasma' (cruza la barra y la materializa a su paso)
+  ef(fase) { const e = fase === 'salida' ? this.o.efSal : this.o.efEnt; return e === 'fantasma' && window.EOYF_ESPECTRO ? 'fantasma' : 'ovni'; }
+  ponerSer(ef) {
+    const fantasma = ef === 'fantasma' || (!this.o.efEnt && this.o.espectro && window.EOYF_ESPECTRO);
+    if (this.ser === fantasma) return;
+    this.ser = fantasma; this.ufo.innerHTML = '';
+    this.ufo.appendChild(fantasma ? EOYF_ESPECTRO() : svgOvni());
+    this.el.classList.toggle('serFantasma', !!fantasma);
   }
   textos(t, s) {
     if (this.tit.textContent !== (t || '')) { this.tit.textContent = t || ''; this.fs = this.o.tamT; this.tit.style.fontSize = this.fs + 'px'; }
@@ -359,10 +461,31 @@ class Abduccion {
   salir() {
     if (this.fase === 'salida' || this.fase === 'fin') return this.fin;
     if (this.fase === 'entrada') { this.salidaPendiente = true; return this.fin; }
-    this.fase = 'salida'; this.tFase = ahora();
+    this.fase = 'salida'; this.tFase = ahora(); this.ponerSer(this.ef('salida'));
     return this.fin;
   }
-  valores(t) {
+  // efecto fantasma: el espectro cruza de izquierda a derecha y la gráfica aparece detrás de él (y al salir, se la lleva)
+  valoresF(t, w) {
+    const S = this.S, hY = this.hoverY, bY = this.o.barY, L = -w / 2 - 60, R = w / 2 + 60, fin = w / 2 - 20, pausa = cfg().ovniPausa;
+    const parp = q => q ? (Math.floor(t * 24) % 3 ? 1 : .3) : 1;
+    if (this.fase === 'entrada') return {
+      ux: pista([[0, L - 420], [1.5, R - 40], [1.9, R - 40], [2.5, fin]], t), uy: pista([[0, hY - 190], [1.5, hY - 50], [2.5, hY]], t),
+      us: pista([[0, .3 * S], [.5, .75 * S], [1.9, .75 * S], [2.5, .5 * S]], t), rot: 0, k: 0, gy: bY, gs: 1,
+      bo: pista([[.1, 0], [.35, 1]], t), to: pista([[.5, 0], [1.3, 1]], t) * parp(t < 1.7),
+      wipe: pista([[.15, L - 40], [1.5, R + 80]], t), blur: pista([[0, 16], [1.5, 0]], t),
+      uo: pista([[0, 0], [.35, 1]], t) * ((!pausa && t > 2.0) ? Math.max(0, 1 - (t - 2.0) / .3) : 1), dir: 1
+    };
+    if (this.fase === 'pausa') return { ux: fin, uy: hY, us: .5 * S, rot: 0, k: 0, gy: bY, gs: 1, bo: 1, to: 1, wipe: null, blur: 0, uo: pausa ? 1 : 0, dir: 1 };
+    return {
+      ux: pista([[0, fin], [.4, R - 40], [1.7, L - 460]], t), uy: pista([[0, hY], [.4, hY - 50], [1.9, hY - 200]], t),
+      us: pista([[0, .5 * S], [.4, .75 * S], [1.9, .3 * S]], t), rot: 0, k: 0, gy: bY, gs: 1,
+      bo: pista([[1.5, 1], [1.7, 0]], t), to: pista([[.4, 1], [1.4, 0]], t) * parp(t > .3),
+      wipe: pista([[.4, R + 80], [1.6, L - 40]], t), blur: pista([[.3, 0], [1.6, 16]], t),
+      uo: (pausa ? 1 : Math.min(1, t / .3)) * pista([[1.6, 1], [1.95, 0]], t), dir: -1
+    };
+  }
+  valores(t, w) {
+    if (this.ef(this.fase === 'salida' ? 'salida' : 'entrada') === 'fantasma') return this.valoresF(t, w || 600);
     const S = this.S, uY = this.ufoY, hY = this.hoverY, bY = this.o.barY, m = 40 * S / 100;
     if (this.fase === 'entrada') {
       return {
@@ -399,7 +522,7 @@ class Abduccion {
   render(t) {
     if (t < 0) { this.el.style.visibility = 'hidden'; return; }
     this.el.style.visibility = 'visible';
-    const v = this.valores(t), o = this.o, c = cfg(), now = ahora(), b = c.bamboleo;
+    const o = this.o, c = cfg(), now = ahora(), b = c.bamboleo;
     let wt = this.tit.offsetWidth;
     // si el titular es muy largo, se achica la letra hasta caber
     if (o.maxW && wt + this.mT * 2 + this.icoW > o.maxW && wt > 0) {
@@ -412,6 +535,7 @@ class Abduccion {
       this.stx.style.fontSize = this.fsS + 'px'; ws0 = this.stx.offsetWidth;
     }
     const w = Math.max(wt + this.mT * 2 + this.icoW, o.minW || 360);
+    const v = this.valores(t, w);
     const ws = ws0 > 2 ? ws0 + this.mS * 2 : 0;
     const cx = o.centrado ? 960 : c.bordeIzq + w / 2;
     const barH = this.barH, subH = this.subH, subY = barH / 2 + subH / 2 + 6;
@@ -429,12 +553,21 @@ class Abduccion {
       Object.assign(this.ilus.style, { left: -iw / 2 + 'px', top: (-barH / 2 - 24 - ih + Math.sin(now * 1.6) * 6) + 'px', opacity: v.to });
     }
 
-    // ovni
-    const s = v.us / 100, rot = v.rot + Math.sin(now * 2.3) * 3 * b, rad = rot * Math.PI / 180;
-    const x = cx + v.rx + v.lado * (w / 2 - 20), y = v.uy + Math.sin(now * 3.1) * 6 * b;
+    // efecto fantasma: borde de ectoplasma que avanza con el espectro + desenfoque
+    if (v.wipe !== undefined && v.wipe !== null) {
+      const pts = [`${-w / 2 - 900}px -700px`];
+      for (let yy = -700; yy <= 400; yy += 55) pts.push(`${v.wipe + Math.sin(yy * .045 + now * 9) * 22 + Math.sin(yy * .013 - now * 4) * 30}px ${yy}px`);
+      pts.push(`${-w / 2 - 900}px 400px`);
+      this.grp.style.clipPath = `polygon(${pts.join(',')})`;
+    } else this.grp.style.clipPath = '';
+    this.grp.style.filter = v.blur > .3 ? `blur(${v.blur.toFixed(1)}px)` : '';
+    // ovni o fantasma
+    const fan = v.ux !== undefined;
+    const s = v.us / 100, rot = v.rot + Math.sin(now * (fan ? 4 : 2.3)) * (fan ? 9 : 3) * b, rad = rot * Math.PI / 180;
+    const x = fan ? cx + v.ux : cx + v.rx + v.lado * (w / 2 - 20), y = v.uy + Math.sin(now * 3.1) * (fan ? 14 : 6) * b;
     this.ufo.style.transform = `translate(${x}px,${y}px) rotate(${rot}deg) scale(${s})`;
     this.ufo.style.opacity = v.uo;
-    this.ufo.querySelector('.luces').style.opacity = Math.floor(now * 4) % 2 ? .35 : 1;
+    const lz = this.ufo.querySelector('.luces'); if (lz) lz.style.opacity = Math.floor(now * 4) % 2 ? .35 : 1;
 
     // rayo (mismas fórmulas que la expresión de AE)
     const k = v.k;
@@ -563,7 +696,7 @@ class Multiplex {
       this.reloj.textContent = String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0');
     }, 250);
     this.ondaAnim = this.onda.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-180px)' }], { duration: 1600, iterations: Infinity });
-    this.titulo = new Abduccion(Object.assign(conf('multiplex'), opc.tema && window.EOYF_SAL ? EOYF_SAL.mx(opc.tema) : {}, { titulo }), $('#cGraficas'));
+    this.titulo = new Abduccion(Object.assign(conf('multiplex'), opc.tema && window.EOYF_SAL ? EOYF_SAL.mx(opc.tema, opc.ef) : {}, { titulo }), $('#cGraficas'));
   }
   async salir() {
     this.chip.classList.remove('on');
@@ -609,24 +742,31 @@ function cortina() {
    TRANSICIONES VARIADAS (2 s · punto de corte 1,0 s)
    =================================================================== */
 // devuelve una promesa con .abortar() para sacarla antes de tiempo (fundido de 0,3 s)
+// animar.remap (opcional, lo pone el programa nuevo): estira o acorta la animación a otra duración
+// manteniendo la entrada y la salida; el tiempo extra se reparte en el tramo en que la pantalla está tapada.
 function animar(dur, raiz, fn) {
   const t0 = ahora(); let cortar = false, listo;
+  const rm = animar.remap; animar.remap = null;
+  const total = rm ? rm.total : dur;
   const pr = new Promise(res => {
     listo = res;
     (function paso() {
-      const t = (ahora() - t0) * cfg().velocidad;
+      const r = (ahora() - t0) * cfg().velocidad;
       if (cortar) return;
-      if (t > dur) { raiz.remove(); res(); return; }
-      fn(t); requestAnimationFrame(paso);
+      if (r > total) { raiz.remove(); res(); return; }
+      fn(rm ? rm.f(r) : r); requestAnimationFrame(paso);
     })();
   });
   pr.abortar = () => { if (cortar) return; raiz.classList.add('abortando'); setTimeout(() => { cortar = true; raiz.remove(); listo(); }, 320); };
   return pr;
 }
+// paleta de las transiciones: la del programa anterior, o la que pide el programa nuevo (verde alien, naranjo, rojo)
+let PALETA_T = null;
+const colT = () => PALETA_T || cfg().colores;
 const TRANSICIONES = {
   // 1) El rayo del ovni se abre a pantalla completa
   rayo() {
-    const col = cfg().colores, raiz = el('div', 'abd', $('#cCortina'));
+    const col = colT(), raiz = el('div', 'abd', $('#cCortina'));
     const s = sv('svg', { class: 'full', viewBox: '0 0 1920 1080' }, raiz);
     const p = sv('polygon', { fill: col.rayo, stroke: col.violeta, 'stroke-width': 10 }, s);
     const anillos = [0, 1, 2].map(() => sv('ellipse', { fill: 'none', stroke: col.violeta, 'stroke-width': 6 }, s));
@@ -647,7 +787,7 @@ const TRANSICIONES = {
   },
   // 2) Espiral hipnótica del terapeuta: se abre desde el centro
   hipnosis() {
-    const col = cfg().colores, raiz = el('div', 'abd', $('#cCortina'));
+    const col = colT(), raiz = el('div', 'abd', $('#cCortina'));
     const s = sv('svg', { class: 'full', viewBox: '0 0 1920 1080' }, raiz);
     const defs = sv('defs', {}, s), cp = sv('clipPath', { id: 'hip' + Date.now() }, defs);
     const circ = sv('circle', { cx: 960, cy: 540, r: 0 }, cp);
@@ -668,7 +808,7 @@ const TRANSICIONES = {
   },
   // 3) Test de Rorschach: una mancha simétrica crece y tapa la pantalla (cada vez es distinta)
   rorschach() {
-    const col = cfg().colores, raiz = el('div', 'abd', $('#cCortina'));
+    const col = colT(), raiz = el('div', 'abd', $('#cCortina'));
     const s = sv('svg', { class: 'full', viewBox: '0 0 1920 1080' }, raiz);
     const mancha = (rmin, rmax) => {
       const n = 9, pts = [];
@@ -697,7 +837,7 @@ const TRANSICIONES = {
   },
   // 4) Onda cerebral (electroencefalograma) que cruza y abre una franja
   onda() {
-    const col = cfg().colores, raiz = el('div', 'abd', $('#cCortina'));
+    const col = colT(), raiz = el('div', 'abd', $('#cCortina'));
     const s = sv('svg', { class: 'full', viewBox: '0 0 1920 1080' }, raiz);
     const bB = sv('rect', { x: 0, width: 1920, fill: col.magenta }, s);
     const bA = sv('rect', { x: 0, width: 1920, fill: col.violeta }, s);
@@ -708,8 +848,8 @@ const TRANSICIONES = {
       x += 40 + w + 30 + Math.random() * 60;
     }
     const linea = sv('path', { d, fill: 'none', stroke: col.rayo, 'stroke-width': 10, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': '1 1' }, s);
-    const titulo = sv('text', { x: 960, y: 330, 'text-anchor': 'middle', 'font-weight': 900, 'font-size': 84, 'letter-spacing': 10, fill: col.blanco, opacity: 0, style: 'font-family:var(--ft)' }, s);
-    titulo.textContent = cfg().programa;
+    const titulo = sv('text', { x: 960, y: 330, 'text-anchor': 'middle', 'font-weight': 900, 'font-size': 84, 'letter-spacing': 10, fill: col.blanco, opacity: 0, style: 'font-family:' + (col.fuente || 'var(--ft)') }, s);
+    titulo.textContent = col.programa || cfg().programa;
     return animar(2.0, raiz, t => {
       linea.setAttribute('stroke-dashoffset', pista([[0, 1], [.5, 0], [1.45, 0], [1.95, -1]], t));
       const hA = pista([[.35, 0], [.85, 1200], [1.15, 1200], [1.6, 0]], t), hB = pista([[.28, 0], [.8, 1200], [1.2, 1200], [1.7, 0]], t);
@@ -899,7 +1039,7 @@ function aplicar(nuevo) {
     cambiarSlot(n, clave, () => new Multiplex(VENTANAS[n], t.etiquetas, t.titulo));
   });
   const h = (ti !== null && ti !== undefined && ti >= 0) ? E.titulares[ti] : null;
-  const hayLugar = lugar(h && h.lugar ? h.lugar : '');
+  const hayLugar = lugar(E.programa === 'eoyf' ? EOYF_SAL.lugar(E) : (h && h.lugar ? h.lugar : ''));
   bug(!!a.bug && !hayLugar);           // el lugar ocupa la esquina del bug mientras está al aire
   ticker(!!a.ticker);
   // gráficas con duración: entran con un toque y se pueden sacar con otro

@@ -43,16 +43,21 @@ El programa nuevo vive en `obs/eoyf.js` (salida) y `obs/eoyf-panel.js` (botonera
 | Promo ALIEN | «Envía ALIEN a nuestro número y obtén un código de dscto de hasta un 50%» + 666-9999 | tarjeta |
 | Llámenos | «Déjanos tu mensaje de voz al 666-9999» con la mano zombie | tercio inferior |
 | Menciones | Lay's · One Wish Willow («Con el código de DSCTO ALIEN hasta un 50% en todas nuestras sucursales») · Santo Tomás («Lux et veritas») | tarjeta con logo |
-| Cortina OVNI | rayo + platillo + destellos glitch, corte a 0,6 s | pantalla completa |
-| Cortina FANTASMA | niebla + fantasma + destellos glitch, corte a 0,6 s | pantalla completa |
+| Cortinas (2–5 s) | OVNI · FANTASMA · Barrido OVNI · Expediente · Señal perdida · Murciélagos · Apagón | pantalla completa |
+| Transiciones (2–5 s) | Rayo tractor · Hipnosis alien · Ectoplasma · Psicofonía (las del programa anterior, paleta nueva) · al azar | pantalla completa |
+| EN VIVO · Visor REC · Ubicación | fijos: bajo la marca · visor de cámara nocturna · pin con el lugar | fijos |
+| Medidor EMF | nivel de actividad paranormal 1–5 | tarjeta lateral |
+| Redes · Créditos | @usuario · rollo final con auspiciadores | tercio inferior · pantalla completa |
 | Triplex alien / Duplex fantasmas | ventanas para cámaras (interior en verde o transparente) | pantalla completa |
 
 ## Reglas de switch
 - Un GC, título, dato, promo o mención comparten el **tercio inferior**: uno reemplaza al otro.
 - Las tarjetas de dato (Maitenes / Colbún) van al costado y **no** tapan al entrevistado.
 - La marca de agua y el ticker son fijos; el ticker baja el tercio inferior para que no choquen.
-- Fondo de la salida: **transparente** (OBS), **azul** (chroma como el logo permanente) o **verde**.
-  Con verde se avisa que el acento verde alien se borra con el chroma.
+- Fondo de la salida: **azul fijo por defecto** (LIMPIAR no lo saca); también verde o transparente.
+- Cada gráfica elige su efecto al aparecer y al desaparecer: **🛸 ovni** (platillo + rayo) o **👻 fantasma** (el espectro la materializa / se la lleva).
+- Cortinas y transiciones: duración 2 · 3 · 4 · 5 s; el tiempo extra va al tramo en que la pantalla está tapada.
+- Reutilizar los efectos del programa anterior cambiando solo la paleta (verde alien, naranjo calabaza, rojo sangre).
 - Las cortinas se lanzan y se van solas; tocar otra vez las saca.
 
 ## Pauta

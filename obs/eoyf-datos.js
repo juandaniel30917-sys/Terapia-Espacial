@@ -6,7 +6,9 @@
   var BASE = {
     config: {
       programa: 'ENTRE OVNIS Y FANTASMAS',
-      fondo: 'transparente',            // transparente | azul | verde
+      fondo: 'azul',                    // azul (fijo por defecto, no se limpia) | verde | transparente
+      efecto: 'tema',                   // efecto general de entrada/salida: tema (ovni o fantasma según la gráfica) | ovni | fantasma
+      vivoTexto: 'EN VIVO',
       numero: '666-9999',
       fecha: hoy.getDate() + ' ' + MESES[hoy.getMonth()] + ' ' + hoy.getFullYear(),
       marcaOpacidad: 0.85,
@@ -39,6 +41,19 @@
       { titulo: 'HASTA PRONTO, AMIGOS INVISIBLES', sub: 'Nos vemos en una próxima entrega', etiqueta: 'ENTRE OVNIS Y FANTASMAS', tema: 'neutro' },
       { titulo: 'PRÓXIMO CAPÍTULO', sub: 'Muy pronto en Entre Ovnis y Fantasmas', etiqueta: 'NO TE LO PIERDAS', tema: 'neutro' }
     ],
+    // cortinas y transiciones: duración elegible 2 · 3 · 4 · 5 s
+    efectos: {
+      ovni: { dur: 2 }, fantasma: { dur: 2 }, barrido: { dur: 3 }, expediente: { dur: 3 }, estatica: { dur: 2 }, murcielagos: { dur: 3 }, apagon: { dur: 3 },
+      rayo: { dur: 2 }, hipnosis: { dur: 2 }, rorschach: { dur: 2 }, psicofonia: { dur: 2 }
+    },
+    ubicacion: { texto: 'Sanatorio Los Maitenes, Talca · Región del Maule', tema: 'fantasma' },
+    visor: { modo: 'VISIÓN NOCTURNA · CANAL 1' },
+    emf: { titulo: 'Medidor EMF', lugar: 'Los Maitenes', nivel: 4, etiqueta: 'ACTIVIDAD PARANORMAL', tema: 'fantasma' },
+    redes: { titulo: 'SÍGUENOS', usuario: '@entreovnisyfantasmas', texto: 'Instagram · TikTok · Facebook', tema: 'ovni' },
+    creditos: {
+      dur: 25, cierre: 'Hasta pronto, amigos invisibles', tituloLogos: 'AUSPICIAN', logos: true,
+      texto: 'Conducción: Luis Monasterios\nInvestigación paranormal: Benjamín Castillo\nReporteras: Lucía Osorio · Canela Arroyo\nTestimonios: Noris Ystúriz · Andrea Monasterios\nDirección: \nProducción: \nCámaras: \nGráficas y switch: \nUna producción de: Entre Ovnis y Fantasmas'
+    },
     terreno: { etiqueta: 'EN TERRENO', lugar: 'Sanatorio Los Maitenes', sub: 'Recorrido nocturno · Región del Maule', tema: 'fantasma' },
     datos: [
       { titulo: 'Sanatorio Los Maitenes', texto: 'Se estima que a lo largo de los años, entre 500 y 1000 fallecidos han perdido la vida en este recinto. Siendo la era de tuberculosis la más fuerte.', etiqueta: 'DATO', tema: 'fantasma' },
@@ -57,17 +72,36 @@
       duplex: { titulo: 'DUPLEX FANTASMAS', etiquetas: ['BENJAMÍN CASTILLO', 'SANATORIO LOS MAITENES'] }
     },
     // inferior: 'gc:N' | 'tit:N' | 'terreno' | 'sabias' | 'promo' | 'llamenos' | 'men:N' · lateral: 'dato:N'
-    aire: { inferior: null, lateral: null, marca: false, ticker: false, multiplex: null, cortina: null },
+    aire: { inferior: null, lateral: null, marca: false, ticker: false, multiplex: null, cortina: null, creditos: null, visor: false, ubicacion: false, vivo: false },
+    v: 2,
     paso: -1,
     botonera: null
   };
 
   function normalizar(p) {
+    var viejo = !(p && p.v >= 2);
     var est = TE.mezclar(TE.copia(BASE), p || {});
     ['gcs', 'titulos', 'datos', 'menciones'].forEach(function (k) { if (!Array.isArray(est[k])) est[k] = TE.copia(BASE[k]); });
-    if (['transparente', 'azul', 'verde'].indexOf(est.config.fondo) < 0) est.config.fondo = 'transparente';
+    // v2: la pantalla azul queda fija por defecto
+    if (viejo) { est.config.fondo = 'azul'; est.v = 2; }
+    if (['transparente', 'azul', 'verde'].indexOf(est.config.fondo) < 0) est.config.fondo = 'azul';
+    for (var e in BASE.efectos) { if (!est.efectos[e] || [2, 3, 4, 5].indexOf(+est.efectos[e].dur) < 0) est.efectos[e] = { dur: BASE.efectos[e].dur }; }
     if (!est.aire || typeof est.aire !== 'object') est.aire = TE.copia(BASE.aire);
     return est;
   }
-  window.EOYF_DATOS = { BASE: BASE, normalizar: normalizar };
+  // lista de cortinas y transiciones para la botonera
+  var EFECTOS = [
+    ['ovni', 'cortina', '🛸 Cortina OVNI', 'platillo + rayo + logo', 'ovni'],
+    ['fantasma', 'cortina', '👻 Cortina FANTASMA', 'niebla + espectro + mano', 'fantasma'],
+    ['barrido', 'cortina', '🛸 Barrido OVNI', 'paneles tras el platillo', 'ovni'],
+    ['expediente', 'cortina', '🗂️ Expediente', 'máquina de escribir + CLASIFICADO', 'neutro'],
+    ['estatica', 'cortina', '📺 Señal perdida', 'estática de TV + REC', 'neutro'],
+    ['murcielagos', 'cortina', '🦇 Murciélagos', 'bandada en la noche roja', 'fantasma'],
+    ['apagon', 'cortina', '🔦 Apagón', 'se corta la luz + linterna', 'fantasma'],
+    ['rayo', 'transicion', '🛸 Rayo tractor', 'el rayo tapa la pantalla', 'ovni'],
+    ['hipnosis', 'transicion', '🌀 Hipnosis alien', 'espiral + cabeza alien', 'ovni'],
+    ['rorschach', 'transicion', '🩸 Ectoplasma', 'mancha que crece', 'fantasma'],
+    ['psicofonia', 'transicion', '〰️ Psicofonía', 'onda de voz + nombre', 'fantasma']
+  ];
+  window.EOYF_DATOS = { BASE: BASE, normalizar: normalizar, EFECTOS: EFECTOS };
 })();
