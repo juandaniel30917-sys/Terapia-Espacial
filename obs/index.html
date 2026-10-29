@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>Terapia Espacial · Gráficas en vivo</title>
+<title>Entre Ovnis y Fantasmas · Gráficas en vivo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#07070F">
@@ -100,7 +100,7 @@
     <div class="card">
       <h2>🛸 Crear una sala (por internet)</h2>
       <p>Conecta la botonera con OBS desde cualquier lugar. Recibes un link de control y uno para OBS.</p>
-      <form class="fila" id="fCrear"><input id="nombre" placeholder="Nombre (ej: Terapia Espacial en vivo)" maxlength="60"><button class="btn prim" id="bCrear">Crear sala</button></form>
+      <form class="fila" id="fCrear"><input id="nombre" placeholder="Nombre (ej: Entre Ovnis y Fantasmas en vivo)" maxlength="60"><button class="btn prim" id="bCrear">Crear sala</button></form>
       <div id="msgCrear"></div>
     </div>
     <div class="card">
@@ -127,7 +127,7 @@
     <div><b><span class="n">2</span>Pega el link en OBS</b>Fuente Navegador, 1920×1080. Muestra solo las gráficas.</div>
     <div><b><span class="n">3</span>Controla desde la tablet</b>Escanea el QR: un toque y la gráfica sale al aire.</div>
   </div>
-  <p class="pie">Terapia Espacial · v<span id="ver"></span> · sistema de salas de Completos Mojados CG</p>
+  <p class="pie">Entre Ovnis y Fantasmas · v<span id="ver"></span> · sistema de salas de Completos Mojados CG</p>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -187,7 +187,7 @@ pintar();
 
 $('#fCrear').onsubmit = async e => {
   e.preventDefault();
-  const b = $('#bCrear'), n = $('#nombre').value.trim() || 'Terapia Espacial';
+  const b = $('#bCrear'), n = $('#nombre').value.trim() || 'Entre Ovnis y Fantasmas';
   b.disabled = true; b.textContent = 'Creando…'; $('#msgCrear').innerHTML = '';
   try {
     const r = await TE_RT.crearSala(n);

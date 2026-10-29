@@ -1,3 +1,33 @@
+# ENTRE OVNIS Y FANTASMAS — programa nuevo (v3.2)
+
+El panel y la salida abren directo en **ENTRE OVNIS Y FANTASMAS**. El programa anterior (Terapia Espacial) **no se borró**:
+queda oculto y se muestra desde el menú **⋯ → 👁 Mostrar el programa anterior** (el mismo botón lo vuelve a ocultar).
+
+**Diseño fusionado:** se mantiene el motor de Terapia Espacial (el ovni cae, enciende el rayo y deja el GC; en los
+GC de fantasmas cae un **fantasma** en vez del ovni) con la identidad de After Effects del programa nuevo:
+barras carbón en diagonal, acentos **verde alien** (ovnis), **naranjo calabaza** (fantasmas), **rojo** (neutro),
+Cinzel + Special Elite + Montserrat.
+
+| Botón | Qué sale |
+|---|---|
+| 🛸 Cortina OVNI / 👻 Cortina FANTASMA | cortinas cortas (1,3 s, corte a 0,6 s) con destellos glitch |
+| Marca de agua · Ticker | logo arriba a la derecha · «¡ÚLTIMAS NOTICIAS!» con noticias del Maule |
+| GC personas | Luis Monasterios, Benjamín Castillo, Noris Ystúriz, Andrea Monasterios, Lucía Osorio, Canela Arroyo |
+| Títulos | OVNIS CAPTADOS EN CÁMARA, El enigma de Colbún, Visita al sanatorio, La Nota Espectral, estreno, volvemos, cierre, próximo capítulo |
+| 📹 En terreno | acompaña las notas de terreno (REC + lugar) |
+| 📜 Datos | tarjetas laterales Sanatorio Los Maitenes y Lago Colbún |
+| 🧠 ¿Sabías qué? · 📲 Código ALIEN · ☎️ Llámenos | dato curioso, promo de descuento, número 666-9999 |
+| 💰 Menciones | Lay's · One Wish Willow · Santo Tomás (con logo) |
+| 🛸 Triplex alien · 🦇 Duplex fantasmas | ventanas para cámaras |
+
+- La **Pauta** sigue el libreto del piloto (29 pasos, ◀ ▶ o Av Pág / Re Pág).
+- Todos los textos se editan en **Textos** o con el **✎** de cada botón.
+- **Fondo** (botón): transparente (OBS) · azul (recomendado para chroma) · verde (ojo: el verde alien se borra con chroma verde).
+- Archivos: `obs/eoyf-datos.js` (textos), `obs/eoyf.js` (salida), `obs/eoyf-panel.js` (botonera y pauta), `obs/eoyf/` (logos, glitch, mano zombie, menciones).
+  Prompt de diseño: `PROMPT_EntreOvnisYFantasmas.md`.
+
+---
+
 # TERAPIA ESPACIAL — Paquete gráfico v3.1
 
 **Concepto:** un ovni cae, enciende su rayo tractor y deja el GC. En la salida vuelve, lo absorbe y se va.

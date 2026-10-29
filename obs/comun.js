@@ -49,6 +49,8 @@
       // gráficas con duración (se pueden sacar antes con otro toque): { id, variante } o null
       apertura: null, cierre: null, cortina: null, transicion: null
     },
+    programa: 'eoyf',        // programa activo: 'eoyf' (Entre Ovnis y Fantasmas) | 'te' (Terapia Espacial, oculto)
+    eoyf: null,              // datos del programa nuevo (eoyf-datos.js)
     paso: -1,               // paso actual de la pauta (compartido entre equipos)
     botonera: null          // { botones: [...] } — se siembra en el panel
   };
@@ -74,6 +76,8 @@
       : est.titulares.map(h => Object.assign({ titulo: '', sub: '', lugar: '', fondo: '' }, h));
     Object.keys(est.textos).forEach(k => { if (est.textos[k].fondo === undefined) est.textos[k].fondo = ''; });
     delete est.disparo;
+    if (est.programa !== 'te') est.programa = 'eoyf';
+    if (window.EOYF_DATOS) est.eoyf = EOYF_DATOS.normalizar(est.eoyf);
     if (['verde', 'espacio', 'transparente'].indexOf(est.config.fondo) < 0) est.config.fondo = 'verde';
     return est;
   }
