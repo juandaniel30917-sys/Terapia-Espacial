@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<script src="exportar-reloj.js?v=344"></script>
 <title>Entre Ovnis y Fantasmas · Salida OBS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -309,13 +310,13 @@
 </div>
 <div id="estadoRed">conectando…</div>
 
-<script src="config.js?v=343"></script>
-<script src="comun.js?v=343"></script>
-<script src="eoyf-datos.js?v=343"></script>
-<script src="conexion.js?v=343"></script>
-<script src="escena.js?v=343"></script>
-<script src="chroma.js?v=343"></script>
-<script src="eoyf.js?v=343"></script>
+<script src="config.js?v=344"></script>
+<script src="comun.js?v=344"></script>
+<script src="eoyf-datos.js?v=344"></script>
+<script src="conexion.js?v=344"></script>
+<script src="escena.js?v=344"></script>
+<script src="chroma.js?v=344"></script>
+<script src="eoyf.js?v=344"></script>
 <script>
 /* ===================================================================
    MOTOR DE ANIMACIÓN — replica las llaves del script de After Effects
@@ -1150,6 +1151,7 @@ if (PARAMS.has('debug')) document.body.classList.add('debug');
   aplicar(TE.copia(TE.ESTADO_BASE));
   primeraVez = true;
   bucle();
+  if (PARAMS.get('exportar') === '1') { window.dispatchEvent(new Event('exportador-listo')); return; }   // módulo ⬇️ Descargar del panel
   if (PARAMS.has('demo')) { const d = TE.copia(E); d.aire.gc = 0; d.aire.bug = true; aplicar(d); return; }
   const con = await TE_RT.abrir('salida');
   con.on('estado', est => aplicar(TE.normalizar(est)));
@@ -1158,5 +1160,6 @@ if (PARAMS.has('debug')) document.body.classList.add('debug');
   catch (e) { $('#estadoRed').textContent = 'Error: ' + e.message; document.body.classList.add('debug'); }
 })();
 </script>
+<script src="exportar-salida.js?v=344"></script>
 </body>
 </html>
