@@ -152,3 +152,7 @@ También puedes forzar el fondo desde el link de OBS agregando `&fondo=verde` o 
 - [ ] El chroma está probado con el rayo encendido y con el triplex (solo las ventanas deben borrarse).
 - [ ] Los nombres y titulares están revisados, con tildes.
 - [ ] La cortina corta a los **1,2 s** y las transiciones a **1 s**.
+
+## ⬇️ Descargar gráficas en MP4 (Entre Ovnis y Fantasmas)
+Botón **⬇️ Descargar** en el panel (o menú ⋯ → *Descargar gráfica en MP4*): eliges la gráfica (GC, títulos, tercios, menciones, tarjetas, pantalla, créditos, cortinas y transiciones), cambias sus textos en una copia (el programa no cambia), la animación (entrada y salida, solo entrada, solo salida o ninguna), la duración, 30/60 cuadros/s y el fondo **verde #00FF00** o **azul #0000FF**. Se descarga un MP4 H.264 1920×1080.
+Se arma en `salida.html?exportar=1` con un reloj virtual (`exportar-reloj.js`, `exportar-salida.js`); en OBS no cambia nada. Funciona en Chrome y Edge actualizados.

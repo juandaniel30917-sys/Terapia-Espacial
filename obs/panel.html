@@ -210,6 +210,7 @@
   <div class="chips">
     <div class="chip" id="chipRed" title="Conexión"><i></i><span>conectando</span></div>
     <div class="chip" id="chipSal" title="Salidas de OBS conectadas"><i></i><span>OBS</span></div>
+    <button class="hbtn soloPC" id="btnDescargar" title="Descargar una gráfica como MP4 con fondo verde o azul">⬇️ Descargar</button>
     <button class="hbtn soloPC" id="btnLinks">🔗 Links</button>
     <button class="hbtn limpiar" id="btnLimpiar" title="Esc">LIMPIAR</button>
     <button class="hbtn" id="btnMenu" aria-label="Menú">⋯</button>
@@ -218,6 +219,7 @@
 <div class="menu" id="menu">
   <button data-m="programa" id="mPrograma">👁 Mostrar el programa anterior (Terapia Espacial)</button>
   <button data-m="links">🔗 Links de control y de OBS</button>
+  <button data-m="descargar">⬇️ Descargar gráfica en MP4 (fondo verde)</button>
   <button data-m="elegir">🧩 Elegir botones (nuevas y viejas)</button>
   <button data-m="video">🎬 Subir video (cortina)</button>
   <button data-m="editar">✏️ Editar botonera</button>
@@ -444,13 +446,14 @@
 </div></div>
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=343"></script>
-<script src="comun.js?v=343"></script>
-<script src="eoyf-datos.js?v=343"></script>
-<script src="conexion.js?v=343"></script>
-<script src="escena.js?v=343"></script>
-<script src="qrcode.js?v=343"></script>
-<script src="eoyf-panel.js?v=343"></script>
+<script src="config.js?v=344"></script>
+<script src="comun.js?v=344"></script>
+<script src="eoyf-datos.js?v=344"></script>
+<script src="conexion.js?v=344"></script>
+<script src="escena.js?v=344"></script>
+<script src="qrcode.js?v=344"></script>
+<script src="eoyf-panel.js?v=344"></script>
+<script src="eoyf-descargar.js?v=344"></script>
 <script>
 const $ = (s, p = document) => p.querySelector(s);
 const $$ = (s, p = document) => [...p.querySelectorAll(s)];
@@ -1142,11 +1145,13 @@ $('#menu').onclick = e => {
   if (m === 'elegir') abrirElegir();
   if (m === 'video') $('#archivoVideo').click();
   if (m === 'links') abrirLinks();
+  if (m === 'descargar') EOYF_DESCARGAR.abrir();
   if (m === 'editar') { if (document.body.classList.contains('modo-botonera') === false) cambiarVista('bot'); modoEdicion(!editando); }
   if (['botonera', 'completo', 'auto'].includes(m)) modoDisp(m);
   if (m === 'inicio') location.href = 'index.html';
 };
 $('#btnLinks').onclick = abrirLinks;
+$('#btnDescargar').onclick = () => EOYF_DESCARGAR.abrir();
 $('#btnLimpiar').onclick = () => { vibrar(); limpiar(); };
 let fondoLink = '';
 function linkSalida() {
