@@ -210,6 +210,29 @@
 
   /* ---------------- créditos (rollo) ---------------- */
   var credEl = null, credId = null;
+  /* fondo de los créditos: extractos de un video de la sala (por defecto la Nota Espectral), tratados para que no
+     se vean tan directos (oscuros, desaturados, con tinte y difuminados) y con saltos a otros momentos del video */
+  function fondoVideoCred(raiz, c) {
+    var sel = c.videoFondo === undefined ? 'auto' : c.videoFondo, info = null;
+    // 'auto' usa la versión liviana incluida de la Nota Espectral (la subida es 4:4:4 de 10 bits y Chrome/OBS no la reproducen)
+    if (sel === 'auto') info = { url: R + 'nota_espectral_fondo.webm', dur: 5.1, local: true };
+    else if (sel) info = VIDEOS_SALA.filter(function (v) { return v.id === sel; })[0];
+    if (!info || (!info.local && !window.TE_RT)) return;
+    var caja = el('div', 'credVid ' + (c.fuerzaFondo === 'media' ? 'media' : 'suave'), raiz), v = document.createElement('video');
+    v.muted = true; v.playsInline = true; v.loop = true; v.preload = 'auto'; caja.appendChild(v);
+    (info.local ? Promise.resolve(info.url) : TE_RT.resolverVideo(info.url)).then(function (src) {
+      if (!src || !caja.isConnected) return;
+      if (/^https?:/.test(src) && !src.startsWith(location.origin)) v.crossOrigin = 'anonymous';
+      v.src = src; v.play && v.play().catch(function () {});
+      // cada ~1,6 s salta a otro momento con un destello breve (como cortes de una nota)
+      var n = 0, salto = setInterval(function () {
+        if (!caja.isConnected) { clearInterval(salto); return; }
+        n++; var d = v.duration || info.dur || 5;
+        try { v.currentTime = ((n * 0.618) % 1) * Math.max(0.1, d - 0.4); } catch (e) {}
+        caja.classList.remove('corte'); void caja.offsetWidth; caja.classList.add('corte');
+      }, 1600);
+    });
+  }
   function creditos(cr) {
     var id = cr && cr.id;
     if (id && id !== credId) {
@@ -217,6 +240,7 @@
       credId = id;
       var p = P(), c = p.creditos;
       credEl = el('div', 'eCred', $('#cCreditos'));
+      fondoVideoCred(credEl, c);                    // extractos de video (Nota Espectral) muy suaves detrás
       el('div', 'tex', credEl);                     // textura con parpadeo de color (dinamismo)
       var rollo = el('div', 'rollo', credEl);
       /* el logo va DENTRO del rollo: aparece con el rayo del ovni y después se va hacia arriba con los créditos */
@@ -475,7 +499,9 @@
   /* ---------------- aplicar el estado ---------------- */
   var cortActual = null, primera = true;
   var ACTIVO = false;
+  var VIDEOS_SALA = [];
   function aplicar(est) {
+    VIDEOS_SALA = (est && est.videos) || [];
     var activo = !!(est && est.programa === 'eoyf');
     document.body.classList.toggle('eoyf', activo);
     if (!activo) {

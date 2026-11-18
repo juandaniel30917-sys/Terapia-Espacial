@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<script src="exportar-reloj.js?v=348"></script>
+<script src="exportar-reloj.js?v=350"></script>
 <title>Entre Ovnis y Fantasmas · Salida OBS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -298,6 +298,12 @@
   .eCred{position:absolute;inset:0;overflow:hidden;opacity:0;transition:opacity .8s;
        background:linear-gradient(180deg,rgba(12,6,18,.86),rgba(30,6,24,.9)),url(eoyf/textura.jpg) center/cover}
   .eCred.on{opacity:1}
+  .credVid{position:absolute;inset:0;overflow:hidden}
+  .credVid video{position:absolute;inset:-3%;width:106%;height:106%;object-fit:cover;filter:grayscale(.35) sepia(.25) hue-rotate(250deg) saturate(1.5) contrast(1.2) brightness(.9) blur(1.5px)}
+  .credVid.suave{opacity:.42}.credVid.media{opacity:.62}
+  .credVid::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.35) 0 2px,transparent 2px 4px),radial-gradient(ellipse at 50% 50%,rgba(8,2,12,.15) 30%,rgba(8,2,12,.85) 100%)}
+  .credVid.corte video{animation:credCorte .35s steps(3)}
+  @keyframes credCorte{0%{filter:grayscale(0) brightness(1.6) contrast(1.6) blur(0);transform:translateX(-1.5%)}50%{transform:translateX(1%)}100%{transform:none}}
   .eCred .tex{position:absolute;inset:-4%;background:url(eoyf/textura.jpg) center/cover;mix-blend-mode:screen;opacity:.28;animation:credTex 2.4s steps(1) infinite}
   @keyframes credTex{0%{filter:hue-rotate(0deg) saturate(1.6);transform:translate(0,0) scale(1)}16%{filter:hue-rotate(250deg) saturate(2.2);transform:translate(-1.5%,1%) scale(1.04)}
     33%{filter:hue-rotate(60deg) saturate(1.8);transform:translate(1%,-1%) scale(1.02)}50%{filter:hue-rotate(300deg) saturate(2.4);transform:translate(-1%,-.5%) scale(1.05)}
@@ -360,13 +366,13 @@
 </div>
 <div id="estadoRed">conectando…</div>
 
-<script src="config.js?v=348"></script>
-<script src="comun.js?v=348"></script>
-<script src="eoyf-datos.js?v=348"></script>
-<script src="conexion.js?v=348"></script>
-<script src="escena.js?v=348"></script>
-<script src="chroma.js?v=348"></script>
-<script src="eoyf.js?v=348"></script>
+<script src="config.js?v=350"></script>
+<script src="comun.js?v=350"></script>
+<script src="eoyf-datos.js?v=350"></script>
+<script src="conexion.js?v=350"></script>
+<script src="escena.js?v=350"></script>
+<script src="chroma.js?v=350"></script>
+<script src="eoyf.js?v=350"></script>
 <script>
 /* ===================================================================
    MOTOR DE ANIMACIÓN — replica las llaves del script de After Effects
@@ -1243,6 +1249,6 @@ if (PARAMS.has('debug')) document.body.classList.add('debug');
   catch (e) { $('#estadoRed').textContent = 'Error: ' + e.message; document.body.classList.add('debug'); }
 })();
 </script>
-<script src="exportar-salida.js?v=348"></script>
+<script src="exportar-salida.js?v=350"></script>
 </body>
 </html>
