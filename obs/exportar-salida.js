@@ -81,6 +81,7 @@
   function capturar(canvas, fondo) {
     var col = COLOR[fondo] || COLOR.verde;
     var o = { width: 1920, height: 1080, canvasWidth: 1920, canvasHeight: 1080, pixelRatio: 1, skipAutoScale: true, backgroundColor: col,
+      filter: function (n) { return !(n.tagName === 'VIDEO' && n.readyState < 2); },   // un video que aún no carga no rompe la foto
       /* en la copia fotografiada nada se anima: cada nodo lleva el estilo exacto de este cuadro */
       fontEmbedCSS: (fontCSS || '') + '\n*,*::before,*::after{animation:none!important;transition:none!important}' };
     return R.conRelojReal(function () { return htmlToImage.toCanvas(document.getElementById('escena'), o); }).then(function (c) {

@@ -167,3 +167,4 @@ Si un botón usa la misma gráfica que otro (porque lo duplicaste o le elegiste 
 
 ## Créditos con ovni
 Los créditos parten con el **ovni** cruzando arriba: se detiene, baja su **rayo** y deja el **logo** en el centro; luego se va y el logo **sube junto con los créditos** hasta salir de pantalla. La textura del fondo parpadea en colores para darle movimiento (mismo diseño).
+Detrás de los créditos van **extractos de La Nota Espectral** (oscurecidos, con tinte morado, difuminados y con saltos a distintos momentos), para que se sientan sin competir con los nombres. En el ✎ de Créditos se elige el video de fondo (Nota Espectral, otro video subido o sin video) y cuánto se ve (Suave / Un poco más).

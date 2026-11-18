@@ -52,6 +52,8 @@
     redes: { titulo: 'SÍGUENOS', usuario: '@entreovnisyfantasmas', texto: 'Instagram · TikTok · Facebook', tema: 'ovni' },
     creditos: {
       dur: 25, cierre: 'Hasta pronto, amigos invisibles', tituloLogos: 'AUSPICIAN', logos: true,
+      // video de fondo (extractos suaves): 'auto' = el de la Nota Espectral si existe · '' = sin video · o el id de un video subido
+      videoFondo: 'auto', fuerzaFondo: 'suave',
       texto: 'Conducción: Luis Monasterios\nInvestigación paranormal: Benjamín Castillo\nReporteras: Lucía Osorio · Canela Arroyo\nTestimonios: Noris Ystúriz · Andrea Monasterios\nDirección: \nProducción: \nCámaras: \nGráficas y switch: \nUna producción de: Entre Ovnis y Fantasmas'
     },
     terreno: { etiqueta: 'EN TERRENO', lugar: 'Sanatorio Los Maitenes', sub: 'Recorrido nocturno · Región del Maule', tema: 'fantasma' },
