@@ -217,8 +217,11 @@
       credId = id;
       var p = P(), c = p.creditos;
       credEl = el('div', 'eCred', $('#cCreditos'));
-      var lg = el('img', 'logo', credEl); lg.src = R + 'logo.png';
+      el('div', 'tex', credEl);                     // textura con parpadeo de color (dinamismo)
       var rollo = el('div', 'rollo', credEl);
+      /* el logo va DENTRO del rollo: aparece con el rayo del ovni y después se va hacia arriba con los créditos */
+      var cab = el('div', 'cabeza', rollo), lg = el('img', 'logo', cab); lg.src = R + 'logo.png';
+      el('div', 'hueco', rollo);
       (c.texto || '').split('\n').forEach(function (l) {
         l = l.trim(); if (!l) return;
         var i = l.indexOf(':');
@@ -233,11 +236,29 @@
         p.menciones.forEach(function (m) { if (m.logo) { var im = el('img', '', lw); im.src = m.logo; } });
       }
       var fin = el('div', 'fin', rollo); fin.textContent = c.cierre || '';
+      // ovni que cruza arriba, se detiene sobre el logo, lo deja con su rayo y se va
+      var uf = el('div', 'credUfo', credEl), ray = el('div', 'credRayo', uf), nave = el('div', 'credNave', uf); nave.appendChild(svgOvni());
       document.body.classList.add('e-cred');
       requestAnimationFrame(function () {
         credEl.classList.add('on');
-        var dist = 1080 - 540 + fin.offsetTop + fin.offsetHeight / 2;
-        rollo.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-' + dist + 'px)' }], { duration: (+c.dur || 20) * 1000, delay: 600, easing: 'linear', fill: 'forwards' });
+        var vel = 1, T = function (s) { return s * 1000 / vel; };
+        uf.animate([
+          { transform: 'translate(-260px,0) rotate(14deg)', offset: 0 },
+          { transform: 'translate(960px,18px) rotate(0deg)', offset: .36, easing: 'ease-in-out' },
+          { transform: 'translate(960px,6px) rotate(0deg)', offset: .5 },
+          { transform: 'translate(960px,18px) rotate(0deg)', offset: .66 },
+          { transform: 'translate(2200px,-30px) rotate(-16deg)', offset: 1 }
+        ], { duration: T(3.8), easing: 'linear', fill: 'forwards' });
+        ray.animate([{ transform: 'scaleY(0)', opacity: 0, offset: 0 }, { transform: 'scaleY(0)', opacity: 0, offset: .34 }, { transform: 'scaleY(1)', opacity: .95, offset: .42 },
+          { transform: 'scaleY(1)', opacity: .95, offset: .6 }, { transform: 'scaleY(0)', opacity: 0, offset: .68 }, { transform: 'scaleY(0)', opacity: 0, offset: 1 }], { duration: T(3.8), fill: 'forwards' });
+        lg.animate([{ opacity: 0, transform: 'scale(.55) translateY(-120px)', filter: 'blur(14px) brightness(3)', offset: 0 },
+          { opacity: 0, transform: 'scale(.55) translateY(-120px)', filter: 'blur(14px) brightness(3)', offset: .4 },
+          { opacity: 1, transform: 'scale(1.06) translateY(0)', filter: 'blur(0) brightness(1.8)', offset: .58 },
+          { opacity: 1, transform: 'scale(1) translateY(0)', filter: 'blur(0) brightness(1)', offset: .66 },
+          { opacity: 1, transform: 'scale(1) translateY(0)', filter: 'blur(0) brightness(1)', offset: 1 }], { duration: T(3.8), fill: 'forwards' });
+        // el rollo (logo + créditos) parte cuando el ovni ya se fue
+        var top0 = rollo.offsetTop, dist = top0 + fin.offsetTop + fin.offsetHeight / 2 - 540;
+        rollo.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-' + dist + 'px)' }], { duration: (+c.dur || 20) * 1000, delay: T(3.6), easing: 'linear', fill: 'forwards' });
       });
     } else if (!id && credEl) {
       var e = credEl; credEl = null; credId = null; e.classList.remove('on'); document.body.classList.remove('e-cred');
@@ -479,11 +500,12 @@
     else cambiarSlot('e_lat', claveL, function () { return new Tarjeta(d, a.lateral === 'emf'); });
     // triplex alien / duplex fantasmas
     var mk = a.multiplex, t = mk ? p.multiplex[mk] : null;
-    var claveM = t ? mk + '|' + t.titulo + '|' + t.etiquetas.join(',') + '|' + fe + (mk === 'llamada' ? '|' + [t.nombre, t.lugar, t.estado, t.tema, (t.foto || '').length, (t.foto || '').slice(-40)].join('|') : '') : null;
+    var claveM = t ? mk + '|' + t.titulo + '|' + t.etiquetas.join(',') + '|' + fe + (/^llamada/.test(mk) ? '|' + [t.nombre, t.lugar, t.estado, t.tema, (t.foto || '').length, (t.foto || '').slice(-40)].join('|') : '') : null;
     cambiarSlot('e_mx', claveM, function () {
-      if (mk === 'llamada') return llamada(t);
-      var tm = mk === 'triplex' ? 'ovni' : 'fantasma', ef = efectos(t, tm);
-      return new Multiplex(VENTANAS[mk], t.etiquetas, t.titulo, { skin: mk === 'triplex' ? 'eTriplex' : 'eDuplex', tema: tm, ef: ef });
+      var tp = String(mk).replace(/\d+$/, '');   // las copias (duplex2, llamada3…) usan el diseño de su tipo
+      if (tp === 'llamada') return llamada(t);
+      var tm = tp === 'triplex' ? 'ovni' : 'fantasma', ef = efectos(t, tm);
+      return new Multiplex(VENTANAS[tp] || VENTANAS.duplex, t.etiquetas, t.titulo, { skin: tp === 'triplex' ? 'eTriplex' : 'eDuplex', tema: tm, ef: ef });
     });
     document.body.classList.toggle('e-mx', !!a.multiplex);
     document.body.classList.toggle('e-visor', !!a.visor);

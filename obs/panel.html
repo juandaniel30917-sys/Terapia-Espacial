@@ -426,7 +426,7 @@
     <div class="seg" id="ebFondo">
       <button data-f="">General</button><button data-f="verde">🟩 Verde</button><button data-f="espacio">🌌 Espacio</button>
     </div>
-    <p class="nota" style="margin-top:6px">«General» usa el fondo del botón 🌌 / Configuración. Verde o Espacio se aplican solo mientras esta gráfica está al aire.</p>
+    <p class="nota" id="ebFondoNota" style="margin-top:6px">«General» usa el fondo del botón 🌌 / Configuración. Verde o Espacio se aplican solo mientras esta gráfica está al aire.</p>
   </div>
   <h2>Botón</h2>
   <div class="campo"><label>Acción</label><select id="ebAccion"></select></div>
@@ -446,14 +446,14 @@
 </div></div>
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=345"></script>
-<script src="comun.js?v=345"></script>
-<script src="eoyf-datos.js?v=345"></script>
-<script src="conexion.js?v=345"></script>
-<script src="escena.js?v=345"></script>
-<script src="qrcode.js?v=345"></script>
-<script src="eoyf-panel.js?v=345"></script>
-<script src="eoyf-descargar.js?v=345"></script>
+<script src="config.js?v=348"></script>
+<script src="comun.js?v=348"></script>
+<script src="eoyf-datos.js?v=348"></script>
+<script src="conexion.js?v=348"></script>
+<script src="escena.js?v=348"></script>
+<script src="qrcode.js?v=348"></script>
+<script src="eoyf-panel.js?v=348"></script>
+<script src="eoyf-descargar.js?v=348"></script>
 <script>
 const $ = (s, p = document) => p.querySelector(s);
 const $$ = (s, p = document) => [...p.querySelectorAll(s)];
@@ -743,7 +743,7 @@ function campoTexto(cont, etiqueta, obj, clave, largo) {
 function pintarGrafica(accion) {
   const g = $('#ebGrafica'); g.innerHTML = '';
   const ob = objetivo(accion), o = ob && ob.o;
-  $('#ebFondoBox').hidden = !(ob && ['gc', 'titular', 'titulo'].includes(ob.tipo));
+  $('#ebFondoBox').hidden = !(ob && (['gc', 'titular', 'titulo'].includes(ob.tipo)));
   if (!ob || !o) { g.innerHTML = '<p class="nota">Esta acción no tiene textos para editar.</p>'; return; }
   const h = document.createElement('h2'); h.textContent = 'Textos de la gráfica'; g.appendChild(h);
   if (ob.tipo === 'campos') { EOYF_PANEL.campos(g, ob, inm => { publicar(inm); dibujarBotonera(); }); return; }
@@ -768,6 +768,13 @@ function pintarGrafica(accion) {
     campoTexto(g, 'Portada · título', o, 'titulo'); campoTexto(g, 'Portada · subtítulo', o, 'sub');
     const p = document.createElement('p'); p.className = 'nota'; p.textContent = 'Cada titular se edita con el ✎ de su propio botón (o en la pestaña Textos).'; g.appendChild(p);
   }
+  /* en el programa nuevo: con o sin fondo, y cuál (espacio, ovni, fantasma, niebla) */
+  $('#ebFondo').innerHTML = esEOYF()
+    ? '<button data-f="">Sin fondo</button><button data-f="espacio">🌌 Espacio</button><button data-f="ovni">🛸 Ovni</button><button data-f="fantasma">👻 Fantasma</button><button data-f="niebla">🌫️ Niebla</button>'
+    : '<button data-f="">General</button><button data-f="verde">🟩 Verde</button><button data-f="espacio">🌌 Espacio</button>';
+  $('#ebFondoNota').textContent = esEOYF()
+    ? 'El fondo cubre toda la pantalla mientras esta gráfica está al aire (encima del chroma). «Sin fondo» deja ver la cámara.'
+    : '«General» usa el fondo del botón 🌌 / Configuración. Verde o Espacio se aplican solo mientras esta gráfica está al aire.';
   $$('#ebFondo button').forEach(b => b.classList.toggle('on', (o.fondo || '') === b.dataset.f));
   $$('#ebFondo button').forEach(b => b.onclick = () => { o.fondo = b.dataset.f; $$('#ebFondo button').forEach(x => x.classList.toggle('on', x === b)); publicar(true); dibujarBotonera(); });
 }
@@ -898,6 +905,7 @@ function editarBoton(i) {
     grupos[gn].forEach(a => { const o = document.createElement('option'); o.value = a.id; o.textContent = a.titulo + (a.sub ? ' — ' + a.sub : ''); og.appendChild(o); });
     sel.appendChild(og);
   });
+  ebCopia = null; separarSiCompartido(b, i < 0); refrescarOpciones(sel);
   sel.value = b.accion;
   $('#ebTitulo').textContent = '✎ ' + (b.texto || (cat[b.accion] ? cat[b.accion].titulo : 'Botón'));
   $('#ebTexto').value = b.texto || '';
@@ -907,7 +915,30 @@ function editarBoton(i) {
   $('#mBoton').classList.add('on');
 }
 function botonActual() { return botones()[ebIndice]; }
-$('#ebAccion').onchange = e => { const b = botonActual(); b.accion = e.target.value; pintarGrafica(b.accion); publicar(true); dibujarBotonera(); };
+/* cada botón tiene SU gráfica: si otro botón ya usa la misma, a este se le hace una copia propia
+   (así cambiar el nombre o la foto en uno no cambia el otro). Las gráficas únicas (terreno, promo…) se comparten. */
+let ebCopia = null;
+function separarSiCompartido(b, nuevo) {
+  if (!esEOYF()) return;
+  const otro = botones().some(x => x !== b && x.accion === b.accion);
+  if (!otro) return;
+  const n = EOYF_PANEL.copiarGrafica(b.accion);
+  if (!n) { if (!nuevo) toast('Esta gráfica es única: el otro botón que la usa también cambia'); return; }
+  b.accion = n; ebCopia = n; publicar(true); dibujarBotonera();
+  if (!nuevo) toast('Este botón ahora tiene su propia copia de la gráfica');
+}
+function refrescarOpciones(sel) {
+  const cat = catalogo(), val = botonActual().accion;
+  if (cat[val] && !sel.querySelector('option[value="' + CSS.escape(val) + '"]')) {
+    const o = document.createElement('option'); o.value = val; o.textContent = cat[val].titulo + ' (copia de este botón)'; sel.appendChild(o);
+  }
+}
+$('#ebAccion').onchange = e => {
+  const b = botonActual(), antes = ebCopia; b.accion = e.target.value; ebCopia = null;
+  if (antes && antes !== b.accion && esEOYF()) EOYF_PANEL.borrarCopia(antes, botones());
+  separarSiCompartido(b, true); refrescarOpciones(e.target); e.target.value = b.accion;
+  pintarGrafica(b.accion); publicar(true); dibujarBotonera();
+};
 $('#ebTexto').oninput = e => { botonActual().texto = e.target.value.trim(); publicar(); dibujarBotonera(); };
 $('#ebColor').oninput = e => { botonActual().color = e.target.value; publicar(); dibujarBotonera(); };
 function pintarTeclas() {

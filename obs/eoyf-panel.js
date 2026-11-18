@@ -63,6 +63,28 @@
   }
 
   /* ---------------- catálogo de acciones ---------------- */
+  function tipoMx(k) { return String(k).replace(/\d+$/, ''); }
+  /* copia independiente de la gráfica de un botón (para que dos botones parecidos no se cambien juntos).
+     Devuelve la acción nueva, o null si esa gráfica es única. */
+  function copiarGrafica(accion) {
+    var p = P(), m, listas = { gc: 'gcs', tit: 'titulos', dato: 'datos', men: 'menciones' };
+    if ((m = /^e:(gc|tit|dato|men):(\d+)$/.exec(accion))) {
+      var l = p[listas[m[1]]], o = l && l[+m[2]]; if (!o) return null;
+      l.push(TE.copia(o)); return 'e:' + m[1] + ':' + (l.length - 1);
+    }
+    if ((m = /^e:mx:(\w+)$/.exec(accion)) && p.multiplex[m[1]]) {
+      var tp = tipoMx(m[1]), n = 2; while (p.multiplex[tp + n]) n++;
+      p.multiplex[tp + n] = TE.copia(p.multiplex[m[1]]); return 'e:mx:' + tp + n;
+    }
+    return null;
+  }
+  /* si una copia recién hecha quedó sin usar (el botón cambió de gráfica), se borra */
+  function borrarCopia(accion, botones) {
+    if (botones.some(function (b) { return b.accion === accion; })) return;
+    var p = P(), m, listas = { gc: 'gcs', tit: 'titulos', dato: 'datos', men: 'menciones' };
+    if ((m = /^e:(gc|tit|dato|men):(\d+)$/.exec(accion))) { var l = p[listas[m[1]]]; if (l && +m[2] === l.length - 1 && l.length > 1) l.pop(); }
+    else if ((m = /^e:mx:(\w+\d+)$/.exec(accion)) && p.multiplex[m[1]]) delete p.multiplex[m[1]];
+  }
   // datos de cada acción de gráfica (para el selector rápido de efecto 🛸/👻 en el botón)
   function datoDe(accion) {
     var p = P(), m;
@@ -70,7 +92,7 @@
     if ((m = /^e:tit:(\d+)$/.exec(accion))) return p.titulos[+m[1]];
     if ((m = /^e:dato:(\d+)$/.exec(accion))) return p.datos[+m[1]];
     if ((m = /^e:men:(\d+)$/.exec(accion))) return p.menciones[+m[1]];
-    if ((m = /^e:mx:(triplex|duplex|llamada)$/.exec(accion))) return p.multiplex[m[1]];
+    if ((m = /^e:mx:(\w+)$/.exec(accion))) return p.multiplex[m[1]];
     var k = { 'e:terreno': 'terreno', 'e:sabias': 'sabias', 'e:promo': 'promo', 'e:llamenos': 'llamenos', 'e:redes': 'redes', 'e:emf': 'emf' }[accion];
     return k ? p[k] : null;
   }
@@ -87,9 +109,12 @@
     add('e:llamenos', '☎️ Llámenos ' + p.config.numero, p.llamenos.texto, NARANJO, 'MENCIÓN', function () { inferior('llamenos'); }, function () { return A().inferior === 'llamenos'; });
     add('e:redes', '📱 Redes ' + p.redes.usuario, p.redes.texto, colorTema(p.redes.tema), 'MENCIÓN', function () { inferior('redes'); }, function () { return A().inferior === 'redes'; });
     p.menciones.forEach(function (m, i) { add('e:men:' + i, '💰 ' + (m.marca || 'Mención ' + (i + 1)), m.texto, m.color || AMARILLO, 'MENCIÓN', function () { inferior('men:' + i); }, function () { return A().inferior === 'men:' + i; }); });
-    add('e:mx:triplex', '🛸 ' + p.multiplex.triplex.titulo, p.multiplex.triplex.etiquetas.join(' · '), VERDE, 'PANTALLA', function () { multiplex('triplex'); }, function () { return A().multiplex === 'triplex'; });
-    add('e:mx:duplex', '🦇 ' + p.multiplex.duplex.titulo, p.multiplex.duplex.etiquetas.join(' · '), NARANJO, 'PANTALLA', function () { multiplex('duplex'); }, function () { return A().multiplex === 'duplex'; });
-    add('e:mx:llamada', '📞 ' + p.multiplex.llamada.titulo, p.multiplex.llamada.nombre + ' · dúplex de llamada', colorTema(p.multiplex.llamada.tema), 'PANTALLA', function () { multiplex('llamada'); }, function () { return A().multiplex === 'llamada'; });
+    /* pantallas: triplex, duplex y dúplex de llamada, más sus copias (llamada2, llamada3…) */
+    Object.keys(p.multiplex).forEach(function (k) {
+      var t = p.multiplex[k], tp = tipoMx(k); if (!t) return;
+      if (tp === 'llamada') add('e:mx:' + k, '📞 ' + t.titulo, (t.nombre || '') + ' · dúplex de llamada', colorTema(t.tema), 'PANTALLA', function () { multiplex(k); }, function () { return A().multiplex === k; });
+      else add('e:mx:' + k, (tp === 'triplex' ? '🛸 ' : '🦇 ') + t.titulo, (t.etiquetas || []).join(' · '), tp === 'triplex' ? VERDE : NARANJO, 'PANTALLA', function () { multiplex(k); }, function () { return A().multiplex === k; });
+    });
     add('e:creditos', '🎞️ Créditos', 'rollo final · ' + p.creditos.dur + ' s', ROJO, 'PANTALLA', creditos, function () { return !!A().creditos; });
     EOYF_DATOS.EFECTOS.forEach(function (e) {
       var v = e[0];
@@ -228,8 +253,8 @@
     if (accion === 'e:llamenos') return T(p.llamenos, [['titulo', 'Título (se agrega «AL número»)'], ['texto', 'Bajada'], ENT, SAL]);
     if (accion === 'e:redes') return T(p.redes, [['titulo', 'Etiqueta'], ['usuario', 'Usuario (@)'], ['texto', 'Redes'], TEMA, ENT, SAL]);
     if ((m = /^e:men:(\d+)$/.exec(accion))) return T(p.menciones[+m[1]], [['marca', 'Marca'], ['texto', 'Texto de la mención'], ['etiqueta', 'Etiqueta (AUSPICIA, MENCIÓN…)'], ['color', 'Color (#RRGGBB)'], ['logo', 'Logo (ruta o link)'], ENT, SAL]);
-    if ((m = /^e:mx:(triplex|duplex)$/.exec(accion))) return T(p.multiplex[m[1]], [['titulo', 'Título'], ['etiquetas', 'Etiquetas de las ventanas (separadas por | )'], ENT, SAL]);
-    if (accion === 'e:mx:llamada') return T(p.multiplex.llamada, [['nombre', 'Nombre de quien llama'], ['lugar', 'Lugar (ciudad)'], ['foto', 'Foto de quien llama', 'foto'], ['estado', 'Estado (EN LÍNEA, LLAMANDO…, AL TELÉFONO)'], ['titulo', 'Título de abajo'], ['etiquetas', 'Etiqueta del video'], ['tema', 'Estilo', [['ovni', '👽 Ovni (verde)'], ['fantasma', '👻 Fantasma (naranjo)']]], ENT, SAL]);
+    if ((m = /^e:mx:(\w+)$/.exec(accion)) && p.multiplex[m[1]] && tipoMx(m[1]) !== 'llamada') return T(p.multiplex[m[1]], [['titulo', 'Título'], ['etiquetas', 'Etiquetas de las ventanas (separadas por | )'], ENT, SAL]);
+    if (m && p.multiplex[m[1]]) return T(p.multiplex[m[1]], [['nombre', 'Nombre de quien llama'], ['lugar', 'Lugar (ciudad)'], ['foto', 'Foto de quien llama', 'foto'], ['estado', 'Estado (EN LÍNEA, LLAMANDO…, AL TELÉFONO)'], ['titulo', 'Título de abajo'], ['etiquetas', 'Etiqueta del video'], ['tema', 'Estilo', [['ovni', '👽 Ovni (verde)'], ['fantasma', '👻 Fantasma (naranjo)']]], ENT, SAL]);
     if ((m = /^e:cort:(\w+)$/.exec(accion)) && p.efectos[m[1]]) return T(p.efectos[m[1]], [['dur', 'Duración', DURS]]);
     if (accion === 'e:creditos') return T(p.creditos, [['texto', 'Créditos (una línea por cargo: «Cargo: nombre · nombre»)', 'largo'], ['cierre', 'Frase final'], ['tituloLogos', 'Título de los logos'], ['dur', 'Duración del rollo (segundos)', [[15, '15 s'], [20, '20 s'], [25, '25 s'], [30, '30 s'], [45, '45 s']]]]);
     if (accion === 'e:ticker') return T(p.config, [['ticker', 'Noticias (separadas por · )', 'largo'], ['fecha', 'Fecha']]);
@@ -310,8 +335,8 @@
     seccion('¿Sabías qué?'); campos(cont, objetivo('e:sabias'), alCambiar);
     seccion('Código ALIEN y Llámenos'); campos(cont, objetivo('e:promo'), alCambiar); campos(cont, objetivo('e:llamenos'), alCambiar);
     seccion('Menciones'); p.menciones.forEach(function (_, i) { campos(cont, objetivo('e:men:' + i), alCambiar); });
-    seccion('Triplex y duplex'); campos(cont, objetivo('e:mx:triplex'), alCambiar); campos(cont, objetivo('e:mx:duplex'), alCambiar);
-    seccion('📞 Dúplex de llamada'); campos(cont, objetivo('e:mx:llamada'), alCambiar);
+    seccion('Triplex y duplex'); Object.keys(p.multiplex).forEach(function (k) { if (tipoMx(k) !== 'llamada') campos(cont, objetivo('e:mx:' + k), alCambiar); });
+    seccion('📞 Dúplex de llamada'); Object.keys(p.multiplex).forEach(function (k) { if (tipoMx(k) === 'llamada') campos(cont, objetivo('e:mx:' + k), alCambiar); });
     seccion('Ticker'); campos(cont, objetivo('e:ticker'), alCambiar);
     seccion('Efectos de entrada y salida'); campos(cont, objetivo('e:efecto'), alCambiar);
     var n2 = document.createElement('p'); n2.className = 'nota';
@@ -326,6 +351,7 @@
   }
 
   window.EOYF_PANEL = {
+    copiarGrafica: copiarGrafica, borrarCopia: borrarCopia, tipoMx: tipoMx,
     iniciar: function (ayudas) { H = ayudas; },
     catalogo: catalogo, botonesIniciales: botonesIniciales, decorar: decorar, FILTROS: FILTROS, GRUPOS: GRUPOS,
     pasos: pasos, describir: describir, irPaso: irPaso, limpiar: limpiar, objetivo: objetivo, campos: campos, editorTextos: editorTextos

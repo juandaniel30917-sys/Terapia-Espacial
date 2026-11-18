@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<script src="exportar-reloj.js?v=345"></script>
+<script src="exportar-reloj.js?v=348"></script>
 <title>Entre Ovnis y Fantasmas · Salida OBS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -114,6 +114,16 @@
         --e-ft:'Cinzel', Georgia, serif;--e-tx:'Montserrat', Arial, sans-serif;--e-exp:'Special Elite', 'Courier New', monospace;}
   body.eoyf.e-azul #fondoVerde{display:block;background:#0000FF}
   body.eoyf.e-verde #fondoVerde{display:block;background:#00FF00}
+  /* fondo opcional de las gráficas de Terapia Espacial dentro del programa nuevo: espacio, ovni, fantasma o niebla */
+  #fondoTema{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none}
+  #fondoTema.on{opacity:1}
+  #fondoTema > div{position:absolute;inset:0;display:none}
+  #fondoTema > div.on{display:block}
+  #fondoTema .ftEspacio{background:radial-gradient(ellipse at 50% 120%,#2B0F5E 0%,#0B0620 55%,#05030F 100%)}
+  #fondoTema .ftEspacio canvas{position:absolute;left:0;top:0;animation:deriva 60s linear infinite}
+  #fondoTema .eNiebla{inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(150,90,170,.85),rgba(60,24,80,.9) 45%,rgba(10,2,14,.98) 85%),url(eoyf/textura.jpg) center/cover;background-blend-mode:screen}
+  #fondoTema .eNiebla::after{content:"";position:absolute;inset:-20%;background:radial-gradient(ellipse at 30% 60%,rgba(255,255,255,.18),transparent 45%),radial-gradient(ellipse at 75% 35%,rgba(255,255,255,.14),transparent 40%);animation:ftNiebla 14s ease-in-out infinite alternate}
+  @keyframes ftNiebla{from{transform:translateX(-4%)}to{transform:translateX(4%)}}
   /* barras del tercio inferior: carbón en diagonal con franjas ///, acento verde alien o naranjo calabaza */
   .abd.eoyf .barra{border-radius:0;clip-path:polygon(22px 0,100% 0,calc(100% - 22px) 100%,0 100%);
        box-shadow:inset 0 -3px 0 rgba(255,255,255,.06);background-image:linear-gradient(180deg,rgba(255,255,255,.07),transparent 60%)!important}
@@ -288,15 +298,27 @@
   .eCred{position:absolute;inset:0;overflow:hidden;opacity:0;transition:opacity .8s;
        background:linear-gradient(180deg,rgba(12,6,18,.86),rgba(30,6,24,.9)),url(eoyf/textura.jpg) center/cover}
   .eCred.on{opacity:1}
-  .eCred .logo{position:absolute;left:50%;top:40px;width:420px;transform:translateX(-50%);filter:drop-shadow(0 0 18px rgba(0,0,0,.8));z-index:2}
-  .eCred .rollo{position:absolute;left:0;right:0;top:1080px;text-align:center}
+  .eCred .tex{position:absolute;inset:-4%;background:url(eoyf/textura.jpg) center/cover;mix-blend-mode:screen;opacity:.28;animation:credTex 2.4s steps(1) infinite}
+  @keyframes credTex{0%{filter:hue-rotate(0deg) saturate(1.6);transform:translate(0,0) scale(1)}16%{filter:hue-rotate(250deg) saturate(2.2);transform:translate(-1.5%,1%) scale(1.04)}
+    33%{filter:hue-rotate(60deg) saturate(1.8);transform:translate(1%,-1%) scale(1.02)}50%{filter:hue-rotate(300deg) saturate(2.4);transform:translate(-1%,-.5%) scale(1.05)}
+    66%{filter:hue-rotate(120deg) saturate(1.4);transform:translate(1.5%,.5%) scale(1.01)}83%{filter:hue-rotate(200deg) saturate(2);transform:translate(0,1.2%) scale(1.03)}}
+  /* el rollo parte con el logo centrado; los créditos vienen justo debajo, fuera de la pantalla */
+  .eCred .rollo{position:absolute;left:0;right:0;top:300px;text-align:center}
+  .eCred .cabeza{height:360px;display:flex;align-items:center;justify-content:center}
+  .eCred .logo{width:520px;max-height:360px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(0,0,0,.8));opacity:0}
+  .eCred .hueco{height:420px}
+  .credUfo{position:absolute;left:0;top:95px;width:0;height:0;z-index:6}
+  .credNave{position:absolute;left:0;top:0;width:0;height:0;transform:scale(.8);filter:drop-shadow(0 0 16px rgba(217,255,176,.55))}
+  .credNave svg{position:absolute;left:-140px;top:-100px;width:280px;height:150px;overflow:visible}
+  .credRayo{position:absolute;left:-150px;top:10px;width:300px;height:520px;transform-origin:50% 0;opacity:0;
+    background:linear-gradient(180deg,rgba(235,255,210,.95),rgba(217,255,176,.55) 60%,rgba(217,255,176,0));clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);filter:blur(1px)}
   .eCred .rollo h3{margin:60px 0 14px;font:800 24px/1 var(--e-tx);letter-spacing:.3em;color:var(--e-naranjo);text-transform:uppercase}
   .eCred .rollo h3:nth-of-type(2n){color:var(--e-verde)}
   .eCred .rollo p{margin:8px 0;font:700 48px/1.15 var(--e-ft);color:#fff;letter-spacing:.04em;text-shadow:2px 0 rgba(255,0,60,.35),-2px 0 rgba(0,255,220,.25)}
   .eCred .rollo .logos{display:flex;gap:70px;justify-content:center;align-items:center;margin-top:30px}
   .eCred .rollo .logos img{max-height:140px;max-width:360px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.6))}
   .eCred .rollo .fin{margin-top:160px;font:700 64px/1.1 var(--e-ft);color:#fff}
-  .eCred::after{content:"";position:absolute;left:0;right:0;top:0;height:300px;background:linear-gradient(180deg,rgba(12,6,18,1) 55%,transparent)}
+  .eCred::after{content:"";position:absolute;left:0;right:0;top:0;height:220px;background:linear-gradient(180deg,rgba(12,6,18,1) 35%,transparent);z-index:3}
 
   /* cortinas nuevas */
   .eExp{position:absolute;inset:0;background:#1A1712 url(eoyf/textura.jpg) center/cover;background-blend-mode:multiply}
@@ -325,6 +347,7 @@
 <div id="escena">
   <div id="fondoVerde"></div>
   <div id="fondoEspacio"></div>
+  <div id="fondoTema"></div>
   <div class="capa" id="cEspacio"></div>
   <div class="capa" id="cVentanas"></div>
   <div class="capa" id="cCreditos"></div>
@@ -337,13 +360,13 @@
 </div>
 <div id="estadoRed">conectando…</div>
 
-<script src="config.js?v=345"></script>
-<script src="comun.js?v=345"></script>
-<script src="eoyf-datos.js?v=345"></script>
-<script src="conexion.js?v=345"></script>
-<script src="escena.js?v=345"></script>
-<script src="chroma.js?v=345"></script>
-<script src="eoyf.js?v=345"></script>
+<script src="config.js?v=348"></script>
+<script src="comun.js?v=348"></script>
+<script src="eoyf-datos.js?v=348"></script>
+<script src="conexion.js?v=348"></script>
+<script src="escena.js?v=348"></script>
+<script src="chroma.js?v=348"></script>
+<script src="eoyf.js?v=348"></script>
 <script>
 /* ===================================================================
    MOTOR DE ANIMACIÓN — replica las llaves del script de After Effects
@@ -1026,6 +1049,36 @@ function fondoEfectivo() {
   if (pedidos.includes('verde')) return 'verde';
   return FORZAR_FONDO || cfg().fondo;
 }
+/* en el programa nuevo, las gráficas de Terapia Espacial pueden llevar su propio fondo a pantalla completa */
+const FONDOS_TEMA = ['espacio', 'ovni', 'fantasma', 'niebla'];
+function fondoTemaPedido() {
+  const a = E.aire, pedidos = [];
+  if (a.gc !== null && a.gc !== undefined && E.gcs[a.gc]) pedidos.push(E.gcs[a.gc].fondo);
+  if (a.titular !== null && a.titular !== undefined) pedidos.push(a.titular < 0 ? E.textos.avance.fondo : (E.titulares[a.titular] || {}).fondo);
+  ['cortinaTitulo', 'aviso', 'volvemos'].forEach(k => { if (a[k] && E.textos[k]) pedidos.push(E.textos[k].fondo); });
+  return pedidos.find(x => FONDOS_TEMA.includes(x)) || '';
+}
+function fondoTema(v) {
+  const c = $('#fondoTema'); if (!c) return;
+  if (v && !c.querySelector('.ft-' + v)) {
+    const d = el('div', 'ft-' + v, c);
+    if (v === 'espacio') { d.classList.add('ftEspacio'); d.appendChild(estrellas(2400, 1080, 260)); }
+    else if (v === 'ovni') {
+      d.classList.add('eMxFondo');
+      const vd = el('video', '', d); Object.assign(vd, { src: 'eoyf/rayo_ciudad.mp4', muted: true, loop: true, autoplay: true, playsInline: true }); vd.play && vd.play().catch(() => {});
+      el('div', 'eMxTinte', d).appendChild(estrellas(1920, 1080, 120));
+    } else if (v === 'fantasma') {
+      d.classList.add('eMxFondo', 'noche');
+      const ms = sv('svg', { viewBox: '0 0 1920 1080', class: 'eMurc' }, d);
+      for (let i = 0; i < 9; i++) {
+        const g = sv('g', { style: `animation-delay:${-i * .7}s;--y:${120 + (i * 97) % 300}px` }, ms);
+        sv('path', { d: 'M0,0 C-14,-14 -34,-12 -46,2 C-36,-2 -28,4 -26,12 C-18,4 -8,6 0,12 C8,6 18,4 26,12 C28,4 36,-2 46,2 C34,-12 14,-14 0,0 Z', fill: '#140003' }, g);
+      }
+    } else if (v === 'niebla') d.classList.add('eNiebla');
+  }
+  [].forEach.call(c.children, d => d.classList.toggle('on', !!v && d.classList.contains('ft-' + v)));
+  c.classList.toggle('on', !!v);
+}
 function aplicarConfig() {
   const c = cfg(), r = document.documentElement.style;
   for (const k in c.colores) r.setProperty('--' + k, c.colores[k]);
@@ -1035,6 +1088,7 @@ function aplicarConfig() {
   r.setProperty('--ft', `'${c.fuenteTitulo}', 'Arial Black', Arial, sans-serif`);
   r.setProperty('--fx', `'${c.fuenteTexto}', Arial, sans-serif`);
   const f = E.programa === 'eoyf' ? 'transparente' : fondoEfectivo();
+  fondoTema(E.programa === 'eoyf' ? fondoTemaPedido() : '');
   document.body.classList.toggle('verde', f === 'verde');
   document.body.classList.toggle('fondo-espacio', f === 'espacio');
   if (f === 'espacio' && !$('#fondoEspacio canvas')) $('#fondoEspacio').appendChild(estrellas(2400, 1080, 260));
@@ -1189,6 +1243,6 @@ if (PARAMS.has('debug')) document.body.classList.add('debug');
   catch (e) { $('#estadoRed').textContent = 'Error: ' + e.message; document.body.classList.add('debug'); }
 })();
 </script>
-<script src="exportar-salida.js?v=345"></script>
+<script src="exportar-salida.js?v=348"></script>
 </body>
 </html>

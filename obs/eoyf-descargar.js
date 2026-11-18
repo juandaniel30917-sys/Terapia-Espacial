@@ -27,9 +27,10 @@
     (p.menciones || []).forEach(function (x, i) { add('Menciones', x.marca, { k: 'inferior', v: 'men:' + i }, ['menciones', i]); });
     (p.datos || []).forEach(function (x, i) { add('Tarjeta lateral', 'Dato · ' + x.titulo, { k: 'lateral', v: 'dato:' + i }, ['datos', i]); });
     add('Tarjeta lateral', 'Medidor EMF', { k: 'lateral', v: 'emf' }, ['emf']);
-    add('Pantalla', 'Triplex alien', { k: 'multiplex', v: 'triplex' }, ['multiplex', 'triplex']);
-    add('Pantalla', 'Duplex fantasmas', { k: 'multiplex', v: 'duplex' }, ['multiplex', 'duplex']);
-    add('Pantalla', 'Dúplex llamada · ' + p.multiplex.llamada.nombre, { k: 'multiplex', v: 'llamada' }, ['multiplex', 'llamada']);
+    Object.keys(p.multiplex || {}).forEach(function (k) {
+      var t = p.multiplex[k], tp = k.replace(/\d+$/, ''); if (!t) return;
+      add('Pantalla', tp === 'llamada' ? 'Dúplex llamada · ' + t.nombre : t.titulo, { k: 'multiplex', v: k }, ['multiplex', k]);
+    });
     add('Pantalla', 'Ubicación', { k: 'ubicacion', v: true }, ['ubicacion']);
     add('Pantalla', 'Visor nocturno', { k: 'visor', v: true }, ['visor']);
     add('Pantalla', 'Logo / marca del programa', { k: 'marca', v: true }, null);
