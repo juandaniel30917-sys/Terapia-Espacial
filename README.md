@@ -162,3 +162,5 @@ Botón **📞 LLAMADA EN VIVO**: el video va en la ventana grande del medio (fon
 
 ## Fondos para las gráficas de Terapia Espacial (dentro de Entre Ovnis y Fantasmas)
 En los GC, titulares, Cortina título, Volvemos y Aviso de la pestaña 🧠 Terapia Espacial, el ✎ del botón tiene **Fondo de esta gráfica**: **Sin fondo** (se ve la cámara), **🌌 Espacio**, **🛸 Ovni** (rayo sobre la ciudad), **👻 Fantasma** (noche roja con murciélagos) o **🌫️ Niebla**. El fondo cubre toda la pantalla solo mientras esa gráfica está al aire.
+## Cada botón con su propia gráfica
+Si un botón usa la misma gráfica que otro (porque lo duplicaste o le elegiste la misma), al abrirlo con ✎ (o al elegirle esa gráfica) se le hace **una copia propia**: cambiar nombre, foto o textos en uno ya no cambia el otro. Funciona con GC, títulos, datos, menciones, triplex, duplex y dúplex de llamada (las copias se llaman llamada2, llamada3…). Las gráficas únicas (en terreno, ¿sabías qué?, código ALIEN, llámenos, redes, EMF, ticker…) se siguen compartiendo.
