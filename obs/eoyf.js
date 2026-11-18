@@ -215,7 +215,7 @@
   function fondoVideoCred(raiz, c) {
     var sel = c.videoFondo === undefined ? 'auto' : c.videoFondo, info = null;
     // 'auto' usa la versión liviana incluida de la Nota Espectral (la subida es 4:4:4 de 10 bits y Chrome/OBS no la reproducen)
-    if (sel === 'auto') info = { url: R + 'nota_espectral_fondo.webm', dur: 5.1, local: true };
+    if (sel === 'auto') info = { url: R + 'nota_espectral_fondo.webm?v=2', dur: 5.1, local: true };
     else if (sel) info = VIDEOS_SALA.filter(function (v) { return v.id === sel; })[0];
     if (!info || (!info.local && !window.TE_RT)) return;
     var caja = el('div', 'credVid ' + (c.fuerzaFondo === 'media' ? 'media' : 'suave'), raiz), v = document.createElement('video');
