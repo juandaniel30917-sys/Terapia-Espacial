@@ -479,8 +479,9 @@
     else cambiarSlot('e_lat', claveL, function () { return new Tarjeta(d, a.lateral === 'emf'); });
     // triplex alien / duplex fantasmas
     var mk = a.multiplex, t = mk ? p.multiplex[mk] : null;
-    var claveM = t ? mk + '|' + t.titulo + '|' + t.etiquetas.join(',') + '|' + fe : null;
+    var claveM = t ? mk + '|' + t.titulo + '|' + t.etiquetas.join(',') + '|' + fe + (mk === 'llamada' ? '|' + [t.nombre, t.lugar, t.estado, t.tema, (t.foto || '').length, (t.foto || '').slice(-40)].join('|') : '') : null;
     cambiarSlot('e_mx', claveM, function () {
+      if (mk === 'llamada') return llamada(t);
       var tm = mk === 'triplex' ? 'ovni' : 'fantasma', ef = efectos(t, tm);
       return new Multiplex(VENTANAS[mk], t.etiquetas, t.titulo, { skin: mk === 'triplex' ? 'eTriplex' : 'eDuplex', tema: tm, ef: ef });
     });
@@ -506,5 +507,39 @@
     return { skin: b.skin, tema: t, colorBarra: b.colorBarra, colorAcento: b.colorAcento, colorSub: b.colorSub, colorSubTxt: b.colorSubTxt,
       colorRayo: b.colorRayo, etqColor: b.etqColor, efEnt: (ef || b).efEnt, efSal: (ef || b).efSal };
   }
+  /* 📞 DÚPLEX DE LLAMADA: el video al medio (ventana con chroma) y a la izquierda la foto de quien llama,
+     con anillos de «llamando», el estado con el tiempo de la llamada y ondas de sonido abajo */
+  var SILUETA = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#2A2A31"/><circle cx="50" cy="38" r="18" fill="#6B6B78"/><path d="M14 100c2-22 17-34 36-34s34 12 36 34z" fill="#6B6B78"/></svg>';
+  function llamada(t) {
+    var tm = t.tema === 'fantasma' ? 'fantasma' : 'ovni', ef = efectos(t, tm);
+    var m = new Multiplex(VENTANAS.llamada, t.etiquetas, t.titulo, { skin: 'eLlamada', tema: tm, ef: ef, fondoRayo: tm === 'ovni' });
+    if (tm === 'fantasma') m.cont.classList.add('fant');
+    var c = document.createElement('div'); c.className = 'eLlam'; m.cont.appendChild(c);
+    var est = document.createElement('div'); est.className = 'eLl-estado'; est.appendChild(document.createElement('i'));
+    var et = document.createElement('span'); et.textContent = t.estado || 'EN LÍNEA'; est.appendChild(et);
+    var rl = document.createElement('b'); rl.textContent = '00:00'; est.appendChild(rl); c.appendChild(est);
+    var fo = document.createElement('div'); fo.className = 'eLl-foto';
+    fo.innerHTML = '<span class="eLl-ring"></span><span class="eLl-ring r2"></span><span class="eLl-ring r3"></span><div class="eLl-img"></div><div class="eLl-tel">📞</div>';
+    var im = fo.querySelector('.eLl-img');
+    if (t.foto) { var img = document.createElement('img'); img.src = t.foto; img.onerror = function () { im.innerHTML = SILUETA; }; im.appendChild(img); } else im.innerHTML = SILUETA;
+    c.appendChild(fo);
+    var no = document.createElement('div'); no.className = 'eLl-nom'; no.textContent = t.nombre || ''; c.appendChild(no);
+    var lu = document.createElement('div'); lu.className = 'eLl-lug'; lu.textContent = t.lugar || ''; if (!t.lugar) lu.style.display = 'none'; c.appendChild(lu);
+    var on = document.createElement('div'); on.className = 'eLl-onda';
+    for (var i = 0; i < 34; i++) {
+      var b = document.createElement('i'), x = Math.sin(i * 1.7) * .5 + .5, cen = 1 - Math.abs(i - 16.5) / 17;
+      b.style.setProperty('--h', Math.round(30 + 66 * cen * (.55 + .45 * x)) + 'px');
+      b.style.setProperty('--t', (380 + Math.round(((i * 37) % 7) * 55)) + 'ms');
+      b.style.setProperty('--d', (-((i * 113) % 900)) + 'ms');
+      on.appendChild(b);
+    }
+    c.appendChild(on);
+    var t0 = ahora(), reloj = setInterval(function () { var s = Math.floor(ahora() - t0); rl.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }, 250);
+    setTimeout(function () { c.classList.add('on'); }, 250);
+    var salir = m.salir.bind(m);
+    m.salir = function () { c.classList.remove('on'); clearInterval(reloj); return salir(); };
+    return m;
+  }
+
   window.EOYF_SAL = { aplicar: aplicar, opciones: opciones, mx: mx, ICONOS: ICONOS, lugar: lugarTexto, lanzarCortina: lanzarCortina, CORT: CORT };
 })();

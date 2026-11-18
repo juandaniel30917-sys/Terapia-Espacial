@@ -29,6 +29,7 @@
     add('Tarjeta lateral', 'Medidor EMF', { k: 'lateral', v: 'emf' }, ['emf']);
     add('Pantalla', 'Triplex alien', { k: 'multiplex', v: 'triplex' }, ['multiplex', 'triplex']);
     add('Pantalla', 'Duplex fantasmas', { k: 'multiplex', v: 'duplex' }, ['multiplex', 'duplex']);
+    add('Pantalla', 'Dúplex llamada · ' + p.multiplex.llamada.nombre, { k: 'multiplex', v: 'llamada' }, ['multiplex', 'llamada']);
     add('Pantalla', 'Ubicación', { k: 'ubicacion', v: true }, ['ubicacion']);
     add('Pantalla', 'Visor nocturno', { k: 'visor', v: true }, ['visor']);
     add('Pantalla', 'Logo / marca del programa', { k: 'marca', v: true }, null);
@@ -42,7 +43,7 @@
     marca: 'Marca', color: 'Color', badge: 'Descuento', nivel: 'Nivel (1 a 5)', modo: 'Texto del visor', dur: 'Duración (s)', cierre: 'Frase final', tituloLogos: 'Título de los logos',
     logos: 'Mostrar logos de auspiciadores', etiquetas: 'Etiquetas (una por línea)', numero: 'Número de teléfono', vivoTexto: 'Texto EN VIVO', ticker: 'Texto del ticker (separa las noticias con ·)',
     entrada: 'Efecto de entrada', salida: 'Efecto de salida' };
-  var SALTAR = { logo: 1, id: 1 };
+  var SALTAR = { logo: 1, id: 1, foto: 1 };
 
   /* ---------- estilos del módulo ---------- */
   var css = document.createElement('style');
