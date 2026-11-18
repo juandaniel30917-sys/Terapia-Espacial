@@ -70,7 +70,7 @@
     if ((m = /^e:tit:(\d+)$/.exec(accion))) return p.titulos[+m[1]];
     if ((m = /^e:dato:(\d+)$/.exec(accion))) return p.datos[+m[1]];
     if ((m = /^e:men:(\d+)$/.exec(accion))) return p.menciones[+m[1]];
-    if ((m = /^e:mx:(triplex|duplex)$/.exec(accion))) return p.multiplex[m[1]];
+    if ((m = /^e:mx:(triplex|duplex|llamada)$/.exec(accion))) return p.multiplex[m[1]];
     var k = { 'e:terreno': 'terreno', 'e:sabias': 'sabias', 'e:promo': 'promo', 'e:llamenos': 'llamenos', 'e:redes': 'redes', 'e:emf': 'emf' }[accion];
     return k ? p[k] : null;
   }
@@ -89,6 +89,7 @@
     p.menciones.forEach(function (m, i) { add('e:men:' + i, '💰 ' + (m.marca || 'Mención ' + (i + 1)), m.texto, m.color || AMARILLO, 'MENCIÓN', function () { inferior('men:' + i); }, function () { return A().inferior === 'men:' + i; }); });
     add('e:mx:triplex', '🛸 ' + p.multiplex.triplex.titulo, p.multiplex.triplex.etiquetas.join(' · '), VERDE, 'PANTALLA', function () { multiplex('triplex'); }, function () { return A().multiplex === 'triplex'; });
     add('e:mx:duplex', '🦇 ' + p.multiplex.duplex.titulo, p.multiplex.duplex.etiquetas.join(' · '), NARANJO, 'PANTALLA', function () { multiplex('duplex'); }, function () { return A().multiplex === 'duplex'; });
+    add('e:mx:llamada', '📞 ' + p.multiplex.llamada.titulo, p.multiplex.llamada.nombre + ' · dúplex de llamada', colorTema(p.multiplex.llamada.tema), 'PANTALLA', function () { multiplex('llamada'); }, function () { return A().multiplex === 'llamada'; });
     add('e:creditos', '🎞️ Créditos', 'rollo final · ' + p.creditos.dur + ' s', ROJO, 'PANTALLA', creditos, function () { return !!A().creditos; });
     EOYF_DATOS.EFECTOS.forEach(function (e) {
       var v = e[0];
@@ -116,7 +117,7 @@
       .concat(p.titulos.map(function (_, i) { return 'e:tit:' + i; }))
       .concat(['e:terreno', 'e:ubicacion', 'e:visor'], p.datos.map(function (_, i) { return 'e:dato:' + i; }), ['e:emf', 'e:sabias', 'e:promo', 'e:llamenos', 'e:redes'])
       .concat(p.menciones.map(function (_, i) { return 'e:men:' + i; }))
-      .concat(['e:mx:triplex', 'e:mx:duplex', 'e:creditos'])
+      .concat(['e:mx:triplex', 'e:mx:duplex', 'e:mx:llamada', 'e:creditos'])
       .concat(EOYF_DATOS.EFECTOS.slice(2).map(function (e) { return 'e:cort:' + e[0]; }), ['e:trans:azar'])
       .concat(['e:vivo', 'e:efecto', 'e:paso:sig', 'e:limpiar']);
     return ids.map(function (a, i) { return { id: TE.id() + i, accion: a, texto: '', color: '', tecla: TECLAS[i] || '' }; });
@@ -228,6 +229,7 @@
     if (accion === 'e:redes') return T(p.redes, [['titulo', 'Etiqueta'], ['usuario', 'Usuario (@)'], ['texto', 'Redes'], TEMA, ENT, SAL]);
     if ((m = /^e:men:(\d+)$/.exec(accion))) return T(p.menciones[+m[1]], [['marca', 'Marca'], ['texto', 'Texto de la mención'], ['etiqueta', 'Etiqueta (AUSPICIA, MENCIÓN…)'], ['color', 'Color (#RRGGBB)'], ['logo', 'Logo (ruta o link)'], ENT, SAL]);
     if ((m = /^e:mx:(triplex|duplex)$/.exec(accion))) return T(p.multiplex[m[1]], [['titulo', 'Título'], ['etiquetas', 'Etiquetas de las ventanas (separadas por | )'], ENT, SAL]);
+    if (accion === 'e:mx:llamada') return T(p.multiplex.llamada, [['nombre', 'Nombre de quien llama'], ['lugar', 'Lugar (ciudad)'], ['foto', 'Foto de quien llama', 'foto'], ['estado', 'Estado (EN LÍNEA, LLAMANDO…, AL TELÉFONO)'], ['titulo', 'Título de abajo'], ['etiquetas', 'Etiqueta del video'], ['tema', 'Estilo', [['ovni', '👽 Ovni (verde)'], ['fantasma', '👻 Fantasma (naranjo)']]], ENT, SAL]);
     if ((m = /^e:cort:(\w+)$/.exec(accion)) && p.efectos[m[1]]) return T(p.efectos[m[1]], [['dur', 'Duración', DURS]]);
     if (accion === 'e:creditos') return T(p.creditos, [['texto', 'Créditos (una línea por cargo: «Cargo: nombre · nombre»)', 'largo'], ['cierre', 'Frase final'], ['tituloLogos', 'Título de los logos'], ['dur', 'Duración del rollo (segundos)', [[15, '15 s'], [20, '20 s'], [25, '25 s'], [30, '30 s'], [45, '45 s']]]]);
     if (accion === 'e:ticker') return T(p.config, [['ticker', 'Noticias (separadas por · )', 'largo'], ['fecha', 'Fecha']]);
@@ -252,6 +254,29 @@
           seg.appendChild(b);
         });
         d.appendChild(seg);
+      } else if (c[2] === 'foto') {
+        /* foto: se elige del computador o celular, se achica a 400×400 (JPG liviano) y queda guardada en la sala */
+        var fila = document.createElement('div'); fila.style.cssText = 'display:flex;gap:10px;align-items:center;flex-wrap:wrap';
+        var mini = document.createElement('img'); mini.style.cssText = 'width:64px;height:64px;border-radius:50%;object-fit:cover;background:#2A2A31;border:2px solid rgba(255,255,255,.25)';
+        var pinta = function () { var v = ob.o[c[0]]; if (v) mini.src = v; else mini.removeAttribute('src'); };
+        var file = document.createElement('input'); file.type = 'file'; file.accept = 'image/*'; file.style.display = 'none';
+        var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'mini'; bt.textContent = '📷 Elegir foto'; bt.onclick = function () { file.click(); };
+        var qu = document.createElement('button'); qu.type = 'button'; qu.className = 'mini'; qu.textContent = 'Quitar'; qu.onclick = function () { ob.o[c[0]] = ''; pinta(); alCambiar(true); };
+        file.onchange = function () {
+          var f = file.files[0]; file.value = ''; if (!f) return;
+          var rd = new FileReader();
+          rd.onload = function () {
+            var im = new Image();
+            im.onload = function () {
+              var lado = Math.min(im.width, im.height), cv = document.createElement('canvas'); cv.width = cv.height = 400;
+              cv.getContext('2d').drawImage(im, (im.width - lado) / 2, (im.height - lado) / 2, lado, lado, 0, 0, 400, 400);
+              ob.o[c[0]] = cv.toDataURL('image/jpeg', 0.82); pinta(); alCambiar(true);
+            };
+            im.src = rd.result;
+          };
+          rd.readAsDataURL(f);
+        };
+        pinta(); fila.appendChild(mini); fila.appendChild(bt); fila.appendChild(qu); fila.appendChild(file); d.appendChild(fila);
       } else {
         var i = document.createElement(c[2] === 'largo' ? 'textarea' : 'input');
         if (i.tagName === 'INPUT') i.type = c[2] === 'num' ? 'number' : 'text';
@@ -286,6 +311,7 @@
     seccion('Código ALIEN y Llámenos'); campos(cont, objetivo('e:promo'), alCambiar); campos(cont, objetivo('e:llamenos'), alCambiar);
     seccion('Menciones'); p.menciones.forEach(function (_, i) { campos(cont, objetivo('e:men:' + i), alCambiar); });
     seccion('Triplex y duplex'); campos(cont, objetivo('e:mx:triplex'), alCambiar); campos(cont, objetivo('e:mx:duplex'), alCambiar);
+    seccion('📞 Dúplex de llamada'); campos(cont, objetivo('e:mx:llamada'), alCambiar);
     seccion('Ticker'); campos(cont, objetivo('e:ticker'), alCambiar);
     seccion('Efectos de entrada y salida'); campos(cont, objetivo('e:efecto'), alCambiar);
     var n2 = document.createElement('p'); n2.className = 'nota';

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<script src="exportar-reloj.js?v=344"></script>
+<script src="exportar-reloj.js?v=345"></script>
 <title>Entre Ovnis y Fantasmas · Salida OBS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -199,7 +199,34 @@
   @keyframes eVuelo{from{transform:translate(-120px,var(--y)) scale(.9)}50%{transform:translate(960px,calc(var(--y) - 60px)) scale(1.1)}to{transform:translate(2100px,var(--y)) scale(.9)}}
   .eTriplex .etq,.eDuplex .etq{font-family:var(--e-ft);background:var(--e-carbon);letter-spacing:.06em;border-radius:0;clip-path:polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%)}
   .eTriplex .etq::before{background:var(--e-verde);border-radius:0} .eDuplex .etq::before{background:var(--e-naranjo);border-radius:0}
-  .eTriplex .sesion,.eDuplex .sesion{display:none}
+  .eTriplex .sesion,.eDuplex .sesion,.eLlamada .sesion{display:none}
+  .eLlamada .etq{font-family:var(--e-ft);background:var(--e-carbon);letter-spacing:.06em;border-radius:0;clip-path:polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%)}
+  .eLlamada .etq::before{background:var(--ll-c);border-radius:0}
+  /* ---- dúplex de llamada: tarjeta de quien llama ---- */
+  .eLlamada{--ll-c:var(--e-verde)} .eLlamada.fant{--ll-c:var(--e-naranjo)}
+  .eLlam{position:absolute;left:70px;top:196px;width:520px;height:675px;display:flex;flex-direction:column;align-items:center;
+    background:linear-gradient(180deg,rgba(23,23,28,.94),rgba(10,10,14,.96));border:3px solid var(--ll-c);border-radius:22px;box-shadow:0 0 0 2px rgba(255,255,255,.12) inset,0 20px 60px rgba(0,0,0,.55);
+    opacity:0;transform:translateX(-60px) scale(.96);transition:opacity .5s ease,transform .6s cubic-bezier(.2,.9,.2,1)}
+  .eLlam.on{opacity:1;transform:none}
+  .eLl-estado{margin-top:26px;display:flex;align-items:center;gap:12px;padding:8px 18px;border-radius:40px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
+    font:700 24px/1 var(--e-tx);color:#fff;letter-spacing:.12em}
+  .eLl-estado i{width:14px;height:14px;border-radius:50%;background:var(--ll-c);box-shadow:0 0 12px var(--ll-c);animation:eLlPunto 1s steps(2) infinite}
+  .eLl-estado b{font:600 24px/1 'Courier New',monospace;color:var(--ll-c);letter-spacing:0}
+  @keyframes eLlPunto{50%{opacity:.2}}
+  .eLl-foto{position:relative;width:280px;height:280px;margin-top:34px}
+  .eLl-ring{position:absolute;inset:0;border-radius:50%;border:4px solid var(--ll-c);opacity:0;animation:eLlRing 2.4s ease-out infinite}
+  .eLl-ring.r2{animation-delay:.8s}.eLl-ring.r3{animation-delay:1.6s}
+  @keyframes eLlRing{0%{transform:scale(1);opacity:.85}100%{transform:scale(1.42);opacity:0}}
+  .eLl-img{position:absolute;inset:0;border-radius:50%;overflow:hidden;border:6px solid var(--ll-c);background:#2A2A31;box-shadow:0 0 34px rgba(0,0,0,.6)}
+  .eLl-img img,.eLl-img svg{width:100%;height:100%;object-fit:cover;display:block}
+  .eLl-tel{position:absolute;right:4px;bottom:10px;width:70px;height:70px;border-radius:50%;background:var(--ll-c);display:grid;place-items:center;font-size:34px;
+    border:5px solid #17171C;animation:eLlTel 1.2s ease-in-out infinite}
+  @keyframes eLlTel{0%,100%{transform:rotate(0)}10%{transform:rotate(-14deg)}20%{transform:rotate(12deg)}30%{transform:rotate(-8deg)}40%{transform:rotate(0)}}
+  .eLl-nom{margin-top:30px;max-width:470px;text-align:center;font:700 44px/1.05 var(--e-ft);color:#fff;letter-spacing:.03em;text-transform:uppercase}
+  .eLl-lug{margin-top:8px;font:600 26px/1 var(--e-tx);color:var(--ll-c);letter-spacing:.14em;text-transform:uppercase}
+  .eLl-onda{margin-top:auto;margin-bottom:34px;width:440px;height:96px;display:flex;align-items:center;justify-content:space-between}
+  .eLl-onda i{width:7px;height:var(--h);border-radius:5px;background:var(--ll-c);box-shadow:0 0 10px var(--ll-c);transform-origin:50% 50%;animation:eLlOnda var(--t) ease-in-out var(--d) infinite alternate}
+  @keyframes eLlOnda{0%{transform:scaleY(.12)}100%{transform:scaleY(1)}}
 
   /* ===== v3.3 · programa nuevo ===== */
   /* los efectos del programa anterior (ovni, rayo, pin, cabeza alien) con la paleta nueva */
@@ -310,13 +337,13 @@
 </div>
 <div id="estadoRed">conectando…</div>
 
-<script src="config.js?v=344"></script>
-<script src="comun.js?v=344"></script>
-<script src="eoyf-datos.js?v=344"></script>
-<script src="conexion.js?v=344"></script>
-<script src="escena.js?v=344"></script>
-<script src="chroma.js?v=344"></script>
-<script src="eoyf.js?v=344"></script>
+<script src="config.js?v=345"></script>
+<script src="comun.js?v=345"></script>
+<script src="eoyf-datos.js?v=345"></script>
+<script src="conexion.js?v=345"></script>
+<script src="escena.js?v=345"></script>
+<script src="chroma.js?v=345"></script>
+<script src="eoyf.js?v=345"></script>
 <script>
 /* ===================================================================
    MOTOR DE ANIMACIÓN — replica las llaves del script de After Effects
@@ -654,7 +681,7 @@ class Multiplex {
       const hoyos = ventanas.map(vn => `M${vn.b[0] + 16},${vn.b[1]}h${vn.b[2] - 32}a16,16 0 0 1 16,16v${vn.b[3] - 32}a16,16 0 0 1 -16,16h${-(vn.b[2] - 32)}a16,16 0 0 1 -16,-16v${-(vn.b[3] - 32)}a16,16 0 0 1 16,-16z`).join('');
       const mascara = 'url("data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'><path fill-rule='evenodd' d='M0,0H1920V1080H0Z${hoyos}'/></svg>`) + '")';
       const bg = el('div', 'eMxFondo', this.fondo); bg.style.webkitMaskImage = bg.style.maskImage = mascara;
-      if (opc.skin === 'eTriplex') {
+      if (opc.skin === 'eTriplex' || opc.fondoRayo) {
         const v = el('video', '', bg); Object.assign(v, { src: 'eoyf/rayo_ciudad.mp4', muted: true, loop: true, autoplay: true, playsInline: true }); v.play && v.play().catch(() => {});
         el('div', 'eMxTinte', bg).appendChild(estrellas(1920, 1080, 120));
       } else {
@@ -972,7 +999,9 @@ function conf(tipo) {
 // Triplex: costados verticales 9:16 y centro 16:9 · Duplex: cámara de la psicóloga (9:16, chica) + video 16:9 al centro
 const VENTANAS = {
   triplex: [{ b: [40, 280, 447, 510], etq: 'arriba' }, { b: [507, 280, 907, 510], etq: 'arriba' }, { b: [1434, 280, 446, 510], etq: 'arriba' }],
-  duplex: [{ b: [96, 262, 300, 533], etq: 'arriba' }, { b: [440, 210, 1040, 585], etq: 'arriba' }]
+  duplex: [{ b: [96, 262, 300, 533], etq: 'arriba' }, { b: [440, 210, 1040, 585], etq: 'arriba' }],
+  // dúplex de llamada (programa nuevo): un video grande al medio-derecha; a la izquierda va la tarjeta de quien llama (eoyf.js)
+  llamada: [{ b: [640, 196, 1200, 675], etq: 'arriba' }]
 };
 
 /* ===================================================================
@@ -1160,6 +1189,6 @@ if (PARAMS.has('debug')) document.body.classList.add('debug');
   catch (e) { $('#estadoRed').textContent = 'Error: ' + e.message; document.body.classList.add('debug'); }
 })();
 </script>
-<script src="exportar-salida.js?v=344"></script>
+<script src="exportar-salida.js?v=345"></script>
 </body>
 </html>

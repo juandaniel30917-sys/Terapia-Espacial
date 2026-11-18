@@ -69,7 +69,9 @@
     ],
     multiplex: {
       triplex: { titulo: 'TRIPLEX ALIEN', etiquetas: ['LUIS MONASTERIOS', 'AVISTAMIENTOS', 'BENJAMÍN CASTILLO'] },
-      duplex: { titulo: 'DUPLEX FANTASMAS', etiquetas: ['BENJAMÍN CASTILLO', 'SANATORIO LOS MAITENES'] }
+      duplex: { titulo: 'DUPLEX FANTASMAS', etiquetas: ['BENJAMÍN CASTILLO', 'SANATORIO LOS MAITENES'] },
+      // dúplex de llamada: video al medio y, al lado, la foto de quien llama con ondas de sonido
+      llamada: { titulo: 'LLAMADA EN VIVO', etiquetas: ['EN DIRECTO'], nombre: 'NOMBRE DE QUIEN LLAMA', lugar: 'Talca', estado: 'EN LÍNEA', foto: '', tema: 'ovni' }
     },
     // inferior: 'gc:N' | 'tit:N' | 'terreno' | 'sabias' | 'promo' | 'llamenos' | 'men:N' · lateral: 'dato:N'
     aire: { inferior: null, lateral: null, marca: false, ticker: false, multiplex: null, cortina: null, creditos: null, visor: false, ubicacion: false, vivo: false },
@@ -87,6 +89,15 @@
     if (['transparente', 'azul', 'verde'].indexOf(est.config.fondo) < 0) est.config.fondo = 'azul';
     for (var e in BASE.efectos) { if (!est.efectos[e] || [2, 3, 4, 5].indexOf(+est.efectos[e].dur) < 0) est.efectos[e] = { dur: BASE.efectos[e].dur }; }
     if (!est.aire || typeof est.aire !== 'object') est.aire = TE.copia(BASE.aire);
+    // la botonera guardada recibe una vez el botón nuevo del dúplex de llamada, al lado del duplex
+    if (est.botonera && Array.isArray(est.botonera.botones) && !est.conLlamada) {
+      var bs = est.botonera.botones;
+      est.conLlamada = true;
+      if (!bs.some(function (b) { return b && b.accion === 'e:mx:llamada'; })) {
+        var i = bs.map(function (b) { return b && b.accion; }).indexOf('e:mx:duplex');
+        bs.splice(i < 0 ? bs.length : i + 1, 0, { id: TE.id() + 'll', accion: 'e:mx:llamada', texto: '', color: '', tecla: '' });
+      }
+    }
     return est;
   }
   // lista de cortinas y transiciones para la botonera
