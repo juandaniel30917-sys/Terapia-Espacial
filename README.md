@@ -159,3 +159,6 @@ Se arma en `salida.html?exportar=1` con un reloj virtual (`exportar-reloj.js`, `
 
 ## 📞 Dúplex de llamada (sección PANTALLA)
 Botón **📞 LLAMADA EN VIVO**: el video va en la ventana grande del medio (fondo de chroma) y a la izquierda la tarjeta de quien llama: **foto** con anillos de «llamando» y teléfono que vibra, estado (EN LÍNEA) con el tiempo de la llamada, nombre, lugar y **ondas de sonido** animadas abajo. En la pestaña Textos (o con ✏️ en el botón) se cambian nombre, lugar, estado, título, etiqueta del video, estilo ovni (verde) o fantasma (naranjo) y la **foto** (📷 Elegir foto: se achica sola a 400×400).
+
+## Fondos para las gráficas de Terapia Espacial (dentro de Entre Ovnis y Fantasmas)
+En los GC, titulares, Cortina título, Volvemos y Aviso de la pestaña 🧠 Terapia Espacial, el ✎ del botón tiene **Fondo de esta gráfica**: **Sin fondo** (se ve la cámara), **🌌 Espacio**, **🛸 Ovni** (rayo sobre la ciudad), **👻 Fantasma** (noche roja con murciélagos) o **🌫️ Niebla**. El fondo cubre toda la pantalla solo mientras esa gráfica está al aire.

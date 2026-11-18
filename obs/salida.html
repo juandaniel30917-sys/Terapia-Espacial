@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<script src="exportar-reloj.js?v=345"></script>
+<script src="exportar-reloj.js?v=347"></script>
 <title>Entre Ovnis y Fantasmas · Salida OBS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -114,6 +114,16 @@
         --e-ft:'Cinzel', Georgia, serif;--e-tx:'Montserrat', Arial, sans-serif;--e-exp:'Special Elite', 'Courier New', monospace;}
   body.eoyf.e-azul #fondoVerde{display:block;background:#0000FF}
   body.eoyf.e-verde #fondoVerde{display:block;background:#00FF00}
+  /* fondo opcional de las gráficas de Terapia Espacial dentro del programa nuevo: espacio, ovni, fantasma o niebla */
+  #fondoTema{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none}
+  #fondoTema.on{opacity:1}
+  #fondoTema > div{position:absolute;inset:0;display:none}
+  #fondoTema > div.on{display:block}
+  #fondoTema .ftEspacio{background:radial-gradient(ellipse at 50% 120%,#2B0F5E 0%,#0B0620 55%,#05030F 100%)}
+  #fondoTema .ftEspacio canvas{position:absolute;left:0;top:0;animation:deriva 60s linear infinite}
+  #fondoTema .eNiebla{inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(150,90,170,.85),rgba(60,24,80,.9) 45%,rgba(10,2,14,.98) 85%),url(eoyf/textura.jpg) center/cover;background-blend-mode:screen}
+  #fondoTema .eNiebla::after{content:"";position:absolute;inset:-20%;background:radial-gradient(ellipse at 30% 60%,rgba(255,255,255,.18),transparent 45%),radial-gradient(ellipse at 75% 35%,rgba(255,255,255,.14),transparent 40%);animation:ftNiebla 14s ease-in-out infinite alternate}
+  @keyframes ftNiebla{from{transform:translateX(-4%)}to{transform:translateX(4%)}}
   /* barras del tercio inferior: carbón en diagonal con franjas ///, acento verde alien o naranjo calabaza */
   .abd.eoyf .barra{border-radius:0;clip-path:polygon(22px 0,100% 0,calc(100% - 22px) 100%,0 100%);
        box-shadow:inset 0 -3px 0 rgba(255,255,255,.06);background-image:linear-gradient(180deg,rgba(255,255,255,.07),transparent 60%)!important}
@@ -325,6 +335,7 @@
 <div id="escena">
   <div id="fondoVerde"></div>
   <div id="fondoEspacio"></div>
+  <div id="fondoTema"></div>
   <div class="capa" id="cEspacio"></div>
   <div class="capa" id="cVentanas"></div>
   <div class="capa" id="cCreditos"></div>
@@ -337,13 +348,13 @@
 </div>
 <div id="estadoRed">conectando…</div>
 
-<script src="config.js?v=345"></script>
-<script src="comun.js?v=345"></script>
-<script src="eoyf-datos.js?v=345"></script>
-<script src="conexion.js?v=345"></script>
-<script src="escena.js?v=345"></script>
-<script src="chroma.js?v=345"></script>
-<script src="eoyf.js?v=345"></script>
+<script src="config.js?v=347"></script>
+<script src="comun.js?v=347"></script>
+<script src="eoyf-datos.js?v=347"></script>
+<script src="conexion.js?v=347"></script>
+<script src="escena.js?v=347"></script>
+<script src="chroma.js?v=347"></script>
+<script src="eoyf.js?v=347"></script>
 <script>
 /* ===================================================================
    MOTOR DE ANIMACIÓN — replica las llaves del script de After Effects
@@ -1026,6 +1037,36 @@ function fondoEfectivo() {
   if (pedidos.includes('verde')) return 'verde';
   return FORZAR_FONDO || cfg().fondo;
 }
+/* en el programa nuevo, las gráficas de Terapia Espacial pueden llevar su propio fondo a pantalla completa */
+const FONDOS_TEMA = ['espacio', 'ovni', 'fantasma', 'niebla'];
+function fondoTemaPedido() {
+  const a = E.aire, pedidos = [];
+  if (a.gc !== null && a.gc !== undefined && E.gcs[a.gc]) pedidos.push(E.gcs[a.gc].fondo);
+  if (a.titular !== null && a.titular !== undefined) pedidos.push(a.titular < 0 ? E.textos.avance.fondo : (E.titulares[a.titular] || {}).fondo);
+  ['cortinaTitulo', 'aviso', 'volvemos'].forEach(k => { if (a[k] && E.textos[k]) pedidos.push(E.textos[k].fondo); });
+  return pedidos.find(x => FONDOS_TEMA.includes(x)) || '';
+}
+function fondoTema(v) {
+  const c = $('#fondoTema'); if (!c) return;
+  if (v && !c.querySelector('.ft-' + v)) {
+    const d = el('div', 'ft-' + v, c);
+    if (v === 'espacio') { d.classList.add('ftEspacio'); d.appendChild(estrellas(2400, 1080, 260)); }
+    else if (v === 'ovni') {
+      d.classList.add('eMxFondo');
+      const vd = el('video', '', d); Object.assign(vd, { src: 'eoyf/rayo_ciudad.mp4', muted: true, loop: true, autoplay: true, playsInline: true }); vd.play && vd.play().catch(() => {});
+      el('div', 'eMxTinte', d).appendChild(estrellas(1920, 1080, 120));
+    } else if (v === 'fantasma') {
+      d.classList.add('eMxFondo', 'noche');
+      const ms = sv('svg', { viewBox: '0 0 1920 1080', class: 'eMurc' }, d);
+      for (let i = 0; i < 9; i++) {
+        const g = sv('g', { style: `animation-delay:${-i * .7}s;--y:${120 + (i * 97) % 300}px` }, ms);
+        sv('path', { d: 'M0,0 C-14,-14 -34,-12 -46,2 C-36,-2 -28,4 -26,12 C-18,4 -8,6 0,12 C8,6 18,4 26,12 C28,4 36,-2 46,2 C34,-12 14,-14 0,0 Z', fill: '#140003' }, g);
+      }
+    } else if (v === 'niebla') d.classList.add('eNiebla');
+  }
+  [].forEach.call(c.children, d => d.classList.toggle('on', !!v && d.classList.contains('ft-' + v)));
+  c.classList.toggle('on', !!v);
+}
 function aplicarConfig() {
   const c = cfg(), r = document.documentElement.style;
   for (const k in c.colores) r.setProperty('--' + k, c.colores[k]);
@@ -1035,6 +1076,7 @@ function aplicarConfig() {
   r.setProperty('--ft', `'${c.fuenteTitulo}', 'Arial Black', Arial, sans-serif`);
   r.setProperty('--fx', `'${c.fuenteTexto}', Arial, sans-serif`);
   const f = E.programa === 'eoyf' ? 'transparente' : fondoEfectivo();
+  fondoTema(E.programa === 'eoyf' ? fondoTemaPedido() : '');
   document.body.classList.toggle('verde', f === 'verde');
   document.body.classList.toggle('fondo-espacio', f === 'espacio');
   if (f === 'espacio' && !$('#fondoEspacio canvas')) $('#fondoEspacio').appendChild(estrellas(2400, 1080, 260));
@@ -1189,6 +1231,6 @@ if (PARAMS.has('debug')) document.body.classList.add('debug');
   catch (e) { $('#estadoRed').textContent = 'Error: ' + e.message; document.body.classList.add('debug'); }
 })();
 </script>
-<script src="exportar-salida.js?v=345"></script>
+<script src="exportar-salida.js?v=347"></script>
 </body>
 </html>
