@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<script src="exportar-reloj.js?v=351"></script>
+<script src="exportar-reloj.js?v=352"></script>
 <title>Entre Ovnis y Fantasmas · Salida OBS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -366,13 +366,13 @@
 </div>
 <div id="estadoRed">conectando…</div>
 
-<script src="config.js?v=351"></script>
-<script src="comun.js?v=351"></script>
-<script src="eoyf-datos.js?v=351"></script>
-<script src="conexion.js?v=351"></script>
-<script src="escena.js?v=351"></script>
-<script src="chroma.js?v=351"></script>
-<script src="eoyf.js?v=351"></script>
+<script src="config.js?v=352"></script>
+<script src="comun.js?v=352"></script>
+<script src="eoyf-datos.js?v=352"></script>
+<script src="conexion.js?v=352"></script>
+<script src="escena.js?v=352"></script>
+<script src="chroma.js?v=352"></script>
+<script src="eoyf.js?v=352"></script>
 <script>
 /* ===================================================================
    MOTOR DE ANIMACIÓN — replica las llaves del script de After Effects
@@ -1082,8 +1082,19 @@ function fondoTema(v) {
       }
     } else if (v === 'niebla') d.classList.add('eNiebla');
   }
-  [].forEach.call(c.children, d => d.classList.toggle('on', !!v && d.classList.contains('ft-' + v)));
-  c.classList.toggle('on', !!v);
+  const vel = cfg().velocidad || 1, estaba = c.classList.contains('on');
+  if (v) {
+    clearTimeout(fondoTema.t);
+    c.style.transition = 'opacity ' + (.7 / vel).toFixed(2) + 's ease';
+    [].forEach.call(c.children, d => d.classList.toggle('on', d.classList.contains('ft-' + v)));
+    c.classList.add('on');
+  } else if (estaba) {
+    /* al sacar la gráfica, el fondo se va junto con su animación de salida (≈2 s): se desvanece lento y al final */
+    c.style.transition = 'opacity ' + (1.5 / vel).toFixed(2) + 's ease-in-out ' + (.5 / vel).toFixed(2) + 's';
+    c.classList.remove('on');
+    clearTimeout(fondoTema.t);
+    fondoTema.t = setTimeout(() => { if (!c.classList.contains('on')) [].forEach.call(c.children, d => d.classList.remove('on')); }, 2200 / vel);
+  }
 }
 function aplicarConfig() {
   const c = cfg(), r = document.documentElement.style;
@@ -1249,6 +1260,6 @@ if (PARAMS.has('debug')) document.body.classList.add('debug');
   catch (e) { $('#estadoRed').textContent = 'Error: ' + e.message; document.body.classList.add('debug'); }
 })();
 </script>
-<script src="exportar-salida.js?v=351"></script>
+<script src="exportar-salida.js?v=352"></script>
 </body>
 </html>
