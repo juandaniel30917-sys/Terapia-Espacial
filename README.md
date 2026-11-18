@@ -159,3 +159,6 @@ Se arma en `salida.html?exportar=1` con un reloj virtual (`exportar-reloj.js`, `
 
 ## 📞 Dúplex de llamada (sección PANTALLA)
 Botón **📞 LLAMADA EN VIVO**: el video va en la ventana grande del medio (fondo de chroma) y a la izquierda la tarjeta de quien llama: **foto** con anillos de «llamando» y teléfono que vibra, estado (EN LÍNEA) con el tiempo de la llamada, nombre, lugar y **ondas de sonido** animadas abajo. En la pestaña Textos (o con ✏️ en el botón) se cambian nombre, lugar, estado, título, etiqueta del video, estilo ovni (verde) o fantasma (naranjo) y la **foto** (📷 Elegir foto: se achica sola a 400×400).
+
+## Cada botón con su propia gráfica
+Si un botón usa la misma gráfica que otro (porque lo duplicaste o le elegiste la misma), al abrirlo con ✎ (o al elegirle esa gráfica) se le hace **una copia propia**: cambiar nombre, foto o textos en uno ya no cambia el otro. Funciona con GC, títulos, datos, menciones, triplex, duplex y dúplex de llamada (las copias se llaman llamada2, llamada3…). Las gráficas únicas (en terreno, ¿sabías qué?, código ALIEN, llámenos, redes, EMF, ticker…) se siguen compartiendo.

@@ -479,11 +479,12 @@
     else cambiarSlot('e_lat', claveL, function () { return new Tarjeta(d, a.lateral === 'emf'); });
     // triplex alien / duplex fantasmas
     var mk = a.multiplex, t = mk ? p.multiplex[mk] : null;
-    var claveM = t ? mk + '|' + t.titulo + '|' + t.etiquetas.join(',') + '|' + fe + (mk === 'llamada' ? '|' + [t.nombre, t.lugar, t.estado, t.tema, (t.foto || '').length, (t.foto || '').slice(-40)].join('|') : '') : null;
+    var claveM = t ? mk + '|' + t.titulo + '|' + t.etiquetas.join(',') + '|' + fe + (/^llamada/.test(mk) ? '|' + [t.nombre, t.lugar, t.estado, t.tema, (t.foto || '').length, (t.foto || '').slice(-40)].join('|') : '') : null;
     cambiarSlot('e_mx', claveM, function () {
-      if (mk === 'llamada') return llamada(t);
-      var tm = mk === 'triplex' ? 'ovni' : 'fantasma', ef = efectos(t, tm);
-      return new Multiplex(VENTANAS[mk], t.etiquetas, t.titulo, { skin: mk === 'triplex' ? 'eTriplex' : 'eDuplex', tema: tm, ef: ef });
+      var tp = String(mk).replace(/\d+$/, '');   // las copias (duplex2, llamada3…) usan el diseño de su tipo
+      if (tp === 'llamada') return llamada(t);
+      var tm = tp === 'triplex' ? 'ovni' : 'fantasma', ef = efectos(t, tm);
+      return new Multiplex(VENTANAS[tp] || VENTANAS.duplex, t.etiquetas, t.titulo, { skin: tp === 'triplex' ? 'eTriplex' : 'eDuplex', tema: tm, ef: ef });
     });
     document.body.classList.toggle('e-mx', !!a.multiplex);
     document.body.classList.toggle('e-visor', !!a.visor);

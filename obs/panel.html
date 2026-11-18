@@ -446,14 +446,14 @@
 </div></div>
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=345"></script>
-<script src="comun.js?v=345"></script>
-<script src="eoyf-datos.js?v=345"></script>
-<script src="conexion.js?v=345"></script>
-<script src="escena.js?v=345"></script>
-<script src="qrcode.js?v=345"></script>
-<script src="eoyf-panel.js?v=345"></script>
-<script src="eoyf-descargar.js?v=345"></script>
+<script src="config.js?v=346"></script>
+<script src="comun.js?v=346"></script>
+<script src="eoyf-datos.js?v=346"></script>
+<script src="conexion.js?v=346"></script>
+<script src="escena.js?v=346"></script>
+<script src="qrcode.js?v=346"></script>
+<script src="eoyf-panel.js?v=346"></script>
+<script src="eoyf-descargar.js?v=346"></script>
 <script>
 const $ = (s, p = document) => p.querySelector(s);
 const $$ = (s, p = document) => [...p.querySelectorAll(s)];
@@ -898,6 +898,7 @@ function editarBoton(i) {
     grupos[gn].forEach(a => { const o = document.createElement('option'); o.value = a.id; o.textContent = a.titulo + (a.sub ? ' — ' + a.sub : ''); og.appendChild(o); });
     sel.appendChild(og);
   });
+  ebCopia = null; separarSiCompartido(b, i < 0); refrescarOpciones(sel);
   sel.value = b.accion;
   $('#ebTitulo').textContent = '✎ ' + (b.texto || (cat[b.accion] ? cat[b.accion].titulo : 'Botón'));
   $('#ebTexto').value = b.texto || '';
@@ -907,7 +908,30 @@ function editarBoton(i) {
   $('#mBoton').classList.add('on');
 }
 function botonActual() { return botones()[ebIndice]; }
-$('#ebAccion').onchange = e => { const b = botonActual(); b.accion = e.target.value; pintarGrafica(b.accion); publicar(true); dibujarBotonera(); };
+/* cada botón tiene SU gráfica: si otro botón ya usa la misma, a este se le hace una copia propia
+   (así cambiar el nombre o la foto en uno no cambia el otro). Las gráficas únicas (terreno, promo…) se comparten. */
+let ebCopia = null;
+function separarSiCompartido(b, nuevo) {
+  if (!esEOYF()) return;
+  const otro = botones().some(x => x !== b && x.accion === b.accion);
+  if (!otro) return;
+  const n = EOYF_PANEL.copiarGrafica(b.accion);
+  if (!n) { if (!nuevo) toast('Esta gráfica es única: el otro botón que la usa también cambia'); return; }
+  b.accion = n; ebCopia = n; publicar(true); dibujarBotonera();
+  if (!nuevo) toast('Este botón ahora tiene su propia copia de la gráfica');
+}
+function refrescarOpciones(sel) {
+  const cat = catalogo(), val = botonActual().accion;
+  if (cat[val] && !sel.querySelector('option[value="' + CSS.escape(val) + '"]')) {
+    const o = document.createElement('option'); o.value = val; o.textContent = cat[val].titulo + ' (copia de este botón)'; sel.appendChild(o);
+  }
+}
+$('#ebAccion').onchange = e => {
+  const b = botonActual(), antes = ebCopia; b.accion = e.target.value; ebCopia = null;
+  if (antes && antes !== b.accion && esEOYF()) EOYF_PANEL.borrarCopia(antes, botones());
+  separarSiCompartido(b, true); refrescarOpciones(e.target); e.target.value = b.accion;
+  pintarGrafica(b.accion); publicar(true); dibujarBotonera();
+};
 $('#ebTexto').oninput = e => { botonActual().texto = e.target.value.trim(); publicar(); dibujarBotonera(); };
 $('#ebColor').oninput = e => { botonActual().color = e.target.value; publicar(); dibujarBotonera(); };
 function pintarTeclas() {
